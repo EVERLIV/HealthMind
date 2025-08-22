@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useLocation } from "wouter";
 import MobileNav from "@/components/layout/mobile-nav";
 import BottomNav from "@/components/layout/bottom-nav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { User, Settings, Heart, Activity } from "lucide-react";
+import { User, Settings, Heart, Activity, Brain, Moon, Target, Coffee, Plus, Droplets } from "lucide-react";
 
 const profileSchema = z.object({
   age: z.number().min(1).max(120).optional(),
@@ -25,6 +26,7 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, navigate] = useLocation();
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["/api/health-profile"],
@@ -33,15 +35,18 @@ export default function Profile() {
   const { data: healthMetrics } = useQuery({
     queryKey: ["/api/health-metrics"],
   });
+  
+  const pd = profile?.profileData || {};
+  const hasProfile = profile?.profileData && Object.keys(profile.profileData).length > 0;
 
   const form = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      age: profile?.age || undefined,
-      weight: profile?.weight || "",
-      height: profile?.height || "",
-      medicalConditions: profile?.medicalConditions || [],
-      medications: profile?.medications || [],
+      age: pd.age || undefined,
+      weight: pd.weight || "",
+      height: pd.height || "",
+      medicalConditions: pd.medicalConditions || [],
+      medications: pd.medications || [],
     },
   });
 
@@ -90,7 +95,31 @@ export default function Profile() {
     );
   }
 
-  const completionPercentage = profile?.completionPercentage || 0;
+  const getActivityLabel = (level: string) => {
+    const labels: Record<string, string> = {
+      sedentary: 'Малоподвижный',
+      light: 'Легкая активность',
+      moderate: 'Умеренная активность',
+      active: 'Активный',
+      very_active: 'Очень активный'
+    };
+    return labels[level] || level;
+  };
+  
+  const healthGoalLabels: Record<string, string> = {
+    weight_loss: "Снижение веса",
+    muscle_gain: "Набор мышечной массы",
+    improve_fitness: "Улучшение физической формы",
+    reduce_stress: "Снижение стресса",
+    better_sleep: "Улучшение сна",
+    healthy_eating: "Здоровое питание",
+    quit_smoking: "Бросить курить",
+    manage_condition: "Контроль хронического заболевания",
+    increase_energy: "Повышение энергии",
+    mental_health: "Улучшение ментального здоровья",
+    preventive_care: "Профилактика заболеваний",
+    longevity: "Долголетие",
+  };
 
   return (
     <div className="min-h-screen bg-health-bg">
@@ -102,202 +131,192 @@ export default function Profile() {
           <p className="text-muted-foreground">Управление вашими данными и настройками</p>
         </div>
 
-        {/* Profile Completion */}
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex items-center justify-between">
+        {/* Profile Status */}
+        {!hasProfile ? (
+          <Card className="mb-6 bg-gradient-to-r from-medical-blue/10 to-trust-green/10">
+            <CardHeader>
               <CardTitle className="flex items-center">
                 <User className="w-5 h-5 mr-2 text-medical-blue" />
-                Заполненность профиля
+                Профиль здоровья не создан
               </CardTitle>
-              <div className="w-10 h-10 bg-trust-green rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-bold" data-testid="text-completion-percentage">
-                  {completionPercentage}%
-                </span>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="w-full bg-muted rounded-full h-2 mb-3">
-              <div 
-                className="bg-trust-green h-2 rounded-full transition-all duration-300"
-                style={{ width: `${completionPercentage}%` }}
-              ></div>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {completionPercentage < 100 ? 
-                "Заполните дополнительную информацию для персональных рекомендаций" :
-                "Профиль полностью заполнен!"
-              }
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Health Information */}
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center">
-                <Heart className="w-5 h-5 mr-2 text-medical-blue" />
-                Информация о здоровье
-              </CardTitle>
-              <Button
-                data-testid="button-edit-profile"
-                variant="outline"
-                size="sm"
-                onClick={() => setIsEditing(!isEditing)}
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Создайте профиль здоровья для получения персонализированных рекомендаций и отслеживания показателей
+              </p>
+              <Button 
+                onClick={() => navigate("/health-profile")}
+                className="w-full bg-gradient-to-r from-medical-blue to-trust-green hover:opacity-90 text-white rounded-full"
               >
-                <Settings className="w-4 h-4 mr-1" />
-                {isEditing ? "Отмена" : "Изменить"}
+                <Plus className="w-4 h-4 mr-2" />
+                Создать профиль здоровья
               </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {isEditing ? (
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="age"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Возраст</FormLabel>
-                        <FormControl>
-                          <Input 
-                            data-testid="input-age"
-                            type="number" 
-                            placeholder="Введите возраст"
-                            {...field}
-                            onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="weight"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Вес (кг)</FormLabel>
-                          <FormControl>
-                            <Input 
-                              data-testid="input-weight"
-                              type="number" 
-                              step="0.1"
-                              placeholder="Вес"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="height"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Рост (см)</FormLabel>
-                          <FormControl>
-                            <Input 
-                              data-testid="input-height"
-                              type="number"
-                              placeholder="Рост"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  
-                  <div className="flex space-x-3">
-                    <Button
-                      data-testid="button-save-profile"
-                      type="submit"
-                      className="flex-1"
-                      disabled={updateProfileMutation.isPending}
-                    >
-                      {updateProfileMutation.isPending ? "Сохранение..." : "Сохранить"}
-                    </Button>
-                    <Button
-                      data-testid="button-cancel-edit"
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsEditing(false)}
-                    >
-                      Отмена
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            ) : (
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="mb-6 bg-gradient-to-r from-trust-green/10 to-medical-blue/10">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center">
+                  <User className="w-5 h-5 mr-2 text-trust-green" />
+                  Профиль создан
+                </CardTitle>
+                <div className="w-10 h-10 bg-trust-green rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-bold" data-testid="text-completion-percentage">
+                    ✓
+                  </span>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-3">
+                Ваш профиль здоровья успешно создан и готов к использованию
+              </p>
+              <Button 
+                variant="outline"
+                onClick={() => navigate("/health-profile")}
+                className="w-full rounded-full"
+              >
+                Просмотреть полный профиль
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Health Information - Only show if profile exists */}
+        {hasProfile && (
+          <Card className="mb-6">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center">
+                  <Heart className="w-5 h-5 mr-2 text-medical-blue" />
+                  Основная информация
+                </CardTitle>
+                <Button
+                  data-testid="button-edit-profile"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate("/health-profile")}
+                  className="rounded-full"
+                >
+                  <Settings className="w-4 h-4 mr-1" />
+                  Редактировать
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <div className="text-sm text-muted-foreground">Возраст</div>
                     <div className="font-medium" data-testid="text-age">
-                      {profile?.age ? `${profile.age} лет` : "Не указан"}
+                      {pd.age ? `${pd.age} лет` : "Не указан"}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Пол</div>
+                    <div className="font-medium">
+                      {pd.gender === 'male' ? 'Мужской' : pd.gender === 'female' ? 'Женский' : "Не указан"}
                     </div>
                   </div>
                   <div>
                     <div className="text-sm text-muted-foreground">Вес</div>
                     <div className="font-medium" data-testid="text-weight">
-                      {profile?.weight ? `${profile.weight} кг` : "Не указан"}
+                      {pd.weight ? `${pd.weight} кг` : "Не указан"}
                     </div>
                   </div>
                   <div>
                     <div className="text-sm text-muted-foreground">Рост</div>
                     <div className="font-medium" data-testid="text-height">
-                      {profile?.height ? `${profile.height} см` : "Не указан"}
+                      {pd.height ? `${pd.height} см` : "Не указан"}
                     </div>
                   </div>
+                </div>
+                
+                {pd.activityLevel && (
                   <div>
-                    <div className="text-sm text-muted-foreground">ИМТ</div>
-                    <div className="font-medium" data-testid="text-bmi">
-                      {profile?.weight && profile?.height ? 
-                        (Number(profile.weight) / Math.pow(Number(profile.height) / 100, 2)).toFixed(1) :
-                        "—"
-                      }
+                    <div className="text-sm text-muted-foreground mb-2">Уровень активности</div>
+                    <span className="px-3 py-1 bg-orange-50 dark:bg-orange-900/20 rounded-full text-sm">
+                      {getActivityLabel(pd.activityLevel)}
+                    </span>
+                  </div>
+                )}
+                
+                {pd.healthGoals && pd.healthGoals.length > 0 && (
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-2">Цели здоровья</div>
+                    <div className="flex flex-wrap gap-2">
+                      {pd.healthGoals.slice(0, 3).map((goal: string) => (
+                        <span 
+                          key={goal}
+                          className="px-3 py-1 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-full text-xs font-medium"
+                        >
+                          {healthGoalLabels[goal] || goal}
+                        </span>
+                      ))}
+                      {pd.healthGoals.length > 3 && (
+                        <span className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-xs">
+                          +{pd.healthGoals.length - 3}
+                        </span>
+                      )}
                     </div>
                   </div>
-                </div>
+                )}
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Health Statistics */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Activity className="w-5 h-5 mr-2 text-medical-blue" />
-              Статистика здоровья
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-3 bg-accent/50 rounded-lg">
-                <div className="text-2xl font-bold text-medical-blue" data-testid="text-total-analyses">
-                  {healthMetrics?.length || 0}
+        {/* Quick Stats Cards */}
+        {hasProfile && (
+          <div className="grid grid-cols-2 gap-4">
+            {pd.stressLevel && (
+              <Card className="p-4">
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="p-2 bg-purple-500/10 rounded-full">
+                    <Brain className="w-4 h-4 text-purple-500" />
+                  </div>
+                  <span className="text-sm font-medium">Стресс</span>
                 </div>
-                <div className="text-xs text-muted-foreground">Записей показателей</div>
-              </div>
-              <div className="text-center p-3 bg-accent/50 rounded-lg">
-                <div className="text-2xl font-bold text-trust-green" data-testid="text-profile-score">
-                  {completionPercentage}
+                <div className="text-2xl font-bold">{pd.stressLevel}/10</div>
+              </Card>
+            )}
+            
+            {pd.sleepHours && (
+              <Card className="p-4">
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="p-2 bg-indigo-500/10 rounded-full">
+                    <Moon className="w-4 h-4 text-indigo-500" />
+                  </div>
+                  <span className="text-sm font-medium">Сон</span>
                 </div>
-                <div className="text-xs text-muted-foreground">Балл профиля</div>
+                <div className="text-2xl font-bold">{pd.sleepHours} ч</div>
+              </Card>
+            )}
+            
+            {pd.waterIntake && (
+              <Card className="p-4">
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="p-2 bg-blue-500/10 rounded-full">
+                    <Droplets className="w-4 h-4 text-blue-500" />
+                  </div>
+                  <span className="text-sm font-medium">Вода</span>
+                </div>
+                <div className="text-2xl font-bold">{pd.waterIntake} ст</div>
+              </Card>
+            )}
+            
+            <Card className="p-4">
+              <div className="flex items-center space-x-3 mb-2">
+                <div className="p-2 bg-green-500/10 rounded-full">
+                  <Activity className="w-4 h-4 text-green-500" />
+                </div>
+                <span className="text-sm font-medium">Анализы</span>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="text-2xl font-bold">{healthMetrics?.length || 0}</div>
+            </Card>
+          </div>
+        )}
       </main>
 
       <BottomNav />
