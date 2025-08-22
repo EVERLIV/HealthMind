@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Облачные сообщения</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        /* Базовые стили для облачных сообщений */
+        .cloud-message {
+            position: relative;
+            background: white;
+            border-radius: 18px;
+            padding: 12px 18px;
+            max-width: 300px;
+            min-width: 120px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            font-size: 15px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            animation: fadeInScale 0.3s ease-out;
+        }
+
+        /* Анимация появления */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Хвостик для сообщений */
+        .cloud-message::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border: 8px solid transparent;
+        }
+
+        /* Сообщения слева (входящие) */
+        .message-left {
+            align-self: flex-start;
+            background: #f1f3f5;
+            color: #333;
+        }
+
+        .message-left::after {
+            left: -6px;
+            top: 15px;
+            border-right-color: #f1f3f5;
+            border-left: 0;
+        }
+
+        /* Сообщения справа (исходящие) */
+        .message-right {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .message-right::after {
+            right: -6px;
+            top: 15px;
+            border-left-color: #764ba2;
+            border-right: 0;
+        }
+
+        /* Специальные варианты */
+        .message-success {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .message-success::after {
+            border-left-color: #00f2fe;
+        }
+
+        .message-warning {
+            background: linear-gradient(135deg, #fa709a, #fee140);
+        }
+
+        .message-warning::after {
+            border-left-color: #fee140;
+        }
+
+        .message-error {
+            background: linear-gradient(135deg, #ff6b6b, #ffa500);
+        }
+
+        .message-error::after {
+            border-left-color: #ffa500;
+        }
+
+        /* Компактные сообщения */
+        .message-compact {
+            padding: 8px 12px;
+            font-size: 13px;
+            border-radius: 14px;
+            max-width: 200px;
+        }
+
+        .message-compact::after {
+            border-width: 6px;
+            top: 12px;
+        }
+
+        .message-compact.message-left::after {
+            left: -5px;
+        }
+
+        .message-compact.message-right::after {
+            right: -5px;
+        }
+
+        /* Большие сообщения */
+        .message-large {
+            padding: 16px 24px;
+            font-size: 16px;
+            border-radius: 24px;
+            max-width: 400px;
+        }
+
+        .message-large::after {
+            border-width: 12px;
+            top: 20px;
+        }
+
+        .message-large.message-left::after {
+            left: -8px;
+        }
+
+        .message-large.message-right::after {
+            right: -8px;
+        }
+
+        /* Заголовок */
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 300;
+        }
+
+        /* Подписи */
+        .label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cloud-message {
+                max-width: 280px;
+            }
+            
+            .message-large {
+                max-width: 320px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Идеальные облачные сообщения</h1>
+    
+    <div class="message-container">
+        <div class="label">Стандартные размеры:</div>
+        <div class="cloud-message message-left">Головная боль</div>
+        <div class="cloud-message message-right">Витамины зимой</div>
+        <div class="cloud-message message-left">Качество сна</div>
+        <div class="cloud-message message-right">Результаты анализов</div>
+        
+        <div class="label" style="margin-top: 20px;">Компактные сообщения:</div>
+        <div class="cloud-message message-compact message-left">Да</div>
+        <div class="cloud-message message-compact message-right">Нет</div>
+        <div class="cloud-message message-compact message-left">OK</div>
+        
+        <div class="label" style="margin-top: 20px;">Большие сообщения:</div>
+        <div class="cloud-message message-large message-left">Это более длинное сообщение с подробной информацией</div>
+        <div class="cloud-message message-large message-right">Подробный ответ с развернутым объяснением темы</div>
+        
+        <div class="label" style="margin-top: 20px;">Цветные варианты:</div>
+        <div class="cloud-message message-right message-success">Успешно выполнено</div>
+        <div class="cloud-message message-right message-warning">Внимание!</div>
+        <div class="cloud-message message-right message-error">Ошибка</div>
+    </div>
+</body>
+</html>

@@ -67,9 +67,9 @@ export default function AIChatModal({ open, onOpenChange }: AIChatModalProps) {
   });
 
   useEffect(() => {
-    if (open && sessions && sessions.length > 0) {
+    if (open && sessions && Array.isArray(sessions) && sessions.length > 0) {
       setCurrentSessionId(sessions[0].id);
-    } else if (open && sessions && sessions.length === 0) {
+    } else if (open && sessions && Array.isArray(sessions) && sessions.length === 0) {
       createSessionMutation.mutate();
     }
   }, [open, sessions]);
@@ -83,11 +83,12 @@ export default function AIChatModal({ open, onOpenChange }: AIChatModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md mx-auto h-[90vh] p-0 gap-0">
+      <DialogContent className="max-w-md mx-auto h-[90vh] p-0 gap-0 overflow-hidden">
         <DialogTitle className="sr-only">ИИ Доктор</DialogTitle>
         <DialogDescription className="sr-only">Консультация с искусственным интеллектом</DialogDescription>
+        
         {/* Header */}
-        <div className="bg-medical-blue text-white p-4 flex items-center justify-between rounded-t-lg">
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
               <MessageCircle className="w-5 h-5" />
@@ -108,66 +109,96 @@ export default function AIChatModal({ open, onOpenChange }: AIChatModalProps) {
           </Button>
         </div>
 
-        {/* Messages */}
-        <ScrollArea className="flex-1 p-4 max-h-96">
-          <div className="space-y-4">
-            {!messages || messages.length === 0 ? (
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-medical-blue rounded-full flex items-center justify-center flex-shrink-0">
-                  <MessageCircle className="w-4 h-4 text-white" />
-                </div>
-                <div className="bg-accent rounded-2xl rounded-tl-sm p-3 flex-1">
-                  <p className="text-sm">
-                    Здравствуйте! Я ваш ИИ-доктор. Как вы себя чувствуете сегодня? 
-                    Могу помочь с интерпретацией анализов или ответить на вопросы о здоровье.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              messages.map((msg: any) => (
-                <div
-                  key={msg.id}
-                  className={`flex items-start space-x-3 ${
-                    msg.role === "user" ? "justify-end" : ""
-                  }`}
-                >
-                  {msg.role === "assistant" && (
-                    <div className="w-8 h-8 bg-medical-blue rounded-full flex items-center justify-center flex-shrink-0">
-                      <MessageCircle className="w-4 h-4 text-white" />
-                    </div>
-                  )}
-                  <div
-                    className={`rounded-2xl p-3 max-w-xs ${
-                      msg.role === "user"
-                        ? "bg-medical-blue text-white rounded-tr-sm"
-                        : "bg-accent rounded-tl-sm"
-                    }`}
-                    data-testid={`message-${msg.role}`}
+        {/* Messages Area with Cloud Background */}
+        <div 
+          className="flex-1 relative"
+          style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            minHeight: '400px'
+          }}
+        >
+          <ScrollArea className="h-full p-4">
+            <div className="flex flex-col gap-4">
+              {!messages || !Array.isArray(messages) || messages.length === 0 ? (
+                <div className="flex justify-start">
+                  <div 
+                    className="cloud-message message-left relative bg-gray-100 text-gray-800 rounded-2xl px-4 py-3 max-w-xs shadow-lg animate-fadeInScale"
+                    style={{
+                      fontSize: '15px',
+                      lineHeight: '1.4',
+                      wordWrap: 'break-word'
+                    }}
                   >
-                    <p className="text-sm whitespace-pre-line">{msg.content}</p>
+                    <div className="absolute -left-2 top-4 w-0 h-0 border-l-0 border-r-8 border-t-8 border-b-8 border-transparent border-r-gray-100"></div>
+                    <p>
+                      Здравствуйте! Я ваш ИИ-доктор. Как вы себя чувствуете сегодня? 
+                      Могу помочь с интерпретацией анализов или ответить на вопросы о здоровье.
+                    </p>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
-        </ScrollArea>
+              ) : (
+                (messages as any[]).map((msg: any, index: number) => (
+                  <div
+                    key={msg.id}
+                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`cloud-message relative rounded-2xl px-4 py-3 max-w-xs shadow-lg animate-fadeInScale ${
+                        msg.role === "user"
+                          ? "text-white"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                      style={{
+                        fontSize: '15px',
+                        lineHeight: '1.4',
+                        wordWrap: 'break-word',
+                        background: msg.role === "user" 
+                          ? 'linear-gradient(135deg, #667eea, #764ba2)' 
+                          : '#f1f3f5',
+                        animationDelay: `${index * 0.1}s`
+                      }}
+                      data-testid={`message-${msg.role}`}
+                    >
+                      {/* Cloud tail */}
+                      <div 
+                        className={`absolute top-4 w-0 h-0 border-8 border-transparent ${
+                          msg.role === "user"
+                            ? "-right-2 border-l-8 border-r-0"
+                            : "-left-2 border-r-8 border-l-0"
+                        }`}
+                        style={{
+                          borderLeftColor: msg.role === "user" ? '#764ba2' : '#f1f3f5',
+                          borderRightColor: msg.role === "user" ? 'transparent' : '#f1f3f5'
+                        }}
+                      ></div>
+                      <p className="whitespace-pre-line">{msg.content}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </div>
 
-        {/* Input */}
-        <div className="p-4 border-t border-border">
+        {/* Input Area */}
+        <div className="p-4 bg-white border-t border-gray-200">
           <form onSubmit={handleSendMessage} className="flex space-x-3">
             <Input
               data-testid="input-chat-message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Напишите ваш вопрос..."
-              className="flex-1"
+              className="flex-1 rounded-2xl border-gray-300 focus:border-blue-500 focus:ring-blue-500"
               disabled={sendMessageMutation.isPending}
             />
             <Button
               data-testid="button-send-message"
               type="submit"
               disabled={!message.trim() || sendMessageMutation.isPending}
-              className="bg-medical-blue hover:bg-medical-blue/90 text-white"
+              className="rounded-2xl px-6 text-white shadow-lg transition-all duration-200 hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #667eea, #764ba2)'
+              }}
             >
               <Send className="w-4 h-4" />
             </Button>

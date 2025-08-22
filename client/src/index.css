@@ -466,6 +466,23 @@
   }
 }
 
+/* Cloud Messages Animation */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeInScale {
+  animation: fadeInScale 0.3s ease-out forwards;
+  animation-fill-mode: both;
+}
+
 /* EVA Mobile Optimizations */
 @media (max-width: 640px) {
   .eva-mobile-spacing {
