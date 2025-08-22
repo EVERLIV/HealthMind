@@ -28,7 +28,7 @@ export const bloodAnalyses = pgTable("blood_analyses", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id).notNull(),
   imageUrl: text("image_url"),
-  results: json("results").$type<any>(),
+  results: json("results"),
   status: text("status").notNull().default("pending"), // pending, analyzed, error
   analyzedAt: timestamp("analyzed_at"),
   createdAt: timestamp("created_at").defaultNow(),

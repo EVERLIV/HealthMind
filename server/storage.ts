@@ -83,8 +83,8 @@ export class MemStorage implements IStorage {
       age: 28,
       weight: "65.5",
       height: "168.0",
-      medicalConditions: [],
-      medications: [],
+      medicalConditions: null,
+      medications: null,
       completionPercentage: 85,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -100,7 +100,7 @@ export class MemStorage implements IStorage {
         normalRange: { min: 120, max: 150, unit: "г/л" },
         category: "blood",
         importance: "high",
-        recommendations: ["Увеличить потребление железа", "Проконсультироваться с врачом при отклонениях"],
+        recommendations: ["Увеличить потребление железа", "Проконсультироваться с врачом при отклонениях"] as string[],
       },
       {
         id: "bio-2",
@@ -109,7 +109,7 @@ export class MemStorage implements IStorage {
         normalRange: { min: 0, max: 5.2, unit: "ммоль/л" },
         category: "cardiovascular",
         importance: "high",
-        recommendations: ["Ограничить насыщенные жиры", "Увеличить физическую активность"],
+        recommendations: ["Ограничить насыщенные жиры", "Увеличить физическую активность"] as string[],
       },
       {
         id: "bio-3",
@@ -118,7 +118,7 @@ export class MemStorage implements IStorage {
         normalRange: { min: 3.9, max: 6.1, unit: "ммоль/л" },
         category: "metabolic",
         importance: "high",
-        recommendations: ["Контролировать потребление углеводов", "Регулярные физические нагрузки"],
+        recommendations: ["Контролировать потребление углеводов", "Регулярные физические нагрузки"] as string[],
       },
       {
         id: "bio-4",
@@ -127,7 +127,7 @@ export class MemStorage implements IStorage {
         normalRange: { min: 44, max: 97, unit: "мкмоль/л" },
         category: "kidney",
         importance: "medium",
-        recommendations: ["Поддерживать адекватную гидратацию", "Избегать чрезмерных физических нагрузок"],
+        recommendations: ["Поддерживать адекватную гидратацию", "Избегать чрезмерных физических нагрузок"] as string[],
       },
     ];
 
@@ -209,8 +209,8 @@ export class MemStorage implements IStorage {
       age: insertProfile.age ?? null,
       weight: insertProfile.weight ?? null,
       height: insertProfile.height ?? null,
-      medicalConditions: insertProfile.medicalConditions ?? null,
-      medications: insertProfile.medications ?? null,
+      medicalConditions: Array.isArray(insertProfile.medicalConditions) ? insertProfile.medicalConditions : null,
+      medications: Array.isArray(insertProfile.medications) ? insertProfile.medications : null,
       completionPercentage: insertProfile.completionPercentage ?? null,
     };
     this.healthProfiles.set(id, profile);
@@ -227,8 +227,8 @@ export class MemStorage implements IStorage {
       age: updates.age !== undefined ? updates.age : existing.age,
       weight: updates.weight !== undefined ? updates.weight : existing.weight,
       height: updates.height !== undefined ? updates.height : existing.height,
-      medicalConditions: updates.medicalConditions !== undefined ? updates.medicalConditions : existing.medicalConditions,
-      medications: updates.medications !== undefined ? updates.medications : existing.medications,
+      medicalConditions: updates.medicalConditions !== undefined ? (Array.isArray(updates.medicalConditions) ? updates.medicalConditions : null) : existing.medicalConditions,
+      medications: updates.medications !== undefined ? (Array.isArray(updates.medications) ? updates.medications : null) : existing.medications,
       completionPercentage: updates.completionPercentage !== undefined ? updates.completionPercentage : existing.completionPercentage,
       updatedAt: new Date() 
     };
@@ -288,7 +288,7 @@ export class MemStorage implements IStorage {
       category: insertBiomarker.category,
       importance: insertBiomarker.importance,
       normalRange: insertBiomarker.normalRange ?? null,
-      recommendations: insertBiomarker.recommendations ?? null,
+      recommendations: Array.isArray(insertBiomarker.recommendations) ? insertBiomarker.recommendations : null,
     };
     this.biomarkers.set(id, biomarker);
     return biomarker;
@@ -322,10 +322,11 @@ export class MemStorage implements IStorage {
   async createChatSession(insertSession: InsertChatSession): Promise<ChatSession> {
     const id = randomUUID();
     const session: ChatSession = { 
-      ...insertSession, 
       id, 
       createdAt: new Date(), 
-      updatedAt: new Date() 
+      updatedAt: new Date(),
+      userId: insertSession.userId,
+      title: insertSession.title ?? null,
     };
     this.chatSessions.set(id, session);
     return session;
@@ -335,7 +336,7 @@ export class MemStorage implements IStorage {
   async getChatMessages(sessionId: string): Promise<ChatMessage[]> {
     return Array.from(this.chatMessages.values())
       .filter(message => message.sessionId === sessionId)
-      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+      .sort((a, b) => (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0));
   }
 
   async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
@@ -353,22 +354,27 @@ export class MemStorage implements IStorage {
   async getLatestHealthMetrics(userId: string): Promise<HealthMetrics | undefined> {
     const userMetrics = Array.from(this.healthMetrics.values())
       .filter(metrics => metrics.userId === userId)
-      .sort((a, b) => b.recordedAt.getTime() - a.recordedAt.getTime());
+      .sort((a, b) => (b.recordedAt?.getTime() ?? 0) - (a.recordedAt?.getTime() ?? 0));
     return userMetrics[0];
   }
 
   async getHealthMetrics(userId: string): Promise<HealthMetrics[]> {
     return Array.from(this.healthMetrics.values())
       .filter(metrics => metrics.userId === userId)
-      .sort((a, b) => b.recordedAt.getTime() - a.recordedAt.getTime());
+      .sort((a, b) => (b.recordedAt?.getTime() ?? 0) - (a.recordedAt?.getTime() ?? 0));
   }
 
   async createHealthMetrics(insertMetrics: InsertHealthMetrics): Promise<HealthMetrics> {
     const id = randomUUID();
     const metrics: HealthMetrics = { 
-      ...insertMetrics, 
       id, 
-      createdAt: new Date() 
+      createdAt: new Date(),
+      userId: insertMetrics.userId,
+      heartRate: insertMetrics.heartRate ?? null,
+      bloodPressureSystolic: insertMetrics.bloodPressureSystolic ?? null,
+      bloodPressureDiastolic: insertMetrics.bloodPressureDiastolic ?? null,
+      temperature: insertMetrics.temperature ?? null,
+      recordedAt: insertMetrics.recordedAt ?? null,
     };
     this.healthMetrics.set(id, metrics);
     return metrics;

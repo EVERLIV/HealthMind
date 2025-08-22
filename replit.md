@@ -2,7 +2,7 @@
 
 ## Overview
 
-HealthAI is a modern web application that provides AI-powered analysis of blood test results and health metrics. The platform features a mobile-first design with comprehensive health tracking capabilities, including blood analysis interpretation, biomarker monitoring, health profile management, and AI-powered health consultations. Built with React and Express, it offers a seamless user experience for managing personal health data and receiving intelligent insights.
+HealthAI is a modern web application that provides AI-powered analysis of blood test results and health metrics. The platform features a mobile-first design with comprehensive health tracking capabilities, including blood analysis interpretation with **DeepSeek AI integration**, biomarker monitoring, health profile management, and AI-powered health consultations. Built with React and Express, it offers a seamless user experience for managing personal health data and receiving intelligent insights powered by advanced AI models.
 
 ## User Preferences
 
@@ -41,9 +41,21 @@ Preferred communication style: Simple, everyday language.
 
 ### External Service Integrations
 - **Cloud Storage**: Google Cloud Storage with Replit sidecar authentication for seamless file management
-- **AI Services**: Framework ready for AI integration for blood analysis interpretation and health consultations
+- **AI Services**: 
+  - **DeepSeek AI Integration**: Advanced biomarker recognition and medical analysis with OCR capabilities
+  - Framework ready for additional AI services for health consultations and recommendations
 - **File Processing**: Uppy dashboard for advanced file upload handling with progress tracking and validation
 - **Development Tools**: Replit-specific integrations for development environment optimization
+
+### DeepSeek AI Integration
+- **Advanced OCR**: Recognizes various laboratory formats (Invitro, Hemotest, CMD, KDL, local labs)
+- **Handwritten Text Processing**: Handles doctor's handwritten notes and annotations
+- **Comprehensive Biomarker Analysis**: 
+  - Hemoglobin, cholesterol, glucose, creatinine analysis
+  - Detailed health recommendations and educational content
+  - Risk factor assessment and follow-up suggestions
+- **Dual Input Methods**: Support for both photo upload and manual text input
+- **Educational Content**: Provides detailed explanations for each biomarker and health insights
 
 ### Key Design Patterns
 - **Repository Pattern**: IStorage interface with multiple implementations for flexible data access
