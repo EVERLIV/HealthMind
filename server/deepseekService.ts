@@ -75,7 +75,16 @@ ${text}
 3. Взаимосвязи между показателями
 4. Образовательную ценность для пациента
 
-Верните результат в формате JSON согласно интерфейсу EnhancedBloodAnalysisResults.`;
+Верните результат ТОЛЬКО в формате JSON (без дополнительного текста) со следующей структурой:
+{
+  "markers": [{"name": "название", "value": "значение", "normalRange": "норма", "status": "normal/high/low", "recommendation": "рекомендация", "education": "информация", "lifestyle": "советы"}],
+  "supplements": [{"name": "название", "reason": "причина", "dosage": "дозировка", "duration": "длительность"}],
+  "generalRecommendation": "общие рекомендации",
+  "riskFactors": ["фактор1", "фактор2"],
+  "followUpTests": ["тест1", "тест2"],
+  "urgencyLevel": "low/medium/high",
+  "nextCheckup": "когда повторить"
+}`;
 
     return this.callDeepSeekAPI(prompt);
   }
@@ -90,7 +99,16 @@ ${text}
 4. Извлеките информацию о лаборатории и дате анализа
 5. Найдите референтные значения, если они указаны
 
-Верните результат в формате JSON согласно интерфейсу EnhancedBloodAnalysisResults.`;
+Верните результат ТОЛЬКО в формате JSON (без дополнительного текста) со следующей структурой:
+{
+  "markers": [{"name": "название", "value": "значение", "normalRange": "норма", "status": "normal/high/low", "recommendation": "рекомендация", "education": "информация", "lifestyle": "советы"}],
+  "supplements": [{"name": "название", "reason": "причина", "dosage": "дозировка", "duration": "длительность"}],
+  "generalRecommendation": "общие рекомендации",
+  "riskFactors": ["фактор1", "фактор2"],
+  "followUpTests": ["тест1", "тест2"],
+  "urgencyLevel": "low/medium/high",
+  "nextCheckup": "когда повторить"
+}`;
 
     return this.callDeepSeekAPI(prompt, imageBase64);
   }
@@ -129,8 +147,7 @@ ${text}
           model: "deepseek-chat",
           messages: messages,
           temperature: 0.2,
-          max_tokens: 4000,
-          response_format: { type: "json_object" }
+          max_tokens: 4000
         }),
       });
 

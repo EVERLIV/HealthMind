@@ -172,6 +172,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         results: analysisResults,
       });
 
+      // Create biomarker results from DeepSeek analysis
+      if (analysisResults.markers && analysisResults.markers.length > 0) {
+        for (const marker of analysisResults.markers) {
+          // Find existing biomarker or create a new one
+          const existingBiomarkers = await storage.getAllBiomarkers();
+          let biomarker = existingBiomarkers.find(b => 
+            b.name.toLowerCase() === marker.name.toLowerCase()
+          );
+          
+          if (!biomarker) {
+            // Create new biomarker if it doesn't exist
+            const newBiomarker = {
+              name: marker.name,
+              description: marker.education || "Biomarker information",
+              normalRange: {
+                min: 0,
+                max: 0,
+                unit: "" 
+              },
+              category: "general" as const,
+              importance: "medium" as const,
+              recommendations: marker.recommendation ? [marker.recommendation] : [],
+            };
+            biomarker = await storage.createBiomarker(newBiomarker);
+          }
+
+          // Create biomarker result
+          const numericValue = parseFloat(marker.value.replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
+          await storage.createBiomarkerResult({
+            analysisId: req.params.id,
+            biomarkerId: biomarker.id,
+            value: numericValue.toString(),
+            unit: marker.value.match(/[а-яА-Яa-zA-Z/]+/)?.[0] || "",
+            status: marker.status,
+          });
+        }
+      }
+
       res.json({ analysis: updatedAnalysis, results: analysisResults });
     } catch (error) {
       console.error("Error analyzing text with DeepSeek:", error);
@@ -200,6 +238,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         analyzedAt: new Date(),
         results: analysisResults,
       });
+
+      // Create biomarker results from DeepSeek analysis
+      if (analysisResults.markers && analysisResults.markers.length > 0) {
+        for (const marker of analysisResults.markers) {
+          // Find existing biomarker or create a new one
+          const existingBiomarkers = await storage.getAllBiomarkers();
+          let biomarker = existingBiomarkers.find(b => 
+            b.name.toLowerCase() === marker.name.toLowerCase()
+          );
+          
+          if (!biomarker) {
+            // Create new biomarker if it doesn't exist
+            const newBiomarker = {
+              name: marker.name,
+              description: marker.education || "Biomarker information",
+              normalRange: {
+                min: 0,
+                max: 0,
+                unit: "" 
+              },
+              category: "general" as const,
+              importance: "medium" as const,
+              recommendations: marker.recommendation ? [marker.recommendation] : [],
+            };
+            biomarker = await storage.createBiomarker(newBiomarker);
+          }
+
+          // Create biomarker result
+          const numericValue = parseFloat(marker.value.replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
+          await storage.createBiomarkerResult({
+            analysisId: req.params.id,
+            biomarkerId: biomarker.id,
+            value: numericValue.toString(),
+            unit: marker.value.match(/[а-яА-Яa-zA-Z/]+/)?.[0] || "",
+            status: marker.status,
+          });
+        }
+      }
 
       res.json({ analysis: updatedAnalysis, results: analysisResults });
     } catch (error) {

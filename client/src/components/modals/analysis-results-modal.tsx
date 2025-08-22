@@ -22,6 +22,9 @@ export default function AnalysisResultsModal({ open, onOpenChange, analysis }: A
     return null;
   }
 
+  // Check if we have DeepSeek analysis results
+  const hasDeepSeekResults = analysis.results && analysis.results.markers && analysis.results.markers.length > 0;
+
   const formatDate = (date: Date | string) => {
     const d = typeof date === 'string' ? new Date(date) : date;
     return d.toLocaleDateString('ru-RU');
@@ -120,9 +123,85 @@ export default function AnalysisResultsModal({ open, onOpenChange, analysis }: A
               </div>
             </div>
 
-            {/* Biomarker Results */}
-            <div className="space-y-4">
-              {biomarkerResults?.map((result: any) => (
+            {/* DeepSeek AI Results */}
+            {hasDeepSeekResults && (
+              <div className="space-y-4 mb-6">
+                <h4 className="font-semibold text-card-foreground flex items-center">
+                  <TrendingUp className="w-5 h-5 text-medical-blue mr-2" />
+                  Результаты анализа DeepSeek AI
+                </h4>
+                {analysis.results.markers.map((marker: any, index: number) => (
+                  <div 
+                    key={index} 
+                    className={`border rounded-xl p-4 ${getBorderColor(marker.status)}`}
+                    data-testid={`ai-marker-${marker.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h5 className="font-semibold text-card-foreground">{marker.name}</h5>
+                      <Badge className={getStatusColor(marker.status)} data-testid={`ai-badge-${marker.status}`}>
+                        {getStatusIcon(marker.status)}
+                        <span className="ml-1">{getStatusText(marker.status)}</span>
+                      </Badge>
+                    </div>
+                    
+                    <div className={`text-2xl font-bold mb-1 ${
+                      marker.status === "normal" ? "text-card-foreground" : 
+                      marker.status === "critical" ? "text-error-red" : "text-warning-amber"
+                    }`}>
+                      {marker.value}
+                    </div>
+                    
+                    {marker.normalRange && (
+                      <p className="text-xs text-muted-foreground mb-2">
+                        Норма: {marker.normalRange}
+                      </p>
+                    )}
+                    
+                    {marker.education && (
+                      <p className="text-sm text-card-foreground mb-2">
+                        {marker.education}
+                      </p>
+                    )}
+                    
+                    {marker.recommendation && (
+                      <div className="bg-muted/50 rounded-lg p-2 mt-2">
+                        <p className="text-xs text-muted-foreground font-medium mb-1">Рекомендация:</p>
+                        <p className="text-sm text-card-foreground">{marker.recommendation}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                
+                {/* Supplements */}
+                {analysis.results.supplements && analysis.results.supplements.length > 0 && (
+                  <div className="bg-trust-green/5 rounded-xl p-4 mt-4">
+                    <h5 className="font-semibold text-card-foreground mb-3">Рекомендуемые добавки</h5>
+                    <ul className="space-y-2">
+                      {analysis.results.supplements.map((supplement: any, index: number) => (
+                        <li key={index} className="text-sm text-card-foreground">
+                          <span className="font-medium">{supplement.name}</span>
+                          {supplement.dosage && <span className="text-muted-foreground"> - {supplement.dosage}</span>}
+                          {supplement.reason && <p className="text-xs text-muted-foreground mt-1">{supplement.reason}</p>}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* General Recommendation */}
+                {analysis.results.generalRecommendation && (
+                  <div className="bg-medical-blue/5 rounded-xl p-4">
+                    <p className="text-sm text-card-foreground">{analysis.results.generalRecommendation}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Traditional Biomarker Results */}
+            {biomarkerResults && biomarkerResults.length > 0 && (
+              <div className="space-y-4">
+                <h4 className="font-semibold text-card-foreground">Сохраненные биомаркеры</h4>
+                {biomarkerResults.map((result: any) => (
                 <div 
                   key={result.id} 
                   className={`border rounded-xl p-4 ${getBorderColor(result.status)}`}
@@ -154,7 +233,8 @@ export default function AnalysisResultsModal({ open, onOpenChange, analysis }: A
                   </p>
                 </div>
               ))}
-            </div>
+              </div>
+            )}
 
             {/* Recommendations */}
             {hasAbnormalResults && (
