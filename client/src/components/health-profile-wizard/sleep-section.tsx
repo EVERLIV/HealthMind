@@ -1,5 +1,4 @@
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Card } from "@/components/ui/card";
@@ -78,40 +77,48 @@ export default function SleepSection({ data, onUpdate }: SleepSectionProps) {
           <Moon className="w-4 h-4" />
           <span>Качество сна</span>
         </Label>
-        <RadioGroup
-          value={data.sleepQuality || ""}
-          onValueChange={(value) => onUpdate({ sleepQuality: value as HealthProfileData["sleepQuality"] })}
-        >
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="p-3 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="poor" id="poor" />
-                <Label htmlFor="poor" className="cursor-pointer">Плохое</Label>
-              </div>
-            </Card>
-            
-            <Card className="p-3 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="fair" id="fair" />
-                <Label htmlFor="fair" className="cursor-pointer">Удовлетворительное</Label>
-              </div>
-            </Card>
-            
-            <Card className="p-3 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="good" id="good" />
-                <Label htmlFor="good" className="cursor-pointer">Хорошее</Label>
-              </div>
-            </Card>
-            
-            <Card className="p-3 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="excellent" id="excellent" />
-                <Label htmlFor="excellent" className="cursor-pointer">Отличное</Label>
-              </div>
-            </Card>
-          </div>
-        </RadioGroup>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => onUpdate({ sleepQuality: "poor" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.sleepQuality === "poor"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Плохое
+          </button>
+          <button
+            onClick={() => onUpdate({ sleepQuality: "fair" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.sleepQuality === "fair"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Удовлетворительное
+          </button>
+          <button
+            onClick={() => onUpdate({ sleepQuality: "good" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.sleepQuality === "good"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Хорошее
+          </button>
+          <button
+            onClick={() => onUpdate({ sleepQuality: "excellent" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.sleepQuality === "excellent"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Отличное
+          </button>
+        </div>
       </div>
       
       {/* Sleep Problems */}
@@ -122,18 +129,17 @@ export default function SleepSection({ data, onUpdate }: SleepSectionProps) {
         </Label>
         <div className="grid grid-cols-2 gap-3">
           {sleepProblems.map((problem) => (
-            <Card key={problem.value} className="p-3 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id={problem.value}
-                  checked={data.sleepProblems?.includes(problem.value) || false}
-                  onCheckedChange={(checked) => handleProblemToggle(problem.value, checked as boolean)}
-                />
-                <Label htmlFor={problem.value} className="cursor-pointer font-normal">
-                  {problem.label}
-                </Label>
-              </div>
-            </Card>
+            <button
+              key={problem.value}
+              onClick={() => handleProblemToggle(problem.value, !data.sleepProblems?.includes(problem.value))}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                data.sleepProblems?.includes(problem.value)
+                  ? "bg-medical-blue text-white shadow-md"
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+              }`}
+            >
+              {problem.label}
+            </button>
           ))}
         </div>
       </div>

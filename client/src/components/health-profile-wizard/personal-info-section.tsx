@@ -1,6 +1,5 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card } from "@/components/ui/card";
 import { Calculator } from "lucide-react";
 import type { HealthProfileData } from "./index";
@@ -70,23 +69,38 @@ export default function PersonalInfoSection({ data, onUpdate }: PersonalInfoSect
       {/* Gender */}
       <div className="space-y-2">
         <Label>Пол</Label>
-        <RadioGroup
-          value={data.gender || ""}
-          onValueChange={(value) => onUpdate({ gender: value as HealthProfileData["gender"] })}
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="male" id="male" />
-            <Label htmlFor="male" className="font-normal">Мужской</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="female" id="female" />
-            <Label htmlFor="female" className="font-normal">Женский</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="other" id="other" />
-            <Label htmlFor="other" className="font-normal">Другой</Label>
-          </div>
-        </RadioGroup>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => onUpdate({ gender: "male" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.gender === "male"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Мужской
+          </button>
+          <button
+            onClick={() => onUpdate({ gender: "female" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.gender === "female"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Женский
+          </button>
+          <button
+            onClick={() => onUpdate({ gender: "other" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.gender === "other"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Другой
+          </button>
+        </div>
       </div>
       
       {/* Height and Weight */}

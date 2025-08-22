@@ -1,6 +1,5 @@
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card } from "@/components/ui/card";
 import { Brain, Heart, TrendingUp } from "lucide-react";
 import type { HealthProfileData } from "./index";
@@ -94,66 +93,48 @@ export default function MentalHealthSection({ data, onUpdate }: MentalHealthSect
           <TrendingUp className="w-4 h-4" />
           <span>Изменения настроения</span>
         </Label>
-        <RadioGroup
-          value={data.moodChanges || ""}
-          onValueChange={(value) => onUpdate({ moodChanges: value as HealthProfileData["moodChanges"] })}
-        >
-          <Card className="p-4 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-            <div className="flex items-start space-x-3">
-              <RadioGroupItem value="stable" id="stable" className="mt-1" />
-              <div className="flex-1">
-                <Label htmlFor="stable" className="font-medium cursor-pointer">
-                  Стабильное
-                </Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Настроение обычно ровное и предсказуемое
-                </p>
-              </div>
-            </div>
-          </Card>
-          
-          <Card className="p-4 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-            <div className="flex items-start space-x-3">
-              <RadioGroupItem value="mild" id="mild" className="mt-1" />
-              <div className="flex-1">
-                <Label htmlFor="mild" className="font-medium cursor-pointer">
-                  Легкие колебания
-                </Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Небольшие изменения настроения в течение дня
-                </p>
-              </div>
-            </div>
-          </Card>
-          
-          <Card className="p-4 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-            <div className="flex items-start space-x-3">
-              <RadioGroupItem value="moderate" id="moderate" className="mt-1" />
-              <div className="flex-1">
-                <Label htmlFor="moderate" className="font-medium cursor-pointer">
-                  Умеренные колебания
-                </Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Заметные изменения настроения, влияющие на активность
-                </p>
-              </div>
-            </div>
-          </Card>
-          
-          <Card className="p-4 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-            <div className="flex items-start space-x-3">
-              <RadioGroupItem value="severe" id="severe" className="mt-1" />
-              <div className="flex-1">
-                <Label htmlFor="severe" className="font-medium cursor-pointer">
-                  Сильные колебания
-                </Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Резкие изменения настроения, мешающие повседневной жизни
-                </p>
-              </div>
-            </div>
-          </Card>
-        </RadioGroup>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => onUpdate({ moodChanges: "stable" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.moodChanges === "stable"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Стабильное
+          </button>
+          <button
+            onClick={() => onUpdate({ moodChanges: "mild" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.moodChanges === "mild"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Легкие колебания
+          </button>
+          <button
+            onClick={() => onUpdate({ moodChanges: "moderate" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.moodChanges === "moderate"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Умеренные
+          </button>
+          <button
+            onClick={() => onUpdate({ moodChanges: "severe" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.moodChanges === "severe"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Сильные колебания
+          </button>
+        </div>
       </div>
       
       {/* Helpful Tips */}

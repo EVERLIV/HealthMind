@@ -1,6 +1,4 @@
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Card } from "@/components/ui/card";
 import { Activity, Dumbbell, TrendingUp } from "lucide-react";
 import type { HealthProfileData } from "./index";
 
@@ -25,80 +23,58 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
           <Activity className="w-4 h-4" />
           <span>Уровень активности</span>
         </Label>
-        <RadioGroup
-          value={data.activityLevel || ""}
-          onValueChange={(value) => onUpdate({ activityLevel: value as HealthProfileData["activityLevel"] })}
-        >
-          <Card className="p-4 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-            <div className="flex items-start space-x-3">
-              <RadioGroupItem value="sedentary" id="sedentary" className="mt-1" />
-              <div className="flex-1">
-                <Label htmlFor="sedentary" className="font-medium cursor-pointer">
-                  Сидячий образ жизни
-                </Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Минимальная активность
-                </p>
-              </div>
-            </div>
-          </Card>
-          
-          <Card className="p-4 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-            <div className="flex items-start space-x-3">
-              <RadioGroupItem value="light" id="light" className="mt-1" />
-              <div className="flex-1">
-                <Label htmlFor="light" className="font-medium cursor-pointer">
-                  Легкая активность
-                </Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Легкие упражнения 1-3 раза в неделю
-                </p>
-              </div>
-            </div>
-          </Card>
-          
-          <Card className="p-4 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-            <div className="flex items-start space-x-3">
-              <RadioGroupItem value="moderate" id="moderate" className="mt-1" />
-              <div className="flex-1">
-                <Label htmlFor="moderate" className="font-medium cursor-pointer">
-                  Умеренная активность
-                </Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Умеренные упражнения 3-5 раз в неделю
-                </p>
-              </div>
-            </div>
-          </Card>
-          
-          <Card className="p-4 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-            <div className="flex items-start space-x-3">
-              <RadioGroupItem value="active" id="active" className="mt-1" />
-              <div className="flex-1">
-                <Label htmlFor="active" className="font-medium cursor-pointer">
-                  Активный образ жизни
-                </Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Интенсивные упражнения 6-7 раз в неделю
-                </p>
-              </div>
-            </div>
-          </Card>
-          
-          <Card className="p-4 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-            <div className="flex items-start space-x-3">
-              <RadioGroupItem value="very_active" id="very_active" className="mt-1" />
-              <div className="flex-1">
-                <Label htmlFor="very_active" className="font-medium cursor-pointer">
-                  Очень активный
-                </Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Профессиональный спорт или физический труд
-                </p>
-              </div>
-            </div>
-          </Card>
-        </RadioGroup>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => onUpdate({ activityLevel: "sedentary" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.activityLevel === "sedentary"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Сидячий
+          </button>
+          <button
+            onClick={() => onUpdate({ activityLevel: "light" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.activityLevel === "light"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Легкая активность
+          </button>
+          <button
+            onClick={() => onUpdate({ activityLevel: "moderate" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.activityLevel === "moderate"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Умеренная
+          </button>
+          <button
+            onClick={() => onUpdate({ activityLevel: "active" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.activityLevel === "active"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Активный
+          </button>
+          <button
+            onClick={() => onUpdate({ activityLevel: "very_active" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.activityLevel === "very_active"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Очень активный
+          </button>
+        </div>
       </div>
       
       {/* Exercise Frequency */}
@@ -107,40 +83,48 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
           <Dumbbell className="w-4 h-4" />
           <span>Частота тренировок</span>
         </Label>
-        <RadioGroup
-          value={data.exerciseFrequency || ""}
-          onValueChange={(value) => onUpdate({ exerciseFrequency: value })}
-        >
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="p-3 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="never" id="never" />
-                <Label htmlFor="never" className="cursor-pointer">Никогда</Label>
-              </div>
-            </Card>
-            
-            <Card className="p-3 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="1-2_week" id="1-2_week" />
-                <Label htmlFor="1-2_week" className="cursor-pointer">1-2 раза/нед</Label>
-              </div>
-            </Card>
-            
-            <Card className="p-3 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="3-4_week" id="3-4_week" />
-                <Label htmlFor="3-4_week" className="cursor-pointer">3-4 раза/нед</Label>
-              </div>
-            </Card>
-            
-            <Card className="p-3 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="5+_week" id="5+_week" />
-                <Label htmlFor="5+_week" className="cursor-pointer">5+ раз/нед</Label>
-              </div>
-            </Card>
-          </div>
-        </RadioGroup>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => onUpdate({ exerciseFrequency: "never" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.exerciseFrequency === "never"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Никогда
+          </button>
+          <button
+            onClick={() => onUpdate({ exerciseFrequency: "1-2_week" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.exerciseFrequency === "1-2_week"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            1-2 раза/нед
+          </button>
+          <button
+            onClick={() => onUpdate({ exerciseFrequency: "3-4_week" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.exerciseFrequency === "3-4_week"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            3-4 раза/нед
+          </button>
+          <button
+            onClick={() => onUpdate({ exerciseFrequency: "5+_week" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.exerciseFrequency === "5+_week"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            5+ раз/нед
+          </button>
+        </div>
       </div>
       
       {/* Fitness Level */}
@@ -149,39 +133,38 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
           <TrendingUp className="w-4 h-4" />
           <span>Уровень физической подготовки</span>
         </Label>
-        <RadioGroup
-          value={data.fitnessLevel || ""}
-          onValueChange={(value) => onUpdate({ fitnessLevel: value as HealthProfileData["fitnessLevel"] })}
-        >
-          <div className="grid grid-cols-3 gap-3">
-            <Card className="p-3 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-              <div className="flex flex-col items-center space-y-2">
-                <RadioGroupItem value="beginner" id="beginner" />
-                <Label htmlFor="beginner" className="cursor-pointer text-center">
-                  Начинающий
-                </Label>
-              </div>
-            </Card>
-            
-            <Card className="p-3 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-              <div className="flex flex-col items-center space-y-2">
-                <RadioGroupItem value="intermediate" id="intermediate" />
-                <Label htmlFor="intermediate" className="cursor-pointer text-center">
-                  Средний
-                </Label>
-              </div>
-            </Card>
-            
-            <Card className="p-3 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
-              <div className="flex flex-col items-center space-y-2">
-                <RadioGroupItem value="advanced" id="advanced" />
-                <Label htmlFor="advanced" className="cursor-pointer text-center">
-                  Продвинутый
-                </Label>
-              </div>
-            </Card>
-          </div>
-        </RadioGroup>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => onUpdate({ fitnessLevel: "beginner" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.fitnessLevel === "beginner"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Начинающий
+          </button>
+          <button
+            onClick={() => onUpdate({ fitnessLevel: "intermediate" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.fitnessLevel === "intermediate"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Средний
+          </button>
+          <button
+            onClick={() => onUpdate({ fitnessLevel: "advanced" })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              data.fitnessLevel === "advanced"
+                ? "bg-medical-blue text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Продвинутый
+          </button>
+        </div>
       </div>
     </div>
   );
