@@ -19,6 +19,7 @@ export const healthProfiles = pgTable("health_profiles", {
   height: text("height"),
   medicalConditions: json("medical_conditions").$type<string[]>(),
   medications: json("medications").$type<string[]>(),
+  profileData: json("profile_data"), // Complete profile data
   completionPercentage: integer("completion_percentage").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

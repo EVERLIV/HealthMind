@@ -385,6 +385,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Complete health profile
+  app.post("/api/health-profile/complete", async (req, res) => {
+    try {
+      const userId = "user-1"; // Demo user
+      const profileData = req.body;
+      
+      // Check if profile exists
+      const existingProfile = await storage.getHealthProfile(userId);
+      
+      if (existingProfile) {
+        // Update existing profile
+        const updated = await storage.updateHealthProfile(userId, {
+          profileData,
+          completionPercentage: 100,
+          age: profileData.age,
+          weight: profileData.weight?.toString(),
+          height: profileData.height?.toString(),
+          medicalConditions: profileData.chronicConditions,
+          medications: profileData.currentMedications?.map((m: any) => m.name),
+        });
+        res.json(updated);
+      } else {
+        // Create new profile
+        const profile = await storage.createHealthProfile({
+          userId,
+          profileData,
+          completionPercentage: 100,
+          age: profileData.age,
+          weight: profileData.weight?.toString(),
+          height: profileData.height?.toString(),
+          medicalConditions: profileData.chronicConditions,
+          medications: profileData.currentMedications?.map((m: any) => m.name),
+        });
+        res.json(profile);
+      }
+    } catch (error) {
+      console.error("Error saving health profile:", error);
+      res.status(500).json({ error: "Failed to save health profile" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

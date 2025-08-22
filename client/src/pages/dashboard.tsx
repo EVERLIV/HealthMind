@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import MobileNav from "@/components/layout/mobile-nav";
 import BottomNav from "@/components/layout/bottom-nav";
@@ -11,9 +12,11 @@ import AIChatModal from "@/components/modals/ai-chat-modal";
 import BloodAnalysisModal from "@/components/modals/blood-analysis-modal";
 import AnalysisResultsModal from "@/components/modals/analysis-results-modal";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Heart, Camera, MessageCircle, Activity } from "lucide-react";
 
 export default function Dashboard() {
+  const [, navigate] = useLocation();
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
@@ -73,6 +76,28 @@ export default function Dashboard() {
           </Button>
         </div>
 
+        {/* Health Profile Card */}
+        {!healthProfile?.profileData && (
+          <Card className="p-4 bg-gradient-to-r from-medical-blue/10 to-trust-green/10 border-0 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <h3 className="font-semibold text-sm mb-1">Создайте профиль здоровья</h3>
+                <p className="text-xs text-muted-foreground">
+                  Заполните информацию для персональных рекомендаций
+                </p>
+              </div>
+              <Button 
+                size="sm"
+                onClick={() => navigate("/health-profile")}
+                className="bg-medical-blue hover:bg-medical-blue/90"
+                data-testid="button-create-profile"
+              >
+                Создать
+              </Button>
+            </div>
+          </Card>
+        )}
+        
         {/* Asklepios Score */}
         <div className="mb-6">
           <AsklepiosScoreCard score={88} trend="up" />

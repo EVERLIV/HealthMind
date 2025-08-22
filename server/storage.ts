@@ -211,7 +211,8 @@ export class MemStorage implements IStorage {
       height: insertProfile.height ?? null,
       medicalConditions: Array.isArray(insertProfile.medicalConditions) ? insertProfile.medicalConditions : null,
       medications: Array.isArray(insertProfile.medications) ? insertProfile.medications : null,
-      completionPercentage: insertProfile.completionPercentage ?? null,
+      profileData: insertProfile.profileData ?? null,
+      completionPercentage: insertProfile.completionPercentage ?? 0,
     };
     this.healthProfiles.set(id, profile);
     return profile;
@@ -229,6 +230,7 @@ export class MemStorage implements IStorage {
       height: updates.height !== undefined ? updates.height : existing.height,
       medicalConditions: updates.medicalConditions !== undefined ? (Array.isArray(updates.medicalConditions) ? updates.medicalConditions : null) : existing.medicalConditions,
       medications: updates.medications !== undefined ? (Array.isArray(updates.medications) ? updates.medications : null) : existing.medications,
+      profileData: updates.profileData !== undefined ? updates.profileData : existing.profileData,
       completionPercentage: updates.completionPercentage !== undefined ? updates.completionPercentage : existing.completionPercentage,
       updatedAt: new Date() 
     };
