@@ -36,8 +36,8 @@ export default function Profile() {
     queryKey: ["/api/health-metrics"],
   });
   
-  const pd = profile?.profileData || {};
-  const hasProfile = profile?.profileData && Object.keys(profile.profileData).length > 0;
+  const pd = (profile as any)?.profileData || {};
+  const hasProfile = profile && ((profile as any)?.profileData || profile.completionPercentage > 0);
 
   const form = useForm({
     resolver: zodResolver(profileSchema),
@@ -313,7 +313,7 @@ export default function Profile() {
                 </div>
                 <span className="text-sm font-medium">Анализы</span>
               </div>
-              <div className="text-2xl font-bold">{healthMetrics?.length || 0}</div>
+              <div className="text-2xl font-bold">{Array.isArray(healthMetrics) ? healthMetrics.length : 0}</div>
             </Card>
           </div>
         )}

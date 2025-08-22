@@ -76,20 +76,7 @@ export class MemStorage implements IStorage {
     };
     this.users.set(defaultUser.id, defaultUser);
 
-    // Create default health profile
-    const healthProfile: HealthProfile = {
-      id: "profile-1",
-      userId: defaultUser.id,
-      age: 28,
-      weight: "65.5",
-      height: "168.0",
-      medicalConditions: null,
-      medications: null,
-      completionPercentage: 85,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.healthProfiles.set(defaultUser.id, healthProfile);
+    // Note: Health profile will be created when user completes the wizard
 
     // Create sample biomarkers
     const sampleBiomarkers: Biomarker[] = [
@@ -201,7 +188,7 @@ export class MemStorage implements IStorage {
 
   async createHealthProfile(insertProfile: InsertHealthProfile): Promise<HealthProfile> {
     const id = randomUUID();
-    const profile: HealthProfile = { 
+    const profile = { 
       id, 
       createdAt: new Date(), 
       updatedAt: new Date(),
@@ -211,9 +198,9 @@ export class MemStorage implements IStorage {
       height: insertProfile.height ?? null,
       medicalConditions: Array.isArray(insertProfile.medicalConditions) ? insertProfile.medicalConditions : null,
       medications: Array.isArray(insertProfile.medications) ? insertProfile.medications : null,
-      profileData: insertProfile.profileData ?? null,
+      profileData: (insertProfile as any).profileData ?? null,
       completionPercentage: insertProfile.completionPercentage ?? 0,
-    };
+    } as HealthProfile;
     this.healthProfiles.set(id, profile);
     return profile;
   }
@@ -223,17 +210,17 @@ export class MemStorage implements IStorage {
     if (!existing) {
       throw new Error("Health profile not found");
     }
-    const updated: HealthProfile = { 
+    const updated = { 
       ...existing,
       age: updates.age !== undefined ? updates.age : existing.age,
       weight: updates.weight !== undefined ? updates.weight : existing.weight,
       height: updates.height !== undefined ? updates.height : existing.height,
       medicalConditions: updates.medicalConditions !== undefined ? (Array.isArray(updates.medicalConditions) ? updates.medicalConditions : null) : existing.medicalConditions,
       medications: updates.medications !== undefined ? (Array.isArray(updates.medications) ? updates.medications : null) : existing.medications,
-      profileData: updates.profileData !== undefined ? updates.profileData : existing.profileData,
+      profileData: updates.profileData !== undefined ? updates.profileData : (existing as any).profileData,
       completionPercentage: updates.completionPercentage !== undefined ? updates.completionPercentage : existing.completionPercentage,
       updatedAt: new Date() 
-    };
+    } as HealthProfile;
     this.healthProfiles.set(existing.id, updated);
     return updated;
   }
