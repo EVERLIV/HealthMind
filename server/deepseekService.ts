@@ -90,30 +90,28 @@ ${text}
   }
 
   async analyzeBloodTestImage(imageBase64: string): Promise<EnhancedBloodAnalysisResults> {
-    const prompt = `Проанализируйте это изображение анализа крови с расширенными возможностями OCR:
-
-ИНСТРУКЦИИ ПО OCR:
-1. Внимательно изучите весь документ, включая заголовки, таблицы, примечания
-2. Распознайте все числовые значения, даже если они написаны от руки
-3. Обратите внимание на единицы измерения (г/л, ×10⁹/л, ммоль/л и т.д.)
-4. Извлеките информацию о лаборатории и дате анализа
-5. Найдите референтные значения, если они указаны
-
-Верните результат ТОЛЬКО в формате JSON (без дополнительного текста) со следующей структурой:
-{
-  "markers": [{"name": "название", "value": "значение", "normalRange": "норма", "status": "normal/high/low", "recommendation": "рекомендация", "education": "информация", "lifestyle": "советы"}],
-  "supplements": [{"name": "название", "reason": "причина", "dosage": "дозировка", "duration": "длительность"}],
-  "generalRecommendation": "общие рекомендации",
-  "riskFactors": ["фактор1", "фактор2"],
-  "followUpTests": ["тест1", "тест2"],
-  "urgencyLevel": "low/medium/high",
-  "nextCheckup": "когда повторить"
-}`;
-
-    return this.callDeepSeekAPI(prompt, imageBase64);
+    // DeepSeek API не поддерживает изображения, возвращаем сообщение об ошибке
+    console.warn('DeepSeek API не поддерживает анализ изображений. Используйте текстовый ввод.');
+    return {
+      markers: [{
+        name: "Требуется текстовый ввод",
+        value: "—",
+        normalRange: "—",
+        status: "normal",
+        recommendation: "DeepSeek API не поддерживает анализ изображений. Пожалуйста, введите данные анализа в текстовом виде.",
+        education: "Вы можете ввести значения анализов вручную для получения подробной интерпретации от ИИ.",
+        lifestyle: "Используйте режим 'Ввести вручную' для анализа ваших результатов."
+      }],
+      supplements: [],
+      generalRecommendation: "Пожалуйста, используйте текстовый ввод данных анализа. DeepSeek AI может проанализировать только текстовые данные.",
+      riskFactors: [],
+      followUpTests: [],
+      urgencyLevel: "low",
+      nextCheckup: "После ввода данных"
+    };
   }
 
-  private async callDeepSeekAPI(prompt: string, imageBase64?: string): Promise<EnhancedBloodAnalysisResults> {
+  private async callDeepSeekAPI(prompt: string): Promise<EnhancedBloodAnalysisResults> {
     try {
       const messages = [
         {
@@ -122,18 +120,7 @@ ${text}
         },
         {
           role: "user",
-          content: imageBase64 ? [
-            {
-              type: "text",
-              text: prompt
-            },
-            {
-              type: "image_url",
-              image_url: {
-                url: `data:image/jpeg;base64,${imageBase64}`
-              }
-            }
-          ] : prompt
+          content: prompt
         }
       ];
 
@@ -156,11 +143,14 @@ ${text}
       }
 
       const data = await response.json();
-      const content = data.choices[0]?.message?.content;
+      let content = data.choices[0]?.message?.content;
 
       if (!content) {
         throw new Error('Не получен ответ от DeepSeek API');
       }
+
+      // Remove markdown code blocks if present
+      content = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
 
       try {
         const parsedResults = JSON.parse(content) as EnhancedBloodAnalysisResults;

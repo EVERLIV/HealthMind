@@ -5,6 +5,8 @@ import BottomNav from "@/components/layout/bottom-nav";
 import HealthMetricsCard from "@/components/cards/health-metrics-card";
 import BloodAnalysisCard from "@/components/cards/blood-analysis-card";
 import HealthProfileCard from "@/components/cards/health-profile-card";
+import AsklepiosScoreCard from "@/components/cards/asklepios-score-card";
+import ActivityCard from "@/components/cards/activity-card";
 import AIChatModal from "@/components/modals/ai-chat-modal";
 import BloodAnalysisModal from "@/components/modals/blood-analysis-modal";
 import AnalysisResultsModal from "@/components/modals/analysis-results-modal";
@@ -35,12 +37,19 @@ export default function Dashboard() {
       <MobileNav />
       
       <main className="max-w-md mx-auto px-4 py-6 pb-20">
-        {/* Welcome Section */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground mb-2">
-            Добро пожаловать, <span data-testid="user-name">{healthProfile?.userId ? "Анна" : "Пользователь"}</span>!
-          </h1>
-          <p className="text-muted-foreground">Время для вашего ежедневного осмотра здоровья</p>
+        {/* Welcome Section with Logo */}
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground mb-1">
+              Привет, <span data-testid="user-name">{healthProfile?.userId ? "Анна" : "Пользователь"}</span>
+            </h1>
+            <p className="text-sm text-muted-foreground">Время проверить ваше здоровье</p>
+          </div>
+          <img 
+            src="/health-logo.png" 
+            alt="HealthAI" 
+            className="w-12 h-12 rounded-xl shadow-sm"
+          />
         </div>
 
         {/* Quick Actions */}
@@ -64,8 +73,14 @@ export default function Dashboard() {
           </Button>
         </div>
 
+        {/* Asklepios Score */}
+        <div className="mb-6">
+          <AsklepiosScoreCard score={88} trend="up" />
+        </div>
+        
         {/* Health Metrics Cards */}
-        <div className="space-y-4 mb-6">
+        <div className="grid grid-cols-1 gap-4 mb-6">
+          <ActivityCard />
           <HealthMetricsCard metrics={latestMetrics} />
           <BloodAnalysisCard 
             analysis={latestAnalysis} 
