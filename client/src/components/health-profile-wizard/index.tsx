@@ -128,8 +128,8 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-medical-blue/5 to-background pb-20">
-      <Card className="w-full md:max-w-lg md:mx-auto p-0 overflow-hidden border-0 md:shadow-xl md:my-6 rounded-none md:rounded-lg">
+    <div className="min-h-screen bg-white dark:bg-gray-950 pb-20">
+      <div className="w-full md:max-w-lg md:mx-auto min-h-screen md:min-h-0 bg-white dark:bg-gray-950 md:bg-card md:dark:bg-card p-0 overflow-hidden border-0 md:shadow-xl md:my-6 rounded-none md:rounded-lg">
         {/* Header */}
         <div className="bg-gradient-to-r from-medical-blue to-trust-green p-4 md:p-6 text-white">
           <h2 className="text-lg md:text-xl font-bold mb-2">
@@ -141,19 +141,19 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
         </div>
       
       {/* Progress Bar */}
-      <div className="px-4 md:px-6 pt-4">
+      <div className="px-4 md:px-6 pt-4 bg-white dark:bg-gray-950">
         <Progress value={progress} className="h-2 md:h-3 bg-gray-200 dark:bg-gray-700" />
       </div>
       
       {/* Step Title - Убираем повторяющийся номер шага */}
-      <div className="px-4 md:px-6 py-3 md:py-4 border-b">
+      <div className="px-4 md:px-6 py-3 md:py-4 border-b bg-white dark:bg-gray-950">
         <h3 className="text-base md:text-lg font-semibold text-foreground animate-in slide-in-from-left-2 duration-300">
           {steps[currentStep - 1].title}
         </h3>
       </div>
       
       {/* Current Step Content */}
-      <div className="px-4 md:px-6 py-6 min-h-[400px] overflow-y-auto">
+      <div className="px-4 md:px-6 py-6 min-h-[400px] md:min-h-[450px] overflow-y-auto bg-white dark:bg-gray-950">
         <div key={currentStep} className="animate-in fade-in-50 slide-in-from-right-4 duration-300">
           <CurrentStepComponent
             data={profileData}
@@ -161,7 +161,7 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
           />
         </div>
       </div>
-    </Card>
+    </div>
     
     {/* Fixed Navigation Bar */}
     <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-lg z-50">
