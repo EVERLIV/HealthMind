@@ -77,33 +77,27 @@ export default function MedicalHistorySection({ data, onUpdate }: MedicalHistory
             value={newCondition}
             onChange={(e) => setNewCondition(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && addCondition()}
+            className="rounded-full"
             data-testid="input-condition"
           />
-          <Button onClick={addCondition} size="sm" className="bg-medical-blue hover:bg-medical-blue/90">
+          <Button onClick={addCondition} size="sm" className="rounded-full bg-medical-blue hover:bg-medical-blue/90 px-4">
             <Plus className="w-4 h-4" />
           </Button>
         </div>
         {data.chronicConditions && data.chronicConditions.length > 0 && (
-          <Card className="p-3 bg-light-blue border-0">
-            <div className="flex flex-wrap gap-2">
-              {data.chronicConditions.map((condition, index) => (
-                <Badge 
-                  key={index} 
-                  variant="secondary"
-                  className="pl-3 pr-1 py-1 flex items-center space-x-1"
-                >
-                  <span>{condition}</span>
-                  <button
-                    onClick={() => removeCondition(index)}
-                    className="ml-1 hover:bg-destructive/20 rounded p-0.5"
-                    data-testid={`remove-condition-${index}`}
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-          </Card>
+          <div className="flex flex-wrap gap-2">
+            {data.chronicConditions.map((condition, index) => (
+              <button
+                key={index}
+                onClick={() => removeCondition(index)}
+                className="px-4 py-2 rounded-full text-sm font-medium bg-medical-blue text-white shadow-md hover:bg-medical-blue/90 transition-all flex items-center gap-2"
+                data-testid={`remove-condition-${index}`}
+              >
+                <span>{condition}</span>
+                <X className="w-3 h-3 opacity-70 hover:opacity-100" />
+              </button>
+            ))}
+          </div>
         )}
       </div>
       
@@ -119,33 +113,27 @@ export default function MedicalHistorySection({ data, onUpdate }: MedicalHistory
             value={newFamilyHistory}
             onChange={(e) => setNewFamilyHistory(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && addFamilyHistory()}
+            className="rounded-full"
             data-testid="input-family-history"
           />
-          <Button onClick={addFamilyHistory} size="sm" className="bg-medical-blue hover:bg-medical-blue/90">
+          <Button onClick={addFamilyHistory} size="sm" className="rounded-full bg-medical-blue hover:bg-medical-blue/90 px-4">
             <Plus className="w-4 h-4" />
           </Button>
         </div>
         {data.familyHistory && data.familyHistory.length > 0 && (
-          <Card className="p-3 bg-light-blue border-0">
-            <div className="flex flex-wrap gap-2">
-              {data.familyHistory.map((item, index) => (
-                <Badge 
-                  key={index} 
-                  variant="secondary"
-                  className="pl-3 pr-1 py-1 flex items-center space-x-1"
-                >
-                  <span>{item}</span>
-                  <button
-                    onClick={() => removeFamilyHistory(index)}
-                    className="ml-1 hover:bg-destructive/20 rounded p-0.5"
-                    data-testid={`remove-history-${index}`}
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-          </Card>
+          <div className="flex flex-wrap gap-2">
+            {data.familyHistory.map((item, index) => (
+              <button
+                key={index}
+                onClick={() => removeFamilyHistory(index)}
+                className="px-4 py-2 rounded-full text-sm font-medium bg-trust-green text-white shadow-md hover:bg-trust-green/90 transition-all flex items-center gap-2"
+                data-testid={`remove-history-${index}`}
+              >
+                <span>{item}</span>
+                <X className="w-3 h-3 opacity-70 hover:opacity-100" />
+              </button>
+            ))}
+          </div>
         )}
       </div>
       
@@ -161,38 +149,32 @@ export default function MedicalHistorySection({ data, onUpdate }: MedicalHistory
             value={newAllergy}
             onChange={(e) => setNewAllergy(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && addAllergy()}
+            className="rounded-full"
             data-testid="input-allergy"
           />
-          <Button onClick={addAllergy} size="sm" className="bg-medical-blue hover:bg-medical-blue/90">
+          <Button onClick={addAllergy} size="sm" className="rounded-full bg-warning-amber hover:bg-warning-amber/90 px-4">
             <Plus className="w-4 h-4" />
           </Button>
         </div>
         {data.allergies && data.allergies.length > 0 && (
-          <Card className="p-3 bg-warning-amber/10 border-warning-amber/20">
-            <div className="flex flex-wrap gap-2">
-              {data.allergies.map((allergy, index) => (
-                <Badge 
-                  key={index} 
-                  variant="outline"
-                  className="pl-3 pr-1 py-1 flex items-center space-x-1 border-warning-amber text-warning-amber"
-                >
-                  <span>{allergy}</span>
-                  <button
-                    onClick={() => removeAllergy(index)}
-                    className="ml-1 hover:bg-destructive/20 rounded p-0.5"
-                    data-testid={`remove-allergy-${index}`}
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-          </Card>
+          <div className="flex flex-wrap gap-2">
+            {data.allergies.map((allergy, index) => (
+              <button
+                key={index}
+                onClick={() => removeAllergy(index)}
+                className="px-4 py-2 rounded-full text-sm font-medium bg-warning-amber text-white shadow-md hover:bg-warning-amber/90 transition-all flex items-center gap-2"
+                data-testid={`remove-allergy-${index}`}
+              >
+                <span>{allergy}</span>
+                <X className="w-3 h-3 opacity-70 hover:opacity-100" />
+              </button>
+            ))}
+          </div>
         )}
       </div>
       
       {/* Info Card */}
-      <Card className="p-4 bg-light-blue border-0">
+      <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg">
         <div className="flex items-start space-x-3">
           <Heart className="w-5 h-5 text-medical-blue mt-0.5" />
           <div>
@@ -203,7 +185,7 @@ export default function MedicalHistorySection({ data, onUpdate }: MedicalHistory
             </p>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }
