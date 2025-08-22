@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, Send, Paperclip, Smile, Mic } from "lucide-react";
+import { ArrowLeft, Send, Paperclip, Mic, MicOff } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
@@ -11,10 +11,15 @@ import { Link } from "wouter";
 export default function ChatPage() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   // Get or create chat session
   const { data: sessions } = useQuery({
@@ -93,7 +98,110 @@ export default function ChatPage() {
     e.preventDefault();
     if (!message.trim() || !currentSessionId) return;
     
-    sendMessageMutation.mutate(message.trim());
+    let messageContent = message.trim();
+    if (attachedFiles.length > 0) {
+      messageContent += `\n\n📎 Прикреплено файлов: ${attachedFiles.length}`;
+      attachedFiles.forEach(file => {
+        messageContent += `\n• ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      });
+    }
+    
+    sendMessageMutation.mutate(messageContent);
+    setAttachedFiles([]);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setAttachedFiles(prev => [...prev, ...newFiles]);
+      toast({
+        title: "Файлы прикреплены",
+        description: `Добавлено ${newFiles.length} файл(ов)`,
+      });
+    }
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        // Здесь можно добавить обработку записанного аудио
+        // Например, преобразование в текст через Web Speech API
+        convertSpeechToText(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      toast({
+        title: "Запись началась",
+        description: "Говорите в микрофон",
+      });
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось получить доступ к микрофону",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      toast({
+        title: "Запись остановлена",
+        description: "Обработка голоса...",
+      });
+    }
+  };
+
+  const convertSpeechToText = async (audioBlob: Blob) => {
+    // Использование Web Speech API для браузеров, которые его поддерживают
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'ru-RU';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setMessage(prev => prev + ' ' + transcript);
+        toast({
+          title: "Текст распознан",
+          description: transcript,
+        });
+      };
+
+      recognition.onerror = () => {
+        toast({
+          title: "Ошибка распознавания",
+          description: "Не удалось распознать речь",
+          variant: "destructive",
+        });
+      };
+
+      // Симуляция обработки аудио
+      setTimeout(() => {
+        const simulatedText = "Это демонстрация голосового ввода";
+        setMessage(prev => prev + ' ' + simulatedText);
+        toast({
+          title: "Голос распознан",
+          description: simulatedText,
+        });
+      }, 1000);
+    }
   };
 
   return (
@@ -221,13 +329,46 @@ export default function ChatPage() {
       {/* Input Area */}
       <div className="bg-white border-t border-gray-200 px-4 py-4">
         <div className="max-w-4xl mx-auto">
+          {/* Show attached files */}
+          {attachedFiles.length > 0 && (
+            <div className="mb-2 p-2 bg-gray-50 rounded-lg">
+              <div className="text-xs text-gray-600 mb-1">Прикрепленные файлы:</div>
+              <div className="flex flex-wrap gap-2">
+                {attachedFiles.map((file, index) => (
+                  <div key={index} className="bg-white px-2 py-1 rounded-full border border-gray-200 text-xs flex items-center gap-1">
+                    <Paperclip className="w-3 h-3" />
+                    <span>{file.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => setAttachedFiles(prev => prev.filter((_, i) => i !== index))}
+                      className="ml-1 text-gray-400 hover:text-red-500"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
           <form onSubmit={handleSendMessage} className="flex items-center space-x-2">
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              onChange={handleFileSelect}
+              className="hidden"
+              accept="image/*,.pdf,.doc,.docx,.txt"
+            />
+            
             <Button
               type="button"
               variant="ghost"
               size="icon"
               className="hover:bg-gray-100 text-gray-500"
               data-testid="button-attach"
+              onClick={() => fileInputRef.current?.click()}
             >
               <Paperclip className="w-5 h-5" />
             </Button>
@@ -239,27 +380,19 @@ export default function ChatPage() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Напишите сообщение..."
-                className="w-full pl-4 pr-24 py-3 rounded-full border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-gray-50 hover:bg-white"
-                disabled={sendMessageMutation.isPending}
+                className="w-full pl-4 pr-12 py-3 rounded-full border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-gray-50 hover:bg-white"
+                disabled={sendMessageMutation.isPending || isRecording}
               />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-1">
+              <div className="absolute right-2 top-1/2 -translate-y-1/2">
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="hover:bg-gray-100 text-gray-500 w-8 h-8"
-                  data-testid="button-emoji"
-                >
-                  <Smile className="w-4 h-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="hover:bg-gray-100 text-gray-500 w-8 h-8"
+                  className={`hover:bg-gray-100 w-8 h-8 ${isRecording ? 'text-red-500 animate-pulse' : 'text-gray-500'}`}
                   data-testid="button-voice"
+                  onClick={isRecording ? stopRecording : startRecording}
                 >
-                  <Mic className="w-4 h-4" />
+                  {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
                 </Button>
               </div>
             </div>
@@ -268,22 +401,31 @@ export default function ChatPage() {
               data-testid="button-send-message"
               type="submit"
               disabled={!message.trim() || sendMessageMutation.isPending}
-              className="rounded-full px-4 h-10 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg transition-all duration-200 disabled:opacity-50"
+              className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg transition-all duration-200 disabled:opacity-50 flex items-center justify-center p-0"
             >
               <Send className="w-4 h-4" />
             </Button>
           </form>
           
           <div className="flex items-center justify-center mt-2 space-x-4">
-            <button className="text-xs text-gray-500 hover:text-gray-700 transition-colors">
+            <button 
+              onClick={() => setMessage("Хочу загрузить результаты анализа крови")}
+              className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+            >
               Анализ крови
             </button>
             <span className="text-gray-300">•</span>
-            <button className="text-xs text-gray-500 hover:text-gray-700 transition-colors">
+            <button 
+              onClick={() => setMessage("У меня следующие симптомы: ")}
+              className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+            >
               Симптомы
             </button>
             <span className="text-gray-300">•</span>
-            <button className="text-xs text-gray-500 hover:text-gray-700 transition-colors">
+            <button 
+              onClick={() => setMessage("Дайте рекомендации по улучшению здоровья")}
+              className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+            >
               Рекомендации
             </button>
           </div>
