@@ -129,9 +129,6 @@ export default function Dashboard() {
           <div className="eva-slide-up" style={{ animationDelay: '0.1s' }}>
             <ActivityCard />
           </div>
-          <div className="eva-slide-up" style={{ animationDelay: '0.2s' }}>
-            <HealthMetricsCard metrics={latestMetrics as any} />
-          </div>
           <div className="eva-slide-up" style={{ animationDelay: '0.3s' }}>
             <BloodAnalysisCard 
               analysis={latestAnalysis} 
