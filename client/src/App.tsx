@@ -9,6 +9,7 @@ import Biomarkers from "@/pages/biomarkers";
 import Profile from "@/pages/profile";
 import Statistics from "@/pages/statistics";
 import HealthProfilePage from "@/pages/health-profile-page";
+import ChatPage from "@/pages/chat";
 
 function Router() {
   return (
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/profile" component={Profile} />
       <Route path="/statistics" component={Statistics} />
       <Route path="/health-profile" component={HealthProfilePage} />
+      <Route path="/chat" component={ChatPage} />
       <Route component={NotFound} />
     </Switch>
   );

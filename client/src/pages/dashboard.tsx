@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import MobileNav from "@/components/layout/mobile-nav";
 import BottomNav from "@/components/layout/bottom-nav";
@@ -8,7 +8,6 @@ import BloodAnalysisCard from "@/components/cards/blood-analysis-card";
 import HealthProfileCard from "@/components/cards/health-profile-card";
 import AsklepiosScoreCard from "@/components/cards/asklepios-score-card";
 import ActivityCard from "@/components/cards/activity-card";
-import AIChatModal from "@/components/modals/ai-chat-modal";
 import BloodAnalysisModal from "@/components/modals/blood-analysis-modal";
 import AnalysisResultsModal from "@/components/modals/analysis-results-modal";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,6 @@ import healthProfileBg from '@/assets/images/health-profile-bg.png';
 
 export default function Dashboard() {
   const [, navigate] = useLocation();
-  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
 
@@ -61,25 +59,26 @@ export default function Dashboard() {
 
         {/* Quick Actions - EVA Style */}
         <div className="eva-grid-auto mb-6">
-          <button
-            data-testid="button-ai-chat"
-            onClick={() => setIsAIChatOpen(true)}
-            className="eva-card-interactive p-6 flex flex-col items-center space-y-3 text-center text-white min-h-[120px] eva-scale-in hover:scale-105 transition-all duration-300 relative overflow-hidden"
-            style={{
-              backgroundImage: `url(${aiDoctorBg})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-purple-600/90"></div>
-            <div className="relative z-10 p-3 bg-white/20 rounded-full">
-              <MessageCircle className="w-6 h-6" />
-            </div>
-            <div className="relative z-10">
-              <div className="font-semibold">ИИ Доктор</div>
-              <div className="text-xs opacity-90">Консультация</div>
-            </div>
-          </button>
+          <Link href="/chat">
+            <button
+              data-testid="button-ai-chat"
+              className="eva-card-interactive p-6 flex flex-col items-center space-y-3 text-center text-white min-h-[120px] eva-scale-in hover:scale-105 transition-all duration-300 relative overflow-hidden w-full"
+              style={{
+                backgroundImage: `url(${aiDoctorBg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-purple-600/90"></div>
+              <div className="relative z-10 p-3 bg-white/20 rounded-full">
+                <MessageCircle className="w-6 h-6" />
+              </div>
+              <div className="relative z-10">
+                <div className="font-semibold">ИИ Доктор</div>
+                <div className="text-xs opacity-90">Консультация</div>
+              </div>
+            </button>
+          </Link>
           
           <button
             data-testid="button-blood-upload"
@@ -207,11 +206,6 @@ export default function Dashboard() {
       <BottomNav />
 
       {/* Modals */}
-      <AIChatModal 
-        open={isAIChatOpen} 
-        onOpenChange={setIsAIChatOpen}
-      />
-      
       <BloodAnalysisModal 
         open={isUploadOpen}
         onOpenChange={setIsUploadOpen}
