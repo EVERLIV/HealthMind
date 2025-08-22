@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { User, Settings, Heart, Activity, Brain, Moon, Target, Coffee, Plus, Droplets } from "lucide-react";
+import { User, Settings, Heart, Activity, Brain, Moon, Target, Coffee, Plus, Droplets, Shield } from "lucide-react";
 
 const profileSchema = z.object({
   age: z.number().min(1).max(120).optional(),
@@ -37,7 +37,7 @@ export default function Profile() {
   });
   
   const pd = (profile as any)?.profileData || {};
-  const hasProfile = profile && ((profile as any)?.profileData || profile.completionPercentage > 0);
+  const hasProfile = profile && ((profile as any)?.profileData || (profile as any)?.completionPercentage > 0);
 
   const form = useForm({
     resolver: zodResolver(profileSchema),
@@ -78,14 +78,14 @@ export default function Profile() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-health-bg">
+      <div className="eva-page">
         <MobileNav />
-        <main className="max-w-md mx-auto px-4 py-6 pb-20">
+        <main className="eva-page-content">
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-card rounded-xl p-4 animate-pulse">
-                <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-muted rounded w-1/2"></div>
+              <div key={i} className="eva-card p-5 eva-shimmer">
+                <div className="eva-skeleton h-5 w-3/4 mb-3"></div>
+                <div className="eva-skeleton h-4 w-1/2"></div>
               </div>
             ))}
           </div>
@@ -122,74 +122,69 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-health-bg">
+    <div className="eva-page">
       <MobileNav />
       
-      <main className="max-w-md mx-auto px-4 py-6 pb-20">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Профиль здоровья</h1>
-          <p className="text-muted-foreground">Управление вашими данными и настройками</p>
+      <main className="eva-page-content">
+        <div className="eva-page-header">
+          <h1 className="eva-page-title">Профиль здоровья</h1>
+          <p className="eva-page-subtitle">Управление вашими данными и настройками</p>
         </div>
 
-        {/* Profile Status */}
+        {/* Profile Status - EVA Style */}
         {!hasProfile ? (
-          <Card className="mb-6 bg-gradient-to-r from-medical-blue/10 to-trust-green/10">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <User className="w-5 h-5 mr-2 text-medical-blue" />
-                Профиль здоровья не создан
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Создайте профиль здоровья для получения персонализированных рекомендаций и отслеживания показателей
-              </p>
-              <Button 
-                onClick={() => navigate("/health-profile")}
-                className="w-full bg-gradient-to-r from-medical-blue to-trust-green hover:opacity-90 text-white rounded-full"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Создать профиль здоровья
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className="mb-6 bg-gradient-to-r from-trust-green/10 to-medical-blue/10">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center">
-                  <User className="w-5 h-5 mr-2 text-trust-green" />
-                  Профиль создан
-                </CardTitle>
-                <div className="w-10 h-10 bg-trust-green rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-bold" data-testid="text-completion-percentage">
-                    ✓
-                  </span>
+          <div className="eva-card-elevated p-6 mb-6 eva-gradient-primary text-white eva-fade-in">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center flex-1">
+                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-4">
+                  <User className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg mb-1">Профиль здоровья не создан</h3>
+                  <p className="text-sm opacity-90">
+                    Создайте профиль для персонализированных рекомендаций
+                  </p>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-3">
-                Ваш профиль здоровья успешно создан и готов к использованию
-              </p>
+              <Button 
+                onClick={() => navigate("/health-profile")}
+                className="bg-white text-primary hover:bg-white/90 ml-4 rounded-full"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Создать
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="eva-card border-success p-5 mb-6 eva-slide-up" style={{ backgroundColor: 'hsl(var(--success-light))' }}>
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-success rounded-full flex items-center justify-center mr-4">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-success text-lg mb-1">Профиль создан</h3>
+                <p className="text-sm text-muted-foreground">
+                  Ваш профиль здоровья готов к использованию
+                </p>
+              </div>
               <Button 
                 variant="outline"
                 onClick={() => navigate("/health-profile")}
-                className="w-full rounded-full"
+                className="rounded-full border-success text-success hover:bg-success hover:text-white"
               >
-                Просмотреть полный профиль
+                Просмотреть
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
-        {/* Health Information - Only show if profile exists */}
+        {/* Health Information - EVA Style */}
         {hasProfile && (
-          <Card className="mb-6">
+          <div className="eva-card mb-6 eva-slide-up" style={{ animationDelay: '0.1s' }}>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center">
-                  <Heart className="w-5 h-5 mr-2 text-medical-blue" />
+                  <Heart className="w-5 h-5 mr-2 text-primary" />
                   Основная информация
                 </CardTitle>
                 <Button
@@ -205,116 +200,119 @@ export default function Profile() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-sm text-muted-foreground">Возраст</div>
-                    <div className="font-medium" data-testid="text-age">
-                      {pd.age ? `${pd.age} лет` : "Не указан"}
-                    </div>
+              <div className="eva-grid-auto gap-4 mb-6">
+                <div className="eva-card bg-surface-1 border-0 p-4 text-center">
+                  <div className="text-sm text-muted-foreground mb-2">Возраст</div>
+                  <div className="text-2xl font-bold text-primary" data-testid="text-age">
+                    {pd.age ? `${pd.age}` : "—"}
                   </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground">Пол</div>
-                    <div className="font-medium">
-                      {pd.gender === 'male' ? 'Мужской' : pd.gender === 'female' ? 'Женский' : "Не указан"}
-                    </div>
+                  <div className="text-xs text-muted-foreground">лет</div>
+                </div>
+                
+                <div className="eva-card bg-surface-1 border-0 p-4 text-center">
+                  <div className="text-sm text-muted-foreground mb-2">Пол</div>
+                  <div className="text-lg font-bold">
+                    {pd.gender === 'male' ? '👨' : pd.gender === 'female' ? '👩' : '—'}
                   </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground">Вес</div>
-                    <div className="font-medium" data-testid="text-weight">
-                      {pd.weight ? `${pd.weight} кг` : "Не указан"}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground">Рост</div>
-                    <div className="font-medium" data-testid="text-height">
-                      {pd.height ? `${pd.height} см` : "Не указан"}
-                    </div>
+                  <div className="text-xs text-muted-foreground">
+                    {pd.gender === 'male' ? 'Мужской' : pd.gender === 'female' ? 'Женский' : "Не указан"}
                   </div>
                 </div>
                 
-                {pd.activityLevel && (
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-2">Уровень активности</div>
-                    <span className="px-3 py-1 bg-orange-50 dark:bg-orange-900/20 rounded-full text-sm">
-                      {getActivityLabel(pd.activityLevel)}
-                    </span>
+                <div className="eva-card bg-surface-1 border-0 p-4 text-center">
+                  <div className="text-sm text-muted-foreground mb-2">Вес</div>
+                  <div className="text-2xl font-bold text-success" data-testid="text-weight">
+                    {pd.weight || "—"}
                   </div>
-                )}
+                  <div className="text-xs text-muted-foreground">кг</div>
+                </div>
                 
-                {pd.healthGoals && pd.healthGoals.length > 0 && (
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-2">Цели здоровья</div>
-                    <div className="flex flex-wrap gap-2">
-                      {pd.healthGoals.slice(0, 3).map((goal: string) => (
-                        <span 
-                          key={goal}
-                          className="px-3 py-1 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-full text-xs font-medium"
-                        >
-                          {healthGoalLabels[goal] || goal}
-                        </span>
-                      ))}
-                      {pd.healthGoals.length > 3 && (
-                        <span className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-xs">
-                          +{pd.healthGoals.length - 3}
-                        </span>
-                      )}
-                    </div>
+                <div className="eva-card bg-surface-1 border-0 p-4 text-center">
+                  <div className="text-sm text-muted-foreground mb-2">Рост</div>
+                  <div className="text-2xl font-bold text-info" data-testid="text-height">
+                    {pd.height || "—"}
                   </div>
-                )}
+                  <div className="text-xs text-muted-foreground">см</div>
+                </div>
               </div>
+              
+              {pd.activityLevel && (
+                <div className="mb-4">
+                  <div className="text-sm text-muted-foreground mb-2">Уровень активности</div>
+                  <div className="eva-badge eva-badge bg-energy-orange text-white border-0">
+                    <Activity className="w-3 h-3 mr-1" />
+                    {getActivityLabel(pd.activityLevel)}
+                  </div>
+                </div>
+              )}
+              
+              {pd.healthGoals && pd.healthGoals.length > 0 && (
+                <div>
+                  <div className="text-sm text-muted-foreground mb-3">Цели здоровья</div>
+                  <div className="flex flex-wrap gap-2">
+                    {pd.healthGoals.slice(0, 3).map((goal: string) => (
+                      <div 
+                        key={goal}
+                        className="eva-chip eva-chip-selected text-xs"
+                      >
+                        <Target className="w-3 h-3" />
+                        {healthGoalLabels[goal] || goal}
+                      </div>
+                    ))}
+                    {pd.healthGoals.length > 3 && (
+                      <div className="eva-badge">
+                        +{pd.healthGoals.length - 3}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </CardContent>
-          </Card>
+          </div>
         )}
 
-        {/* Quick Stats Cards */}
+        {/* Quick Stats Cards - EVA Style */}
         {hasProfile && (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="eva-grid-auto gap-4 eva-slide-up" style={{ animationDelay: '0.2s' }}>
             {pd.stressLevel && (
-              <Card className="p-4">
-                <div className="flex items-center space-x-3 mb-2">
-                  <div className="p-2 bg-purple-500/10 rounded-full">
-                    <Brain className="w-4 h-4 text-purple-500" />
-                  </div>
-                  <span className="text-sm font-medium">Стресс</span>
+              <div className="eva-card p-4 text-center">
+                <div className="w-10 h-10 bg-wellness-purple rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Brain className="w-5 h-5 text-white" />
                 </div>
-                <div className="text-2xl font-bold">{pd.stressLevel}/10</div>
-              </Card>
+                <div className="text-2xl font-bold text-wellness-purple mb-1">{pd.stressLevel}/10</div>
+                <div className="text-sm text-muted-foreground">Уровень стресса</div>
+              </div>
             )}
             
             {pd.sleepHours && (
-              <Card className="p-4">
-                <div className="flex items-center space-x-3 mb-2">
-                  <div className="p-2 bg-indigo-500/10 rounded-full">
-                    <Moon className="w-4 h-4 text-indigo-500" />
-                  </div>
-                  <span className="text-sm font-medium">Сон</span>
+              <div className="eva-card p-4 text-center">
+                <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Moon className="w-5 h-5 text-white" />
                 </div>
-                <div className="text-2xl font-bold">{pd.sleepHours} ч</div>
-              </Card>
+                <div className="text-2xl font-bold text-indigo-500 mb-1">{pd.sleepHours}</div>
+                <div className="text-sm text-muted-foreground">Часов сна</div>
+              </div>
             )}
             
             {pd.waterIntake && (
-              <Card className="p-4">
-                <div className="flex items-center space-x-3 mb-2">
-                  <div className="p-2 bg-blue-500/10 rounded-full">
-                    <Droplets className="w-4 h-4 text-blue-500" />
-                  </div>
-                  <span className="text-sm font-medium">Вода</span>
+              <div className="eva-card p-4 text-center">
+                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Droplets className="w-5 h-5 text-white" />
                 </div>
-                <div className="text-2xl font-bold">{pd.waterIntake} ст</div>
-              </Card>
+                <div className="text-2xl font-bold text-blue-500 mb-1">{pd.waterIntake}</div>
+                <div className="text-sm text-muted-foreground">Стаканов воды</div>
+              </div>
             )}
             
-            <Card className="p-4">
-              <div className="flex items-center space-x-3 mb-2">
-                <div className="p-2 bg-green-500/10 rounded-full">
-                  <Activity className="w-4 h-4 text-green-500" />
-                </div>
-                <span className="text-sm font-medium">Анализы</span>
+            <div className="eva-card p-4 text-center">
+              <div className="w-10 h-10 bg-success rounded-full flex items-center justify-center mx-auto mb-3">
+                <Activity className="w-5 h-5 text-white" />
               </div>
-              <div className="text-2xl font-bold">{Array.isArray(healthMetrics) ? healthMetrics.length : 0}</div>
-            </Card>
+              <div className="text-2xl font-bold text-success mb-1">
+                {Array.isArray(healthMetrics) ? healthMetrics.length : 0}
+              </div>
+              <div className="text-sm text-muted-foreground">Записей анализов</div>
+            </div>
           </div>
         )}
       </main>

@@ -3,97 +3,122 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(248, 50%, 98%);
-  --foreground: hsl(213, 25%, 8%);
+  /* EVA Design System - Light Theme */
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(220, 14%, 16%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(213, 25%, 8%);
+  --card-foreground: hsl(220, 14%, 16%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(213, 25%, 8%);
-  --primary: hsl(217, 79%, 58%);
+  --popover-foreground: hsl(220, 14%, 16%);
+  
+  /* Primary Colors - EVA Blue */
+  --primary: hsl(211, 100%, 50%);
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(213, 25%, 8%);
-  --secondary-foreground: hsl(0, 0%, 100%);
-  --muted: hsl(210, 40%, 96%);
-  --muted-foreground: hsl(213, 25%, 8%);
-  --accent: hsl(210, 40%, 94%);
-  --accent-foreground: hsl(217, 79%, 58%);
+  --primary-light: hsl(211, 100%, 95%);
+  --primary-dark: hsl(211, 100%, 40%);
+  
+  /* Secondary Colors */
+  --secondary: hsl(220, 14%, 96%);
+  --secondary-foreground: hsl(220, 14%, 16%);
+  
+  /* Status Colors */
+  --success: hsl(158, 64%, 52%);
+  --success-light: hsl(158, 64%, 95%);
+  --warning: hsl(43, 96%, 56%);
+  --warning-light: hsl(43, 96%, 95%);
+  --error: hsl(0, 84%, 60%);
+  --error-light: hsl(0, 84%, 95%);
+  --info: hsl(211, 100%, 50%);
+  --info-light: hsl(211, 100%, 95%);
+  
+  /* Neutral Colors */
+  --muted: hsl(220, 14%, 96%);
+  --muted-foreground: hsl(220, 14%, 40%);
+  --accent: hsl(220, 14%, 96%);
+  --accent-foreground: hsl(211, 100%, 50%);
   --destructive: hsl(0, 84%, 60%);
   --destructive-foreground: hsl(0, 0%, 100%);
-  --border: hsl(214, 32%, 91%);
-  --input: hsl(210, 40%, 98%);
-  --ring: hsl(217, 79%, 58%);
-  --chart-1: hsl(217, 79%, 58%);
-  --chart-2: hsl(158, 64%, 52%);
-  --chart-3: hsl(43, 96%, 56%);
-  --chart-4: hsl(158, 64%, 52%);
-  --chart-5: hsl(340, 75%, 55%);
-  --sidebar: hsl(0, 0%, 100%);
-  --sidebar-foreground: hsl(213, 25%, 8%);
-  --sidebar-primary: hsl(217, 79%, 58%);
-  --sidebar-primary-foreground: hsl(0, 0%, 100%);
-  --sidebar-accent: hsl(210, 40%, 94%);
-  --sidebar-accent-foreground: hsl(217, 79%, 58%);
-  --sidebar-border: hsl(214, 32%, 91%);
-  --sidebar-ring: hsl(217, 79%, 58%);
-  --font-sans: 'Inter', 'Open Sans', sans-serif;
-  --font-serif: Georgia, serif;
-  --font-mono: Menlo, monospace;
-  --radius: 1.3rem;
+  
+  /* Surfaces */
+  --border: hsl(220, 14%, 91%);
+  --input: hsl(220, 14%, 98%);
+  --ring: hsl(211, 100%, 50%);
+  --surface-1: hsl(220, 14%, 98%);
+  --surface-2: hsl(220, 14%, 96%);
+  --surface-3: hsl(220, 14%, 94%);
   
   /* Health-specific colors */
   --medical-blue: hsl(211, 100%, 50%);
   --trust-green: hsl(158, 64%, 52%);
-  --health-bg: hsl(210, 100%, 97%);
-  --warning-amber: hsl(43, 96%, 56%);
-  --success-green: hsl(158, 64%, 52%);
-  --error-red: hsl(0, 84%, 60%);
-  --light-blue: hsl(211, 100%, 94%);
-  --blue-gradient: linear-gradient(135deg, hsl(211, 100%, 50%), hsl(200, 100%, 45%));
+  --health-bg: hsl(220, 20%, 99%);
+  --wellness-purple: hsl(270, 50%, 60%);
+  --energy-orange: hsl(25, 95%, 60%);
+  
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+  
+  /* Spacing & Layout */
+  --radius: 16px;
+  --radius-sm: 8px;
+  --radius-lg: 24px;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
 .dark {
-  --background: hsl(0, 0%, 0%);
-  --foreground: hsl(200, 7%, 91%);
-  --card: hsl(228, 10%, 10%);
-  --card-foreground: hsl(0, 0%, 85%);
-  --popover: hsl(0, 0%, 0%);
-  --popover-foreground: hsl(200, 7%, 91%);
-  --primary: hsl(217, 79%, 58%);
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(195, 15%, 95%);
-  --secondary-foreground: hsl(213, 25%, 8%);
-  --muted: hsl(0, 0%, 9%);
-  --muted-foreground: hsl(210, 3%, 46%);
-  --accent: hsl(206, 70%, 8%);
-  --accent-foreground: hsl(217, 79%, 58%);
+  /* EVA Design System - Dark Theme */
+  --background: hsl(220, 14%, 8%);
+  --foreground: hsl(220, 14%, 96%);
+  --card: hsl(220, 14%, 11%);
+  --card-foreground: hsl(220, 14%, 96%);
+  --popover: hsl(220, 14%, 8%);
+  --popover-foreground: hsl(220, 14%, 96%);
+  
+  /* Primary Colors - EVA Blue (adjusted for dark) */
+  --primary: hsl(211, 100%, 60%);
+  --primary-foreground: hsl(220, 14%, 8%);
+  --primary-light: hsl(211, 100%, 15%);
+  --primary-dark: hsl(211, 100%, 70%);
+  
+  /* Secondary Colors */
+  --secondary: hsl(220, 14%, 16%);
+  --secondary-foreground: hsl(220, 14%, 96%);
+  
+  /* Status Colors */
+  --success: hsl(158, 64%, 52%);
+  --success-light: hsl(158, 64%, 15%);
+  --warning: hsl(43, 96%, 56%);
+  --warning-light: hsl(43, 96%, 15%);
+  --error: hsl(0, 84%, 60%);
+  --error-light: hsl(0, 84%, 15%);
+  --info: hsl(211, 100%, 60%);
+  --info-light: hsl(211, 100%, 15%);
+  
+  /* Neutral Colors */
+  --muted: hsl(220, 14%, 14%);
+  --muted-foreground: hsl(220, 14%, 60%);
+  --accent: hsl(220, 14%, 16%);
+  --accent-foreground: hsl(211, 100%, 60%);
   --destructive: hsl(0, 84%, 60%);
-  --destructive-foreground: hsl(0, 0%, 100%);
-  --border: hsl(210, 5%, 15%);
-  --input: hsl(208, 28%, 18%);
-  --ring: hsl(217, 79%, 58%);
-  --chart-1: hsl(217, 79%, 58%);
-  --chart-2: hsl(158, 64%, 52%);
-  --chart-3: hsl(43, 96%, 56%);
-  --chart-4: hsl(158, 64%, 52%);
-  --chart-5: hsl(340, 75%, 55%);
-  --sidebar: hsl(228, 10%, 10%);
-  --sidebar-foreground: hsl(0, 0%, 85%);
-  --sidebar-primary: hsl(217, 79%, 58%);
-  --sidebar-primary-foreground: hsl(0, 0%, 100%);
-  --sidebar-accent: hsl(206, 70%, 8%);
-  --sidebar-accent-foreground: hsl(217, 79%, 58%);
-  --sidebar-border: hsl(206, 16%, 26%);
-  --sidebar-ring: hsl(217, 79%, 58%);
+  --destructive-foreground: hsl(220, 14%, 8%);
+  
+  /* Surfaces */
+  --border: hsl(220, 14%, 20%);
+  --input: hsl(220, 14%, 16%);
+  --ring: hsl(211, 100%, 60%);
+  --surface-1: hsl(220, 14%, 10%);
+  --surface-2: hsl(220, 14%, 12%);
+  --surface-3: hsl(220, 14%, 16%);
   
   /* Health-specific colors for dark mode */
   --medical-blue: hsl(211, 100%, 60%);
   --trust-green: hsl(158, 64%, 52%);
-  --health-bg: hsl(228, 10%, 5%);
-  --warning-amber: hsl(43, 96%, 56%);
-  --success-green: hsl(158, 64%, 52%);
-  --error-red: hsl(0, 84%, 60%);
-  --light-blue: hsl(211, 100%, 15%);
-  --blue-gradient: linear-gradient(135deg, hsl(211, 100%, 60%), hsl(200, 100%, 55%));
+  --health-bg: hsl(220, 14%, 5%);
+  --wellness-purple: hsl(270, 50%, 70%);
+  --energy-orange: hsl(25, 95%, 70%);
 }
 
 @layer base {
@@ -101,92 +126,366 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
-    @apply font-sans antialiased bg-health-bg text-foreground;
+    @apply bg-health-bg text-foreground;
     font-family: var(--font-sans);
+    line-height: 1.5;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  
+  ::selection {
+    background-color: hsl(var(--primary) / 0.2);
+    color: var(--primary-foreground);
+  }
+
+  /* Mobile-first responsive design */
+  .container {
+    @apply w-full max-w-md mx-auto px-4;
+  }
+  
+  /* Larger screens */
+  @media (min-width: 768px) {
+    .container {
+      @apply max-w-2xl px-6;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .container {
+      @apply max-w-4xl px-8;
+    }
+  }
+}
+
+@layer components {
+  /* EVA Button System */
+  .eva-btn {
+    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-all duration-200 
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
+           disabled:pointer-events-none disabled:opacity-50 active:scale-95;
+  }
+  
+  .eva-btn-primary {
+    @apply eva-btn bg-primary text-primary-foreground shadow-md hover:shadow-lg;
+  }
+  
+  .eva-btn-primary:hover {
+    background-color: hsl(var(--primary-dark));
+  }
+  
+  .eva-btn-secondary {
+    @apply eva-btn bg-secondary text-secondary-foreground border border-border hover:bg-accent hover:text-accent-foreground;
+  }
+  
+  .eva-btn-ghost {
+    @apply eva-btn hover:bg-accent hover:text-accent-foreground;
+  }
+  
+  .eva-btn-sm {
+    @apply h-8 px-3 text-xs;
+  }
+  
+  .eva-btn-md {
+    @apply h-10 px-4;
+  }
+  
+  .eva-btn-lg {
+    @apply h-12 px-6 text-base;
+  }
+
+  /* EVA Card System */
+  .eva-card {
+    @apply rounded-[var(--radius)] border bg-card text-card-foreground shadow-sm transition-all duration-200;
+  }
+  
+  .eva-card-interactive {
+    @apply eva-card hover:shadow-md cursor-pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .eva-card-interactive:hover {
+    border-color: hsl(var(--primary) / 0.2);
+  }
+  
+  .eva-card-elevated {
+    @apply eva-card shadow-md border-0;
+  }
+
+  /* EVA Input System */
+  .eva-input {
+    @apply flex h-10 w-full rounded-lg border border-input px-3 py-2 text-sm 
+           ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium 
+           placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 
+           focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50
+           transition-all duration-200;
+    background-color: hsl(var(--input) / 0.5);
+  }
+
+  /* EVA Badge System */
+  .eva-badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors 
+           focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  }
+  
+  .eva-badge-success {
+    @apply eva-badge;
+    color: hsl(var(--success));
+    background-color: hsl(var(--success-light));
+    border: 1px solid hsl(var(--success) / 0.2);
+  }
+  
+  .eva-badge-warning {
+    @apply eva-badge;
+    color: hsl(var(--warning));
+    background-color: hsl(var(--warning-light));
+    border: 1px solid hsl(var(--warning) / 0.2);
+  }
+  
+  .eva-badge-error {
+    @apply eva-badge;
+    color: hsl(var(--error));
+    background-color: hsl(var(--error-light));
+    border: 1px solid hsl(var(--error) / 0.2);
+  }
+  
+  .eva-badge-info {
+    @apply eva-badge;
+    color: hsl(var(--info));
+    background-color: hsl(var(--info-light));
+    border: 1px solid hsl(var(--info) / 0.2);
+  }
+
+  /* EVA Status Indicators */
+  .eva-status {
+    @apply inline-flex items-center gap-1.5 text-xs font-medium;
+  }
+  
+  .eva-status-dot {
+    @apply w-1.5 h-1.5 rounded-full;
+  }
+
+  /* EVA Page Layout */
+  .eva-page {
+    @apply min-h-screen bg-health-bg;
+  }
+  
+  .eva-page-content {
+    @apply container py-4 pb-20;
+  }
+  
+  .eva-page-header {
+    @apply mb-6 space-y-2;
+  }
+  
+  .eva-page-title {
+    @apply text-2xl font-bold text-foreground;
+  }
+  
+  .eva-page-subtitle {
+    @apply text-muted-foreground;
+  }
+
+  /* EVA Mobile Navigation */
+  .eva-mobile-nav {
+    @apply fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border;
+  }
+  
+  .eva-bottom-nav {
+    @apply fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-t border-border;
+  }
+
+  /* EVA Chip/Cloud Buttons */
+  .eva-chip {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border 
+           transition-all duration-200 cursor-pointer hover:shadow-sm active:scale-95;
+  }
+  
+  .eva-chip-selected {
+    @apply eva-chip bg-primary text-primary-foreground border-primary shadow-md;
+  }
+  
+  .eva-chip-unselected {
+    @apply eva-chip bg-card text-card-foreground border-border hover:bg-accent hover:text-accent-foreground;
+  }
+
+  /* EVA Gradients */
+  .eva-gradient-primary {
+    background: linear-gradient(135deg, hsl(211, 100%, 50%) 0%, hsl(200, 100%, 45%) 100%);
+  }
+  
+  .eva-gradient-success {
+    background: linear-gradient(135deg, hsl(158, 64%, 52%) 0%, hsl(140, 64%, 47%) 100%);
+  }
+  
+  .eva-gradient-wellness {
+    background: linear-gradient(135deg, hsl(270, 50%, 60%) 0%, hsl(290, 50%, 55%) 100%);
+  }
+
+  /* EVA Animations */
+  .eva-fade-in {
+    animation: eva-fadeIn 0.3s ease-out;
+  }
+  
+  .eva-slide-up {
+    animation: eva-slideUp 0.3s ease-out;
+  }
+  
+  .eva-scale-in {
+    animation: eva-scaleIn 0.2s ease-out;
+  }
+
+  /* EVA Loading States */
+  .eva-skeleton {
+    @apply animate-pulse bg-muted rounded-[var(--radius-sm)];
+  }
+  
+  .eva-shimmer {
+    @apply relative overflow-hidden;
+  }
+  
+  .eva-shimmer::after {
+    @apply absolute inset-0 -translate-x-full;
+    content: '';
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: eva-shimmer 1.5s infinite;
   }
 }
 
 @layer utilities {
-  .text-medical-blue {
-    color: var(--medical-blue);
+  /* EVA Color Utilities */
+  .text-medical-blue { color: hsl(var(--medical-blue)); }
+  .bg-medical-blue { background-color: hsl(var(--medical-blue)); }
+  .text-trust-green { color: hsl(var(--trust-green)); }
+  .bg-trust-green { background-color: hsl(var(--trust-green)); }
+  .bg-health-bg { background-color: hsl(var(--health-bg)); }
+  .text-wellness-purple { color: hsl(var(--wellness-purple)); }
+  .bg-wellness-purple { background-color: hsl(var(--wellness-purple)); }
+  .text-energy-orange { color: hsl(var(--energy-orange)); }
+  .bg-energy-orange { background-color: hsl(var(--energy-orange)); }
+  
+  /* Status colors */
+  .text-success { color: hsl(var(--success)); }
+  .text-warning { color: hsl(var(--warning)); }
+  .text-error { color: hsl(var(--error)); }
+  .text-info { color: hsl(var(--info)); }
+  
+  /* EVA Surface Utilities */
+  .bg-surface-1 { background-color: var(--surface-1); }
+  .bg-surface-2 { background-color: var(--surface-2); }
+  .bg-surface-3 { background-color: var(--surface-3); }
+  
+  /* EVA Shadow Utilities */
+  .shadow-eva-sm { box-shadow: var(--shadow-sm); }
+  .shadow-eva-md { box-shadow: var(--shadow-md); }
+  .shadow-eva-lg { box-shadow: var(--shadow-lg); }
+  .shadow-eva-xl { box-shadow: var(--shadow-xl); }
+  
+  /* EVA Responsive Utilities */
+  .eva-mobile-only {
+    @media (min-width: 640px) {
+      display: none;
+    }
   }
   
-  .bg-medical-blue {
-    background-color: var(--medical-blue);
+  .eva-desktop-only {
+    @media (max-width: 639px) {
+      display: none;
+    }
   }
   
-  .text-trust-green {
-    color: var(--trust-green);
+  /* EVA Layout Utilities */
+  .eva-grid-auto {
+    @apply grid grid-cols-1 gap-4;
   }
   
-  .bg-trust-green {
-    background-color: var(--trust-green);
+  @media (min-width: 640px) {
+    .eva-grid-auto {
+      @apply grid-cols-2;
+    }
   }
   
-  .bg-health-bg {
-    background-color: var(--health-bg);
+  @media (min-width: 1024px) {
+    .eva-grid-auto {
+      @apply grid-cols-3;
+    }
   }
   
-  .text-warning-amber {
-    color: var(--warning-amber);
+  /* EVA Safe Areas */
+  .eva-safe-top {
+    padding-top: env(safe-area-inset-top);
   }
   
-  .bg-warning-amber {
-    background-color: var(--warning-amber);
+  .eva-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* EVA Animations */
+@keyframes eva-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes eva-slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes eva-scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes eva-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* EVA Mobile Optimizations */
+@media (max-width: 640px) {
+  .eva-mobile-spacing {
+    @apply px-4 py-3;
   }
   
-  .text-success-green {
-    color: var(--success-green);
+  .eva-mobile-text {
+    @apply text-sm;
   }
   
-  .bg-success-green {
-    background-color: var(--success-green);
+  .eva-mobile-touch {
+    @apply min-h-[44px] min-w-[44px];
   }
-  
-  .text-error-red {
-    color: var(--error-red);
-  }
-  
-  .bg-error-red {
-    background-color: var(--error-red);
-  }
-  
-  .bg-light-blue {
-    background-color: var(--light-blue);
-  }
-  
-  .bg-blue-gradient {
-    background: var(--blue-gradient);
-  }
-  
-  .asklepios-score {
-    @apply relative w-48 h-48 mx-auto;
-  }
-  
-  .asklepios-score-circle {
-    @apply absolute inset-0 rounded-full;
-    background: conic-gradient(
-      from 0deg,
-      var(--medical-blue) 0deg,
-      var(--medical-blue) calc(var(--score) * 3.6deg),
-      var(--light-blue) calc(var(--score) * 3.6deg)
-    );
-  }
-  
-  .asklepios-score-inner {
-    @apply absolute inset-2 rounded-full bg-white dark:bg-card flex items-center justify-center flex-col;
-  }
-  
-  .toggle-group {
-    @apply inline-flex rounded-lg bg-muted p-1;
-  }
-  
-  .toggle-group-item {
-    @apply px-3 py-1.5 text-sm font-medium rounded-md transition-all;
-  }
-  
-  .toggle-group-item-active {
-    @apply bg-white dark:bg-card text-foreground shadow-sm;
+}
+
+/* EVA Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

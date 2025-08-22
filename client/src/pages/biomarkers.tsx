@@ -3,21 +3,32 @@ import MobileNav from "@/components/layout/mobile-nav";
 import BottomNav from "@/components/layout/bottom-nav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Zap, Shield, Activity, TrendingUp, AlertCircle, CheckCircle } from "lucide-react";
+import { Heart, Zap, Shield, Activity, TrendingUp, AlertCircle, CheckCircle, Droplets, Brain } from "lucide-react";
 
 const iconMap = {
-  blood: Heart,
+  blood: Droplets,
   cardiovascular: Heart,
   metabolic: Zap,
   kidney: Shield,
   liver: Activity,
   immune: Shield,
+  brain: Brain,
 };
 
-const importanceColors = {
-  high: "bg-error-red text-white",
-  medium: "bg-warning-amber text-white",
-  low: "bg-muted text-muted-foreground",
+const categoryColors = {
+  blood: "text-error bg-error-light",
+  cardiovascular: "text-primary bg-primary-light", 
+  metabolic: "text-energy-orange bg-orange-50",
+  kidney: "text-success bg-success-light",
+  liver: "text-wellness-purple bg-purple-50",
+  immune: "text-info bg-info-light",
+  brain: "text-wellness-purple bg-purple-50",
+};
+
+const importanceStyles = {
+  high: "eva-badge-error",
+  medium: "eva-badge-warning", 
+  low: "eva-badge eva-badge border-muted-foreground/20 bg-muted text-muted-foreground",
 };
 
 export default function Biomarkers() {
@@ -27,14 +38,15 @@ export default function Biomarkers() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-health-bg">
+      <div className="eva-page">
         <MobileNav />
-        <main className="max-w-md mx-auto px-4 py-6 pb-20">
+        <main className="eva-page-content">
           <div className="space-y-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-card rounded-xl p-4 animate-pulse">
-                <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-muted rounded w-1/2"></div>
+              <div key={i} className="eva-card p-5 eva-shimmer">
+                <div className="eva-skeleton h-5 w-3/4 mb-3"></div>
+                <div className="eva-skeleton h-4 w-1/2 mb-2"></div>
+                <div className="eva-skeleton h-3 w-full"></div>
               </div>
             ))}
           </div>
@@ -45,95 +57,115 @@ export default function Biomarkers() {
   }
 
   return (
-    <div className="min-h-screen bg-health-bg">
+    <div className="eva-page">
       <MobileNav />
       
-      <main className="max-w-md mx-auto px-4 py-6 pb-20">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Биомаркеры</h1>
-          <p className="text-muted-foreground">Подробная информация о показателях здоровья</p>
+      <main className="eva-page-content">
+        <div className="eva-page-header">
+          <h1 className="eva-page-title">Биомаркеры</h1>
+          <p className="eva-page-subtitle">Подробная информация о показателях здоровья</p>
+        </div>
+
+        {/* Summary Cards */}
+        <div className="eva-grid-auto mb-6">
+          <div className="eva-card p-4 text-center">
+            <div className="text-2xl font-bold text-primary mb-1">{Array.isArray(biomarkers) ? biomarkers.length : 0}</div>
+            <div className="text-sm text-muted-foreground">Всего маркеров</div>
+          </div>
+          <div className="eva-card p-4 text-center">
+            <div className="text-2xl font-bold text-error mb-1">
+              {Array.isArray(biomarkers) ? biomarkers.filter((b: any) => b.importance === 'high').length : 0}
+            </div>
+            <div className="text-sm text-muted-foreground">Критичных</div>
+          </div>
         </div>
 
         {/* Biomarkers List */}
         <div className="space-y-4">
-          {biomarkers?.map((biomarker) => {
+          {Array.isArray(biomarkers) && biomarkers.map((biomarker: any, index: number) => {
             const IconComponent = iconMap[biomarker.category as keyof typeof iconMap] || Activity;
+            const categoryStyle = categoryColors[biomarker.category as keyof typeof categoryColors] || "text-muted-foreground bg-muted";
             
             return (
-              <Card key={biomarker.id} data-testid={`card-biomarker-${biomarker.id}`} className="shadow-sm">
+              <div 
+                key={biomarker.id} 
+                className="eva-card-interactive eva-slide-up" 
+                style={{ animationDelay: `${index * 0.1}s` }}
+                data-testid={`card-biomarker-${biomarker.id}`}
+              >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-medical-blue/10 rounded-full flex items-center justify-center">
-                        <IconComponent className="w-5 h-5 text-medical-blue" />
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${categoryStyle}`}>
+                        <IconComponent className="w-6 h-6" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg">{biomarker.name}</CardTitle>
+                        <CardTitle className="text-lg font-semibold">{biomarker.name}</CardTitle>
                         <p className="text-sm text-muted-foreground capitalize">{biomarker.category}</p>
                       </div>
                     </div>
-                    <Badge 
-                      className={importanceColors[biomarker.importance as keyof typeof importanceColors]}
-                      data-testid={`badge-importance-${biomarker.importance}`}
-                    >
+                    <div className={importanceStyles[biomarker.importance as keyof typeof importanceStyles]}>
                       {biomarker.importance === 'high' ? 'Высокий' : 
                        biomarker.importance === 'medium' ? 'Средний' : 'Низкий'}
-                    </Badge>
+                    </div>
                   </div>
                 </CardHeader>
                 
                 <CardContent className="space-y-4">
-                  <p className="text-sm text-card-foreground">{biomarker.description}</p>
+                  <p className="text-sm leading-relaxed">{biomarker.description}</p>
                   
                   {biomarker.normalRange && (
-                    <div className="bg-accent/50 rounded-lg p-3">
-                      <h4 className="font-medium text-sm mb-1 flex items-center">
-                        <TrendingUp className="w-4 h-4 mr-2 text-medical-blue" />
+                    <div className="eva-card bg-surface-1 border-0 p-4">
+                      <h4 className="font-semibold text-sm mb-2 flex items-center">
+                        <TrendingUp className="w-4 h-4 mr-2 text-primary" />
                         Нормальные значения
                       </h4>
-                      <p className="text-sm text-muted-foreground">
-                        {biomarker.normalRange.min} - {biomarker.normalRange.max} {biomarker.normalRange.unit}
-                      </p>
+                      <div className="text-lg font-mono font-bold text-primary">
+                        {biomarker.normalRange.min} - {biomarker.normalRange.max}
+                        <span className="text-sm font-normal text-muted-foreground ml-2">
+                          {biomarker.normalRange.unit}
+                        </span>
+                      </div>
                     </div>
                   )}
                   
                   {biomarker.recommendations && biomarker.recommendations.length > 0 && (
                     <div className="space-y-2">
-                      <h4 className="font-medium text-sm flex items-center">
-                        <CheckCircle className="w-4 h-4 mr-2 text-trust-green" />
+                      <h4 className="font-semibold text-sm flex items-center">
+                        <CheckCircle className="w-4 h-4 mr-2 text-success" />
                         Рекомендации
                       </h4>
-                      <ul className="space-y-1">
-                        {biomarker.recommendations.map((recommendation, index) => (
-                          <li key={index} className="text-sm text-muted-foreground flex items-start">
-                            <span className="w-1 h-1 bg-trust-green rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                            {recommendation}
-                          </li>
+                      <div className="space-y-2">
+                        {biomarker.recommendations.map((recommendation: any, index: number) => (
+                          <div key={index} className="flex items-start space-x-3 p-3 bg-surface-1 rounded-lg">
+                            <div className="w-1.5 h-1.5 bg-success rounded-full mt-2 flex-shrink-0"></div>
+                            <span className="text-sm leading-relaxed">{recommendation}</span>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     </div>
                   )}
                 </CardContent>
-              </Card>
+              </div>
             );
           })}
         </div>
 
-        {/* Educational Note */}
-        <Card className="mt-6 border-medical-blue/20 bg-medical-blue/5">
-          <CardContent className="p-4">
-            <div className="flex items-start space-x-3">
-              <AlertCircle className="w-5 h-5 text-medical-blue mt-0.5 flex-shrink-0" />
-              <div>
-                <h4 className="font-medium text-sm text-medical-blue mb-1">Важная информация</h4>
-                <p className="text-xs text-muted-foreground">
-                  Данная информация носит образовательный характер и не заменяет профессиональную медицинскую консультацию. 
-                  При отклонениях от нормы обратитесь к врачу.
-                </p>
-              </div>
+        {/* Educational Note - EVA Style */}
+        <div className="eva-card border-primary/20 bg-primary-light p-5 mt-6">
+          <div className="flex items-start space-x-3">
+            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+              <AlertCircle className="w-5 h-5 text-white" />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <h4 className="font-semibold text-primary mb-2">Важная информация</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Данная информация носит образовательный характер и не заменяет профессиональную медицинскую консультацию. 
+                При отклонениях от нормы обратитесь к врачу.
+              </p>
+            </div>
+          </div>
+        </div>
       </main>
 
       <BottomNav />
