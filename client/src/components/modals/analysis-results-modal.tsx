@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -94,6 +94,8 @@ export default function AnalysisResultsModal({ open, onOpenChange, analysis }: A
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md mx-auto h-[90vh] p-0 gap-0">
+        <DialogTitle className="sr-only">Результаты анализа крови</DialogTitle>
+        <DialogDescription className="sr-only">Подробные результаты вашего анализа крови с рекомендациями</DialogDescription>
         {/* Header */}
         <div className="bg-card p-4 border-b border-border flex items-center justify-between rounded-t-lg">
           <h3 className="text-lg font-bold text-card-foreground">Результаты анализа</h3>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Camera, X, Upload, FileText } from "lucide-react";
@@ -175,6 +175,7 @@ export default function BloodAnalysisModal({ open, onOpenChange }: BloodAnalysis
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm w-full p-6">
         <DialogTitle className="sr-only">Анализ крови</DialogTitle>
+        <DialogDescription className="sr-only">Загрузите фото анализа крови или введите данные вручную для анализа с помощью ИИ</DialogDescription>
         
         <div className="text-center mb-6">
           <div className="w-16 h-16 bg-trust-green/10 rounded-full flex items-center justify-center mx-auto mb-4">

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -84,6 +84,8 @@ export default function AIChatModal({ open, onOpenChange }: AIChatModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md mx-auto h-[90vh] p-0 gap-0">
+        <DialogTitle className="sr-only">ИИ Доктор</DialogTitle>
+        <DialogDescription className="sr-only">Консультация с искусственным интеллектом</DialogDescription>
         {/* Header */}
         <div className="bg-medical-blue text-white p-4 flex items-center justify-between rounded-t-lg">
           <div className="flex items-center space-x-3">
