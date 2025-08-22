@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService } from "./objectStorage";
+import DeepSeekAnalysisService from "./deepseekService";
 import { insertBloodAnalysisSchema, insertChatSessionSchema, insertChatMessageSchema, insertHealthMetricsSchema, insertHealthProfileSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -141,28 +142,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: "analyzing",
       });
 
-      // Simulate analysis processing - in real app this would be async
-      setTimeout(async () => {
-        try {
-          await storage.updateBloodAnalysis(req.params.id, {
-            status: "analyzed",
-            analyzedAt: new Date(),
-            results: {
-              hemoglobin: { value: 138, unit: "г/л", status: "normal" },
-              cholesterol: { value: 6.2, unit: "ммоль/л", status: "high" },
-              glucose: { value: 5.1, unit: "ммоль/л", status: "normal" },
-              creatinine: { value: 82, unit: "мкмоль/л", status: "normal" },
-            },
-          });
-        } catch (error) {
-          console.error("Error updating analysis status:", error);
-        }
-      }, 3000);
-
       res.json({ objectPath, analysis });
     } catch (error) {
       console.error("Error updating blood analysis image:", error);
       res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // DeepSeek Analysis routes
+  app.post("/api/blood-analyses/:id/analyze-text", async (req, res) => {
+    try {
+      const { text } = req.body;
+      if (!text) {
+        return res.status(400).json({ error: "Text is required" });
+      }
+
+      const deepSeekApiKey = process.env.DEEPSEEK_API_KEY;
+      if (!deepSeekApiKey) {
+        return res.status(500).json({ error: "DeepSeek API key not configured" });
+      }
+
+      const deepSeekService = new DeepSeekAnalysisService(deepSeekApiKey);
+      const analysisResults = await deepSeekService.analyzeBloodTestText(text);
+
+      // Update blood analysis with results
+      const updatedAnalysis = await storage.updateBloodAnalysis(req.params.id, {
+        status: "analyzed",
+        analyzedAt: new Date(),
+        results: analysisResults,
+      });
+
+      res.json({ analysis: updatedAnalysis, results: analysisResults });
+    } catch (error) {
+      console.error("Error analyzing text with DeepSeek:", error);
+      res.status(500).json({ error: "Analysis failed" });
+    }
+  });
+
+  app.post("/api/blood-analyses/:id/analyze-image", async (req, res) => {
+    try {
+      const { imageBase64 } = req.body;
+      if (!imageBase64) {
+        return res.status(400).json({ error: "Image data is required" });
+      }
+
+      const deepSeekApiKey = process.env.DEEPSEEK_API_KEY;
+      if (!deepSeekApiKey) {
+        return res.status(500).json({ error: "DeepSeek API key not configured" });
+      }
+
+      const deepSeekService = new DeepSeekAnalysisService(deepSeekApiKey);
+      const analysisResults = await deepSeekService.analyzeBloodTestImage(imageBase64);
+
+      // Update blood analysis with results
+      const updatedAnalysis = await storage.updateBloodAnalysis(req.params.id, {
+        status: "analyzed",
+        analyzedAt: new Date(),
+        results: analysisResults,
+      });
+
+      res.json({ analysis: updatedAnalysis, results: analysisResults });
+    } catch (error) {
+      console.error("Error analyzing image with DeepSeek:", error);
+      res.status(500).json({ error: "Analysis failed" });
     }
   });
 

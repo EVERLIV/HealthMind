@@ -15,8 +15,8 @@ export const healthProfiles = pgTable("health_profiles", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id).notNull(),
   age: integer("age"),
-  weight: decimal("weight", { precision: 5, scale: 2 }),
-  height: decimal("height", { precision: 5, scale: 2 }),
+  weight: text("weight"),
+  height: text("height"),
   medicalConditions: json("medical_conditions").$type<string[]>(),
   medications: json("medications").$type<string[]>(),
   completionPercentage: integer("completion_percentage").default(0),
@@ -28,7 +28,7 @@ export const bloodAnalyses = pgTable("blood_analyses", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id).notNull(),
   imageUrl: text("image_url"),
-  results: json("results").$type<Record<string, any>>(),
+  results: json("results").$type<any>(),
   status: text("status").notNull().default("pending"), // pending, analyzed, error
   analyzedAt: timestamp("analyzed_at"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -76,8 +76,8 @@ export const healthMetrics = pgTable("health_metrics", {
   heartRate: integer("heart_rate"),
   bloodPressureSystolic: integer("blood_pressure_systolic"),
   bloodPressureDiastolic: integer("blood_pressure_diastolic"),
-  temperature: decimal("temperature", { precision: 4, scale: 1 }),
-  recordedAt: timestamp("recorded_at").defaultNow(),
+  temperature: text("temperature"),
+  recordedAt: timestamp("recorded_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

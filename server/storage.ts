@@ -202,10 +202,16 @@ export class MemStorage implements IStorage {
   async createHealthProfile(insertProfile: InsertHealthProfile): Promise<HealthProfile> {
     const id = randomUUID();
     const profile: HealthProfile = { 
-      ...insertProfile, 
       id, 
       createdAt: new Date(), 
-      updatedAt: new Date() 
+      updatedAt: new Date(),
+      userId: insertProfile.userId,
+      age: insertProfile.age ?? null,
+      weight: insertProfile.weight ?? null,
+      height: insertProfile.height ?? null,
+      medicalConditions: insertProfile.medicalConditions ?? null,
+      medications: insertProfile.medications ?? null,
+      completionPercentage: insertProfile.completionPercentage ?? null,
     };
     this.healthProfiles.set(id, profile);
     return profile;
@@ -217,8 +223,13 @@ export class MemStorage implements IStorage {
       throw new Error("Health profile not found");
     }
     const updated: HealthProfile = { 
-      ...existing, 
-      ...updates, 
+      ...existing,
+      age: updates.age !== undefined ? updates.age : existing.age,
+      weight: updates.weight !== undefined ? updates.weight : existing.weight,
+      height: updates.height !== undefined ? updates.height : existing.height,
+      medicalConditions: updates.medicalConditions !== undefined ? updates.medicalConditions : existing.medicalConditions,
+      medications: updates.medications !== undefined ? updates.medications : existing.medications,
+      completionPercentage: updates.completionPercentage !== undefined ? updates.completionPercentage : existing.completionPercentage,
       updatedAt: new Date() 
     };
     this.healthProfiles.set(existing.id, updated);
@@ -237,9 +248,13 @@ export class MemStorage implements IStorage {
   async createBloodAnalysis(insertAnalysis: InsertBloodAnalysis): Promise<BloodAnalysis> {
     const id = randomUUID();
     const analysis: BloodAnalysis = { 
-      ...insertAnalysis, 
       id, 
-      createdAt: new Date() 
+      createdAt: new Date(),
+      userId: insertAnalysis.userId,
+      imageUrl: insertAnalysis.imageUrl ?? null,
+      results: insertAnalysis.results ?? null,
+      status: insertAnalysis.status ?? "pending",
+      analyzedAt: insertAnalysis.analyzedAt ?? null,
     };
     this.bloodAnalyses.set(id, analysis);
     return analysis;
@@ -266,7 +281,15 @@ export class MemStorage implements IStorage {
 
   async createBiomarker(insertBiomarker: InsertBiomarker): Promise<Biomarker> {
     const id = randomUUID();
-    const biomarker: Biomarker = { ...insertBiomarker, id };
+    const biomarker: Biomarker = { 
+      id,
+      name: insertBiomarker.name,
+      description: insertBiomarker.description,
+      category: insertBiomarker.category,
+      importance: insertBiomarker.importance,
+      normalRange: insertBiomarker.normalRange ?? null,
+      recommendations: insertBiomarker.recommendations ?? null,
+    };
     this.biomarkers.set(id, biomarker);
     return biomarker;
   }
