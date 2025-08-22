@@ -21,13 +21,11 @@ export default function HealthProfilePage() {
   
   if (showWizard || !profile?.profileData) {
     return (
-      <div className="min-h-screen bg-background py-8 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <HealthProfileWizard 
-            onComplete={handleComplete}
-            initialData={profile?.profileData}
-          />
-        </div>
+      <div className="min-h-screen bg-background">
+        <HealthProfileWizard 
+          onComplete={handleComplete}
+          initialData={profile?.profileData}
+        />
       </div>
     );
   }

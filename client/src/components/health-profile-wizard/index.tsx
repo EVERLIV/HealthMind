@@ -128,35 +128,35 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-medical-blue/5 to-background px-4 py-6">
-      <Card className="max-w-lg mx-auto p-0 overflow-hidden border-0 shadow-xl">
+    <div className="min-h-screen bg-gradient-to-b from-medical-blue/5 to-background">
+      <Card className="w-full md:max-w-lg md:mx-auto p-0 overflow-hidden border-0 md:shadow-xl md:my-6">
         {/* Header */}
-        <div className="bg-gradient-to-r from-medical-blue to-trust-green p-6 text-white">
-          <h2 className="text-xl font-bold mb-2">
+        <div className="bg-gradient-to-r from-medical-blue to-trust-green p-4 md:p-6 text-white">
+          <h2 className="text-lg md:text-xl font-bold mb-2">
             Профиль здоровья
           </h2>
-          <p className="text-white/90 text-sm">
+          <p className="text-white/90 text-xs md:text-sm">
             Шаг {currentStep} из {steps.length}
           </p>
         </div>
       
       {/* Progress Bar */}
-      <div className="px-6 pt-4">
-        <Progress value={progress} className="h-3 bg-gray-200 dark:bg-gray-700" />
+      <div className="px-4 md:px-6 pt-4">
+        <Progress value={progress} className="h-2 md:h-3 bg-gray-200 dark:bg-gray-700" />
       </div>
       
       {/* Step Title */}
-      <div className="px-6 py-4 border-b">
-        <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-medical-blue text-white text-sm">
+      <div className="px-4 md:px-6 py-3 md:py-4 border-b">
+        <h3 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-2">
+          <span className="flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded-full bg-medical-blue text-white text-xs md:text-sm">
             {currentStep}
           </span>
-          {steps[currentStep - 1].title}
+          <span className="text-sm md:text-base">{steps[currentStep - 1].title}</span>
         </h3>
       </div>
       
       {/* Current Step Content */}
-      <div className="px-6 py-6 min-h-[400px] max-h-[60vh] overflow-y-auto">
+      <div className="px-4 md:px-6 py-6 min-h-[400px] md:max-h-[60vh] overflow-y-auto">
         <CurrentStepComponent
           data={profileData}
           onUpdate={handleUpdateData}
@@ -164,36 +164,36 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
       </div>
       
       {/* Navigation Buttons */}
-      <div className="flex justify-between p-6 bg-gray-50 dark:bg-gray-900">
+      <div className="flex justify-between p-4 md:p-6 bg-gray-50 dark:bg-gray-900">
         <Button
           variant="ghost"
           onClick={handlePrevious}
           disabled={currentStep === 1}
-          className="text-muted-foreground"
+          className="text-muted-foreground text-sm md:text-base"
           data-testid="button-previous"
         >
-          <ChevronLeft className="w-4 h-4 mr-2" />
-          Назад
+          <ChevronLeft className="w-4 h-4 mr-1 md:mr-2" />
+          <span className="hidden sm:inline">Назад</span>
         </Button>
         
         {currentStep === steps.length ? (
           <Button
             onClick={handleComplete}
             disabled={saveProfileMutation.isPending}
-            className="bg-gradient-to-r from-trust-green to-medical-blue hover:opacity-90 text-white px-6"
+            className="bg-gradient-to-r from-trust-green to-medical-blue hover:opacity-90 text-white px-4 md:px-6 text-sm md:text-base"
             data-testid="button-complete"
           >
             {saveProfileMutation.isPending ? "Сохранение..." : "Завершить"}
-            <Check className="w-4 h-4 ml-2" />
+            <Check className="w-4 h-4 ml-1 md:ml-2" />
           </Button>
         ) : (
           <Button
             onClick={handleNext}
-            className="bg-gradient-to-r from-medical-blue to-trust-green hover:opacity-90 text-white px-6"
+            className="bg-gradient-to-r from-medical-blue to-trust-green hover:opacity-90 text-white px-4 md:px-6 text-sm md:text-base"
             data-testid="button-next"
           >
             Далее
-            <ChevronRight className="w-4 h-4 ml-2" />
+            <ChevronRight className="w-4 h-4 ml-1 md:ml-2" />
           </Button>
         )}
       </div>
