@@ -129,7 +129,7 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-medical-blue/5 to-background">
-      <Card className="w-full md:max-w-lg md:mx-auto p-0 overflow-hidden border-0 md:shadow-xl md:my-6">
+      <Card className="w-full md:max-w-lg md:mx-auto p-0 overflow-hidden border-0 md:shadow-xl md:my-6 rounded-none md:rounded-lg">
         {/* Header */}
         <div className="bg-gradient-to-r from-medical-blue to-trust-green p-4 md:p-6 text-white">
           <h2 className="text-lg md:text-xl font-bold mb-2">
