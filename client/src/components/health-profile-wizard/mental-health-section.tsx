@@ -26,14 +26,10 @@ export default function MentalHealthSection({ data, onUpdate }: MentalHealthSect
   };
   
   return (
-    <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
-      <div className="text-center mb-6">
-        <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center animate-bounce">
-          <svg className="w-12 h-12 text-purple-500" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M9.76 7.63C8.78 6.66 7.26 6.66 6.29 7.63C5.78 8.14 5.51 8.82 5.51 9.5S5.78 10.86 6.29 11.37C6.8 11.88 7.48 12.15 8.15 12.15C8.83 12.15 9.51 11.88 10.02 11.37C10.53 10.86 10.8 10.18 10.8 9.5S10.53 8.14 10.02 7.63M17.71 7.63C16.73 6.66 15.21 6.66 14.24 7.63C13.73 8.14 13.46 8.82 13.46 9.5S13.73 10.86 14.24 11.37C14.75 11.88 15.43 12.15 16.1 12.15C16.78 12.15 17.46 11.88 17.97 11.37C18.48 10.86 18.75 10.18 18.75 9.5S18.48 8.14 17.97 7.63M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2M12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20M8.5 16C8.5 14.34 9.84 13 11.5 13H12.5C14.16 13 15.5 14.34 15.5 16H8.5Z"/>
-          </svg>
-        </div>
-        <p className="text-sm text-muted-foreground animate-in fade-in duration-700 delay-200">
+    <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold mb-2">Психическое здоровье</h3>
+        <p className="text-sm text-muted-foreground">
           Оцените ваше эмоциональное состояние
         </p>
       </div>
@@ -59,9 +55,9 @@ export default function MentalHealthSection({ data, onUpdate }: MentalHealthSect
           data-testid="slider-stress"
         />
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Низкий 😌</span>
-          <span>Средний 😐</span>
-          <span>Высокий 😰</span>
+          <span>Низкий</span>
+          <span>Средний</span>
+          <span>Высокий</span>
         </div>
       </Card>
       
@@ -102,9 +98,9 @@ export default function MentalHealthSection({ data, onUpdate }: MentalHealthSect
           value={data.moodChanges || ""}
           onValueChange={(value) => onUpdate({ moodChanges: value as HealthProfileData["moodChanges"] })}
         >
-          <Card className="p-3 hover:bg-accent transition-colors">
-            <div className="flex items-start space-x-2">
-              <RadioGroupItem value="stable" id="stable" />
+          <Card className="p-4 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
+            <div className="flex items-start space-x-3">
+              <RadioGroupItem value="stable" id="stable" className="mt-1" />
               <div className="flex-1">
                 <Label htmlFor="stable" className="font-medium cursor-pointer">
                   Стабильное
@@ -116,9 +112,9 @@ export default function MentalHealthSection({ data, onUpdate }: MentalHealthSect
             </div>
           </Card>
           
-          <Card className="p-3 hover:bg-accent transition-colors">
-            <div className="flex items-start space-x-2">
-              <RadioGroupItem value="mild" id="mild" />
+          <Card className="p-4 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
+            <div className="flex items-start space-x-3">
+              <RadioGroupItem value="mild" id="mild" className="mt-1" />
               <div className="flex-1">
                 <Label htmlFor="mild" className="font-medium cursor-pointer">
                   Легкие колебания
@@ -130,9 +126,9 @@ export default function MentalHealthSection({ data, onUpdate }: MentalHealthSect
             </div>
           </Card>
           
-          <Card className="p-3 hover:bg-accent transition-colors">
-            <div className="flex items-start space-x-2">
-              <RadioGroupItem value="moderate" id="moderate" />
+          <Card className="p-4 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
+            <div className="flex items-start space-x-3">
+              <RadioGroupItem value="moderate" id="moderate" className="mt-1" />
               <div className="flex-1">
                 <Label htmlFor="moderate" className="font-medium cursor-pointer">
                   Умеренные колебания
@@ -144,9 +140,9 @@ export default function MentalHealthSection({ data, onUpdate }: MentalHealthSect
             </div>
           </Card>
           
-          <Card className="p-3 hover:bg-accent transition-colors">
-            <div className="flex items-start space-x-2">
-              <RadioGroupItem value="severe" id="severe" />
+          <Card className="p-4 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
+            <div className="flex items-start space-x-3">
+              <RadioGroupItem value="severe" id="severe" className="mt-1" />
               <div className="flex-1">
                 <Label htmlFor="severe" className="font-medium cursor-pointer">
                   Сильные колебания

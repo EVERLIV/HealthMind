@@ -12,11 +12,9 @@ interface LifestyleSectionProps {
 
 export default function LifestyleSection({ data, onUpdate }: LifestyleSectionProps) {
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-full flex items-center justify-center">
-          <Utensils className="w-10 h-10 text-amber-500" />
-        </div>
+    <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold mb-2">Образ жизни</h3>
         <p className="text-sm text-muted-foreground">
           Расскажите о ваших привычках
         </p>
@@ -33,7 +31,7 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
           onValueChange={(value) => onUpdate({ dietType: value as HealthProfileData["dietType"] })}
         >
           <div className="grid grid-cols-2 gap-3">
-            <Card className="p-3 hover:bg-accent transition-colors">
+            <Card className="p-3 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="standard" id="standard" />
                 <Label htmlFor="standard" className="cursor-pointer">Обычное</Label>
@@ -89,7 +87,7 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
           onValueChange={(value) => onUpdate({ smokingStatus: value as HealthProfileData["smokingStatus"] })}
         >
           <div className="grid grid-cols-2 gap-3">
-            <Card className="p-3 hover:bg-accent transition-colors">
+            <Card className="p-3 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="never" id="smoke-never" />
                 <Label htmlFor="smoke-never" className="cursor-pointer">Никогда</Label>
@@ -131,7 +129,7 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
           onValueChange={(value) => onUpdate({ alcoholConsumption: value as HealthProfileData["alcoholConsumption"] })}
         >
           <div className="grid grid-cols-2 gap-3">
-            <Card className="p-3 hover:bg-accent transition-colors">
+            <Card className="p-3 hover:shadow-md transition-all cursor-pointer border hover:border-medical-blue/50 bg-card/50">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="none" id="alc-none" />
                 <Label htmlFor="alc-none" className="cursor-pointer">Не употребляю</Label>

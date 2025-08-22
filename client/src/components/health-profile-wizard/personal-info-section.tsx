@@ -44,14 +44,10 @@ export default function PersonalInfoSection({ data, onUpdate }: PersonalInfoSect
   };
   
   return (
-    <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
-      <div className="text-center mb-6">
-        <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-medical-blue/20 to-trust-green/20 rounded-full flex items-center justify-center animate-bounce">
-          <svg className="w-12 h-12 text-medical-blue" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L18 5L15 7V9C15 11.2 13.2 13 11 13V15L13 17L15 18L17 15V13L21 9ZM3 9V7L6 5L9 7V9C9 11.2 10.8 13 13 13V15L11 17L9 18L7 15V13L3 9ZM12 13.5C14 13.5 15.5 12 15.5 10C15.5 8 14 6.5 12 6.5C10 6.5 8.5 8 8.5 10C8.5 12 10 13.5 12 13.5Z"/>
-          </svg>
-        </div>
-        <p className="text-sm text-muted-foreground animate-in fade-in duration-700 delay-200">
+    <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold mb-2">Основная информация</h3>
+        <p className="text-sm text-muted-foreground">
           Расскажите о себе для персональных рекомендаций
         </p>
       </div>

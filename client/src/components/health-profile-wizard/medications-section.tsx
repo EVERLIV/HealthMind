@@ -42,13 +42,11 @@ export default function MedicationsSection({ data, onUpdate }: MedicationsSectio
   };
   
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-violet-500/20 to-purple-500/20 rounded-full flex items-center justify-center">
-          <Pill className="w-10 h-10 text-violet-500" />
-        </div>
+    <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold mb-2">Лекарства и добавки</h3>
         <p className="text-sm text-muted-foreground">
-          Препараты и витамины
+          Укажите все принимаемые препараты для учета взаимодействий
         </p>
       </div>
       
