@@ -128,7 +128,7 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-medical-blue/5 to-background">
+    <div className="min-h-screen bg-gradient-to-b from-medical-blue/5 to-background pb-20">
       <Card className="w-full md:max-w-lg md:mx-auto p-0 overflow-hidden border-0 md:shadow-xl md:my-6 rounded-none md:rounded-lg">
         {/* Header */}
         <div className="bg-gradient-to-r from-medical-blue to-trust-green p-4 md:p-6 text-white">
@@ -153,7 +153,7 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
       </div>
       
       {/* Current Step Content */}
-      <div className="px-4 md:px-6 py-6 min-h-[400px] md:max-h-[60vh] overflow-y-auto">
+      <div className="px-4 md:px-6 py-6 min-h-[400px] overflow-y-auto">
         <div key={currentStep} className="animate-in fade-in-50 slide-in-from-right-4 duration-300">
           <CurrentStepComponent
             data={profileData}
@@ -161,9 +161,11 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
           />
         </div>
       </div>
-      
-      {/* Navigation Buttons */}
-      <div className="flex justify-between p-4 md:p-6 bg-gray-50 dark:bg-gray-900">
+    </Card>
+    
+    {/* Fixed Navigation Bar */}
+    <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-lg z-50">
+      <div className="w-full md:max-w-lg md:mx-auto flex justify-between items-center p-4">
         <Button
           variant="ghost"
           onClick={handlePrevious}
@@ -179,7 +181,7 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
           <Button
             onClick={handleComplete}
             disabled={saveProfileMutation.isPending}
-            className="bg-gradient-to-r from-trust-green to-medical-blue hover:opacity-90 text-white px-4 md:px-6 text-sm md:text-base"
+            className="bg-gradient-to-r from-trust-green to-medical-blue hover:opacity-90 text-white px-6 md:px-8 py-2 md:py-2.5 text-sm md:text-base rounded-full shadow-md"
             data-testid="button-complete"
           >
             {saveProfileMutation.isPending ? "Сохранение..." : "Завершить"}
@@ -188,7 +190,7 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
         ) : (
           <Button
             onClick={handleNext}
-            className="bg-gradient-to-r from-medical-blue to-trust-green hover:opacity-90 text-white px-4 md:px-6 text-sm md:text-base"
+            className="bg-gradient-to-r from-medical-blue to-trust-green hover:opacity-90 text-white px-6 md:px-8 py-2 md:py-2.5 text-sm md:text-base rounded-full shadow-md"
             data-testid="button-next"
           >
             Далее
@@ -196,7 +198,7 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
           </Button>
         )}
       </div>
-    </Card>
+    </div>
     </div>
   );
 }
