@@ -14,6 +14,9 @@ import AnalysisResultsModal from "@/components/modals/analysis-results-modal";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heart, Camera, MessageCircle, Activity, TrendingUp, Shield, Zap } from "lucide-react";
+import aiDoctorBg from '@/assets/images/ai-doctor-bg.png';
+import bloodAnalysisBg from '@/assets/images/blood-analysis-bg.png';
+import healthProfileBg from '@/assets/images/health-profile-bg.png';
 
 export default function Dashboard() {
   const [, navigate] = useLocation();
@@ -61,12 +64,18 @@ export default function Dashboard() {
           <button
             data-testid="button-ai-chat"
             onClick={() => setIsAIChatOpen(true)}
-            className="eva-card-interactive p-6 flex flex-col items-center space-y-3 text-center eva-gradient-primary text-white min-h-[120px] eva-scale-in hover:scale-105 transition-all duration-300"
+            className="eva-card-interactive p-6 flex flex-col items-center space-y-3 text-center text-white min-h-[120px] eva-scale-in hover:scale-105 transition-all duration-300 relative overflow-hidden"
+            style={{
+              backgroundImage: `url(${aiDoctorBg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
           >
-            <div className="p-3 bg-white/20 rounded-full">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-purple-600/90"></div>
+            <div className="relative z-10 p-3 bg-white/20 rounded-full">
               <MessageCircle className="w-6 h-6" />
             </div>
-            <div>
+            <div className="relative z-10">
               <div className="font-semibold">ИИ Доктор</div>
               <div className="text-xs opacity-90">Консультация</div>
             </div>
@@ -75,12 +84,18 @@ export default function Dashboard() {
           <button
             data-testid="button-blood-upload"
             onClick={() => setIsUploadOpen(true)}
-            className="eva-card-interactive p-6 flex flex-col items-center space-y-3 text-center eva-gradient-success text-white min-h-[120px] eva-scale-in hover:scale-105 transition-all duration-300"
+            className="eva-card-interactive p-6 flex flex-col items-center space-y-3 text-center text-white min-h-[120px] eva-scale-in hover:scale-105 transition-all duration-300 relative overflow-hidden"
+            style={{
+              backgroundImage: `url(${bloodAnalysisBg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
           >
-            <div className="p-3 bg-white/20 rounded-full">
+            <div className="absolute inset-0 bg-gradient-to-r from-green-600/90 to-teal-600/90"></div>
+            <div className="relative z-10 p-3 bg-white/20 rounded-full">
               <Camera className="w-6 h-6" />
             </div>
-            <div>
+            <div className="relative z-10">
               <div className="font-semibold">Анализ крови</div>
               <div className="text-xs opacity-90">Загрузить фото</div>
             </div>
@@ -89,8 +104,16 @@ export default function Dashboard() {
 
         {/* Profile Status Card - EVA Style */}
         {!hasProfile ? (
-          <div className="eva-card-elevated p-5 mb-6 eva-gradient-primary text-white eva-slide-up">
-            <div className="flex items-center justify-between">
+          <div 
+            className="eva-card-elevated p-5 mb-6 text-white eva-slide-up relative overflow-hidden"
+            style={{
+              backgroundImage: `url(${healthProfileBg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/90 to-blue-600/90"></div>
+            <div className="flex items-center justify-between relative z-10">
               <div className="flex-1">
                 <div className="flex items-center mb-2">
                   <Shield className="w-5 h-5 mr-2" />
