@@ -27,21 +27,23 @@ export default function MentalHealthSection({ data, onUpdate }: MentalHealthSect
   
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Психическое здоровье</h3>
-        <p className="text-sm text-muted-foreground mb-6">
-          Оцените ваше текущее эмоциональное состояние
+      <div className="text-center mb-6">
+        <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center">
+          <Brain className="w-10 h-10 text-purple-500" />
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Оцените ваше эмоциональное состояние
         </p>
       </div>
       
       {/* Stress Level */}
-      <div className="space-y-3">
-        <Label className="flex items-center justify-between">
+      <Card className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-0">
+        <Label className="flex items-center justify-between mb-3">
           <span className="flex items-center space-x-2">
-            <Brain className="w-4 h-4" />
-            <span>Уровень стресса</span>
+            <Brain className="w-5 h-5 text-purple-500" />
+            <span className="font-medium">Уровень стресса</span>
           </span>
-          <span className={`text-2xl font-bold ${getStressColor(data.stressLevel)}`}>
+          <span className={`text-3xl font-bold ${getStressColor(data.stressLevel)}`}>
             {data.stressLevel || 5}
           </span>
         </Label>
@@ -51,15 +53,15 @@ export default function MentalHealthSection({ data, onUpdate }: MentalHealthSect
           min={1}
           max={10}
           step={1}
-          className="w-full"
+          className="w-full mb-2"
           data-testid="slider-stress"
         />
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Низкий</span>
-          <span>Средний</span>
-          <span>Высокий</span>
+          <span>Низкий 😌</span>
+          <span>Средний 😐</span>
+          <span>Высокий 😰</span>
         </div>
-      </div>
+      </Card>
       
       {/* Anxiety Level */}
       <div className="space-y-3">

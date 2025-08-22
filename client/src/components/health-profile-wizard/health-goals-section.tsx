@@ -36,10 +36,12 @@ export default function HealthGoalsSection({ data, onUpdate }: HealthGoalsSectio
   
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Цели здоровья</h3>
-        <p className="text-sm text-muted-foreground mb-6">
-          Что вы хотите улучшить в своем здоровье?
+      <div className="text-center mb-6">
+        <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-trust-green/20 to-emerald-500/20 rounded-full flex items-center justify-center">
+          <Target className="w-10 h-10 text-trust-green" />
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Что вы хотите улучшить?
         </p>
       </div>
       

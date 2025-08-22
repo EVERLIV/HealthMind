@@ -58,10 +58,12 @@ export default function MedicalHistorySection({ data, onUpdate }: MedicalHistory
   
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Медицинская история</h3>
-        <p className="text-sm text-muted-foreground mb-6">
-          Эта информация поможет нам лучше понять ваше здоровье
+      <div className="text-center mb-6">
+        <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-red-500/20 to-pink-500/20 rounded-full flex items-center justify-center">
+          <Heart className="w-10 h-10 text-red-500" />
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Медицинская информация
         </p>
       </div>
       

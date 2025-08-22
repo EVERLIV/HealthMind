@@ -12,10 +12,12 @@ interface PhysicalHealthSectionProps {
 export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealthSectionProps) {
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Физическая активность</h3>
-        <p className="text-sm text-muted-foreground mb-6">
-          Оцените ваш уровень физической активности и фитнеса
+      <div className="text-center mb-6">
+        <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-trust-green/20 to-medical-blue/20 rounded-full flex items-center justify-center">
+          <Activity className="w-10 h-10 text-trust-green" />
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Оцените ваш уровень активности
         </p>
       </div>
       
@@ -29,15 +31,16 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
           value={data.activityLevel || ""}
           onValueChange={(value) => onUpdate({ activityLevel: value as HealthProfileData["activityLevel"] })}
         >
-          <Card className="p-3 hover:bg-accent transition-colors">
-            <div className="flex items-start space-x-2">
-              <RadioGroupItem value="sedentary" id="sedentary" />
+          <Card className="p-4 hover:shadow-lg transition-all cursor-pointer border-2 hover:border-medical-blue">
+            <div className="flex items-start space-x-3">
+              <RadioGroupItem value="sedentary" id="sedentary" className="mt-1" />
               <div className="flex-1">
-                <Label htmlFor="sedentary" className="font-medium cursor-pointer">
+                <Label htmlFor="sedentary" className="font-medium cursor-pointer flex items-center gap-2">
+                  <span className="text-lg">🪑</span>
                   Сидячий образ жизни
                 </Label>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Минимальная активность, преимущественно сидячая работа
+                  Минимальная активность
                 </p>
               </div>
             </div>

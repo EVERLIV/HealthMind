@@ -13,10 +13,12 @@ interface LifestyleSectionProps {
 export default function LifestyleSection({ data, onUpdate }: LifestyleSectionProps) {
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Образ жизни</h3>
-        <p className="text-sm text-muted-foreground mb-6">
-          Расскажите о ваших привычках и образе жизни
+      <div className="text-center mb-6">
+        <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-full flex items-center justify-center">
+          <Utensils className="w-10 h-10 text-amber-500" />
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Расскажите о ваших привычках
         </p>
       </div>
       
@@ -161,11 +163,16 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
       </div>
       
       {/* Water and Caffeine Intake */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="water" className="flex items-center space-x-2">
-            <Droplets className="w-4 h-4" />
-            <span>Вода (стаканов/день)</span>
+      <div className="grid grid-cols-1 gap-4">
+        <Card className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-0">
+          <Label htmlFor="water" className="flex items-center justify-between mb-3">
+            <span className="flex items-center space-x-2">
+              <Droplets className="w-5 h-5 text-blue-500" />
+              <span className="font-medium">Вода</span>
+            </span>
+            <span className="text-2xl font-bold text-blue-500">
+              {data.waterIntake || 0} 🥤
+            </span>
           </Label>
           <Input
             id="water"
@@ -175,14 +182,21 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onChange={(e) => onUpdate({ waterIntake: parseInt(e.target.value) || undefined })}
             min={0}
             max={20}
+            className="mb-2"
             data-testid="input-water"
           />
-        </div>
+          <p className="text-xs text-muted-foreground">Стаканов в день (норма: 8)</p>
+        </Card>
         
-        <div className="space-y-2">
-          <Label htmlFor="caffeine" className="flex items-center space-x-2">
-            <Coffee className="w-4 h-4" />
-            <span>Кофеин (чашек/день)</span>
+        <Card className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-0">
+          <Label htmlFor="caffeine" className="flex items-center justify-between mb-3">
+            <span className="flex items-center space-x-2">
+              <Coffee className="w-5 h-5 text-amber-600" />
+              <span className="font-medium">Кофеин</span>
+            </span>
+            <span className="text-2xl font-bold text-amber-600">
+              {data.caffeineIntake || 0} ☕
+            </span>
           </Label>
           <Input
             id="caffeine"
@@ -192,9 +206,11 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onChange={(e) => onUpdate({ caffeineIntake: parseInt(e.target.value) || undefined })}
             min={0}
             max={10}
+            className="mb-2"
             data-testid="input-caffeine"
           />
-        </div>
+          <p className="text-xs text-muted-foreground">Чашек в день (норма: 1-2)</p>
+        </Card>
       </div>
     </div>
   );

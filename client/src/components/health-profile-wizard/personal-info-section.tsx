@@ -45,10 +45,12 @@ export default function PersonalInfoSection({ data, onUpdate }: PersonalInfoSect
   
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Основная информация</h3>
-        <p className="text-sm text-muted-foreground mb-6">
-          Расскажите о себе, чтобы мы могли персонализировать ваши рекомендации
+      <div className="text-center mb-6">
+        <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-medical-blue/20 to-trust-green/20 rounded-full flex items-center justify-center">
+          <Calculator className="w-10 h-10 text-medical-blue" />
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Расскажите о себе для персональных рекомендаций
         </p>
       </div>
       
@@ -123,15 +125,15 @@ export default function PersonalInfoSection({ data, onUpdate }: PersonalInfoSect
       
       {/* BMI Calculator */}
       {data.bmi && (
-        <Card className="p-4 bg-light-blue border-0">
+        <Card className="p-4 bg-gradient-to-r from-medical-blue/10 to-trust-green/10 border-0 shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-white dark:bg-card rounded-lg">
-                <Calculator className="w-5 h-5 text-medical-blue" />
+              <div className="p-3 bg-white dark:bg-card rounded-xl shadow-md">
+                <Calculator className="w-6 h-6 text-medical-blue" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Индекс массы тела (ИМТ)</p>
-                <p className="text-2xl font-bold">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">ИМТ</p>
+                <p className="text-3xl font-bold">
                   <span className={getBMIColor(data.bmi)} data-testid="text-bmi">
                     {data.bmi}
                   </span>
@@ -139,13 +141,19 @@ export default function PersonalInfoSection({ data, onUpdate }: PersonalInfoSect
               </div>
             </div>
             <div className="text-right">
-              <p className={`text-sm font-medium ${getBMIColor(data.bmi)}`}>
+              <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getBMIColor(data.bmi)} bg-white dark:bg-card`}>
                 {getBMICategory(data.bmi)}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Норма: 18.5 - 24.9
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                18.5 - 24.9
               </p>
             </div>
+          </div>
+          <div className="mt-4 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-medical-blue to-trust-green transition-all"
+              style={{ width: `${Math.min(100, (data.bmi / 40) * 100)}%` }}
+            />
           </div>
         </Card>
       )}

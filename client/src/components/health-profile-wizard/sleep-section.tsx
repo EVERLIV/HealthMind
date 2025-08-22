@@ -38,22 +38,24 @@ export default function SleepSection({ data, onUpdate }: SleepSectionProps) {
   
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Сон и отдых</h3>
-        <p className="text-sm text-muted-foreground mb-6">
-          Качественный сон критически важен для здоровья
+      <div className="text-center mb-6">
+        <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-indigo-500/20 to-blue-500/20 rounded-full flex items-center justify-center">
+          <Moon className="w-10 h-10 text-indigo-500" />
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Качественный сон важен для здоровья
         </p>
       </div>
       
       {/* Sleep Hours */}
-      <div className="space-y-3">
-        <Label className="flex items-center justify-between">
+      <Card className="p-4 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border-0">
+        <Label className="flex items-center justify-between mb-3">
           <span className="flex items-center space-x-2">
-            <Clock className="w-4 h-4" />
-            <span>Часов сна в сутки</span>
+            <Clock className="w-5 h-5 text-indigo-500" />
+            <span className="font-medium">Часов сна</span>
           </span>
-          <span className={`text-2xl font-bold ${getSleepColor(data.sleepHours)}`}>
-            {data.sleepHours || 7}
+          <span className={`text-3xl font-bold ${getSleepColor(data.sleepHours)}`}>
+            {data.sleepHours || 7}h
           </span>
         </Label>
         <Slider
@@ -62,15 +64,15 @@ export default function SleepSection({ data, onUpdate }: SleepSectionProps) {
           min={3}
           max={12}
           step={0.5}
-          className="w-full"
+          className="w-full mb-2"
           data-testid="slider-sleep"
         />
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>3 часа</span>
-          <span>7-9 часов (норма)</span>
-          <span>12 часов</span>
+          <span>😴 3h</span>
+          <span>🌙 7-9h (норма)</span>
+          <span>😪 12h</span>
         </div>
-      </div>
+      </Card>
       
       {/* Sleep Quality */}
       <div className="space-y-3">

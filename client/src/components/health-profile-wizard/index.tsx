@@ -128,41 +128,35 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
   };
   
   return (
-    <Card className="max-w-2xl mx-auto p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-foreground mb-2">
-          Создание профиля здоровья
-        </h2>
-        <p className="text-muted-foreground text-sm">
-          Шаг {currentStep} из {steps.length}: {steps[currentStep - 1].title}
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-medical-blue/5 to-background px-4 py-6">
+      <Card className="max-w-lg mx-auto p-0 overflow-hidden border-0 shadow-xl">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-medical-blue to-trust-green p-6 text-white">
+          <h2 className="text-xl font-bold mb-2">
+            Профиль здоровья
+          </h2>
+          <p className="text-white/90 text-sm">
+            Шаг {currentStep} из {steps.length}
+          </p>
+        </div>
       
       {/* Progress Bar */}
-      <Progress value={progress} className="mb-6 h-2" />
+      <div className="px-6 pt-4">
+        <Progress value={progress} className="h-3 bg-gray-200 dark:bg-gray-700" />
+      </div>
       
-      {/* Step Indicators */}
-      <div className="flex justify-between mb-8">
-        {steps.map((step) => (
-          <div
-            key={step.id}
-            className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-colors ${
-              step.id < currentStep
-                ? "bg-trust-green text-white"
-                : step.id === currentStep
-                ? "bg-medical-blue text-white"
-                : "bg-muted text-muted-foreground"
-            }`}
-            data-testid={`step-indicator-${step.id}`}
-          >
-            {step.id < currentStep ? <Check className="w-4 h-4" /> : step.id}
-          </div>
-        ))}
+      {/* Step Title */}
+      <div className="px-6 py-4 border-b">
+        <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-medical-blue text-white text-sm">
+            {currentStep}
+          </span>
+          {steps[currentStep - 1].title}
+        </h3>
       </div>
       
       {/* Current Step Content */}
-      <div className="min-h-[400px] mb-6">
+      <div className="px-6 py-6 min-h-[400px] max-h-[60vh] overflow-y-auto">
         <CurrentStepComponent
           data={profileData}
           onUpdate={handleUpdateData}
@@ -170,11 +164,12 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
       </div>
       
       {/* Navigation Buttons */}
-      <div className="flex justify-between">
+      <div className="flex justify-between p-6 bg-gray-50 dark:bg-gray-900">
         <Button
-          variant="outline"
+          variant="ghost"
           onClick={handlePrevious}
           disabled={currentStep === 1}
+          className="text-muted-foreground"
           data-testid="button-previous"
         >
           <ChevronLeft className="w-4 h-4 mr-2" />
@@ -185,7 +180,7 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
           <Button
             onClick={handleComplete}
             disabled={saveProfileMutation.isPending}
-            className="bg-trust-green hover:bg-trust-green/90"
+            className="bg-gradient-to-r from-trust-green to-medical-blue hover:opacity-90 text-white px-6"
             data-testid="button-complete"
           >
             {saveProfileMutation.isPending ? "Сохранение..." : "Завершить"}
@@ -194,7 +189,7 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
         ) : (
           <Button
             onClick={handleNext}
-            className="bg-medical-blue hover:bg-medical-blue/90"
+            className="bg-gradient-to-r from-medical-blue to-trust-green hover:opacity-90 text-white px-6"
             data-testid="button-next"
           >
             Далее
@@ -203,5 +198,6 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
         )}
       </div>
     </Card>
+    </div>
   );
 }
