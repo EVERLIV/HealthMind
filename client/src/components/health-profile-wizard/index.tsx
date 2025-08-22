@@ -131,13 +131,28 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
     <div className="min-h-screen bg-gradient-to-b from-medical-blue/5 to-background">
       <Card className="w-full md:max-w-lg md:mx-auto p-0 overflow-hidden border-0 md:shadow-xl md:my-6 rounded-none md:rounded-lg">
         {/* Header */}
-        <div className="bg-gradient-to-r from-medical-blue to-trust-green p-4 md:p-6 text-white">
-          <h2 className="text-lg md:text-xl font-bold mb-2">
-            Профиль здоровья
-          </h2>
-          <p className="text-white/90 text-xs md:text-sm">
-            Шаг {currentStep} из {steps.length}
-          </p>
+        <div className="bg-gradient-to-r from-medical-blue via-purple-500 to-trust-green p-4 md:p-6 text-white animate-gradient-x">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg md:text-xl font-bold mb-2 animate-in fade-in duration-500">
+                Профиль здоровья
+              </h2>
+              <p className="text-white/90 text-xs md:text-sm animate-in fade-in duration-700 delay-200">
+                Шаг {currentStep} из {steps.length}
+              </p>
+            </div>
+            <div className="text-4xl animate-pulse">
+              {currentStep === 1 && "👤"}
+              {currentStep === 2 && "💪"}
+              {currentStep === 3 && "🧠"}
+              {currentStep === 4 && "😴"}
+              {currentStep === 5 && "🍎"}
+              {currentStep === 6 && "❤️"}
+              {currentStep === 7 && "💊"}
+              {currentStep === 8 && "🎯"}
+              {currentStep === 9 && "✅"}
+            </div>
+          </div>
         </div>
       
       {/* Progress Bar */}
@@ -145,22 +160,21 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
         <Progress value={progress} className="h-2 md:h-3 bg-gray-200 dark:bg-gray-700" />
       </div>
       
-      {/* Step Title */}
+      {/* Step Title - Убираем повторяющийся номер шага */}
       <div className="px-4 md:px-6 py-3 md:py-4 border-b">
-        <h3 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-2">
-          <span className="flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded-full bg-medical-blue text-white text-xs md:text-sm">
-            {currentStep}
-          </span>
-          <span className="text-sm md:text-base">{steps[currentStep - 1].title}</span>
+        <h3 className="text-base md:text-lg font-semibold text-foreground animate-in slide-in-from-left-2 duration-300">
+          {steps[currentStep - 1].title}
         </h3>
       </div>
       
       {/* Current Step Content */}
       <div className="px-4 md:px-6 py-6 min-h-[400px] md:max-h-[60vh] overflow-y-auto">
-        <CurrentStepComponent
-          data={profileData}
-          onUpdate={handleUpdateData}
-        />
+        <div key={currentStep} className="animate-in fade-in-50 slide-in-from-right-4 duration-300">
+          <CurrentStepComponent
+            data={profileData}
+            onUpdate={handleUpdateData}
+          />
+        </div>
       </div>
       
       {/* Navigation Buttons */}

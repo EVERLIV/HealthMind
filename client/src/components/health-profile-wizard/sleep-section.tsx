@@ -37,12 +37,14 @@ export default function SleepSection({ data, onUpdate }: SleepSectionProps) {
   };
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
       <div className="text-center mb-6">
-        <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-indigo-500/20 to-blue-500/20 rounded-full flex items-center justify-center">
-          <Moon className="w-10 h-10 text-indigo-500" />
+        <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-indigo-500/20 to-blue-500/20 rounded-full flex items-center justify-center animate-pulse">
+          <svg className="w-12 h-12 text-indigo-500" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M22,17L20.22,18.5L20.95,21L18.5,19.45L16.05,21L16.78,18.5L15,17L17.6,16.93L18.5,14.5L19.4,16.93L22,17M13.34,12.78L15.78,14.08L13.66,15.75L11.22,14.45L13.34,12.78M8.34,18.5C5.66,15.11 4.5,10.8 6.07,6.81C3.42,10.86 3,16.04 5.64,20.54C5.64,20.54 8,17.4 8.34,18.5Z"/>
+          </svg>
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground animate-in fade-in duration-700 delay-200">
           Качественный сон важен для здоровья
         </p>
       </div>

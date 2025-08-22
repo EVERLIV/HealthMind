@@ -11,12 +11,16 @@ interface PhysicalHealthSectionProps {
 
 export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealthSectionProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
       <div className="text-center mb-6">
-        <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-trust-green/20 to-medical-blue/20 rounded-full flex items-center justify-center">
-          <Activity className="w-10 h-10 text-trust-green" />
+        <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-trust-green/20 to-emerald-500/20 rounded-full flex items-center justify-center animate-pulse">
+          <svg className="w-12 h-12 text-trust-green" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M15.5 5A1.5 1.5 0 0017 3.5c0-.83-.67-1.5-1.5-1.5S14 2.67 14 3.5 14.67 5 15.5 5M9.5 8.5L12 7l2.5 1.5L17 7l1.09 3.27c.22.66-.16 1.38-.82 1.6L16 12.5v6c0 .55-.45 1-1 1s-1-.45-1-1v-5.5h-2V18c0 .55-.45 1-1 1s-1-.45-1-1v-6l-1.27-.63c-.66-.22-1.04-.94-.82-1.6L9.5 8.5z"/>
+            <circle cx="6" cy="16" r="2"/>
+            <circle cx="18" cy="16" r="2"/>
+          </svg>
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground animate-in fade-in duration-700 delay-200">
           Оцените ваш уровень активности
         </p>
       </div>
