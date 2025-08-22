@@ -63,12 +63,14 @@ export default function MedicationsSection({ data, onUpdate }: MedicationsSectio
                 placeholder="Название"
                 value={newMedication.name}
                 onChange={(e) => setNewMedication({ ...newMedication, name: e.target.value })}
+                className="rounded-full"
                 data-testid="input-med-name"
               />
               <Input
                 placeholder="Дозировка"
                 value={newMedication.dosage}
                 onChange={(e) => setNewMedication({ ...newMedication, dosage: e.target.value })}
+                className="rounded-full"
                 data-testid="input-med-dosage"
               />
               <div className="flex space-x-2">
@@ -77,9 +79,10 @@ export default function MedicationsSection({ data, onUpdate }: MedicationsSectio
                   value={newMedication.frequency}
                   onChange={(e) => setNewMedication({ ...newMedication, frequency: e.target.value })}
                   onKeyPress={(e) => e.key === "Enter" && addMedication()}
+                  className="rounded-full"
                   data-testid="input-med-frequency"
                 />
-                <Button onClick={addMedication} size="sm" className="bg-medical-blue hover:bg-medical-blue/90">
+                <Button onClick={addMedication} size="sm" className="rounded-full bg-medical-blue hover:bg-medical-blue/90 px-4">
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>
@@ -123,7 +126,7 @@ export default function MedicationsSection({ data, onUpdate }: MedicationsSectio
                 placeholder="Название"
                 value={newSupplement.name}
                 onChange={(e) => setNewSupplement({ ...newSupplement, name: e.target.value })}
-                className="flex-1"
+                className="flex-1 rounded-full"
                 data-testid="input-supp-name"
               />
               <Input
@@ -131,10 +134,10 @@ export default function MedicationsSection({ data, onUpdate }: MedicationsSectio
                 value={newSupplement.dosage}
                 onChange={(e) => setNewSupplement({ ...newSupplement, dosage: e.target.value })}
                 onKeyPress={(e) => e.key === "Enter" && addSupplement()}
-                className="flex-1"
+                className="flex-1 rounded-full"
                 data-testid="input-supp-dosage"
               />
-              <Button onClick={addSupplement} size="sm" className="bg-trust-green hover:bg-trust-green/90">
+              <Button onClick={addSupplement} size="sm" className="rounded-full bg-trust-green hover:bg-trust-green/90 px-4">
                 <Plus className="w-4 h-4" />
               </Button>
             </div>

@@ -1,5 +1,4 @@
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Target, Trophy, Heart } from "lucide-react";
@@ -49,27 +48,19 @@ export default function HealthGoalsSection({ data, onUpdate }: HealthGoalsSectio
           <Target className="w-4 h-4" />
           <span>Выберите ваши цели</span>
         </Label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="flex flex-wrap gap-2">
           {healthGoalOptions.map((goal) => (
-            <Card 
-              key={goal.value} 
-              className={`p-3 hover:shadow-md transition-all cursor-pointer border ${
-                data.healthGoals?.includes(goal.value) 
-                  ? "border-medical-blue bg-medical-blue/10" 
-                  : "hover:border-medical-blue/50 bg-card/50"
+            <button
+              key={goal.value}
+              onClick={() => handleGoalToggle(goal.value, !data.healthGoals?.includes(goal.value))}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                data.healthGoals?.includes(goal.value)
+                  ? "bg-medical-blue text-white shadow-md"
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
               }`}
             >
-              <div className="flex items-center space-x-3">
-                <Checkbox
-                  id={goal.value}
-                  checked={data.healthGoals?.includes(goal.value) || false}
-                  onCheckedChange={(checked) => handleGoalToggle(goal.value, checked as boolean)}
-                />
-                <Label htmlFor={goal.value} className="cursor-pointer font-normal flex-1">
-                  {goal.label}
-                </Label>
-              </div>
-            </Card>
+              {goal.label}
+            </button>
           ))}
         </div>
       </div>
@@ -92,7 +83,7 @@ export default function HealthGoalsSection({ data, onUpdate }: HealthGoalsSectio
       </div>
       
       {/* Motivation Card */}
-      <Card className="p-4 bg-gradient-to-r from-medical-blue/10 to-trust-green/10 border-0">
+      <div className="p-4 bg-gradient-to-r from-medical-blue/10 to-trust-green/10 rounded-lg">
         <div className="flex items-start space-x-3">
           <Heart className="w-5 h-5 text-medical-blue mt-0.5" />
           <div>
@@ -104,11 +95,11 @@ export default function HealthGoalsSection({ data, onUpdate }: HealthGoalsSectio
             </p>
           </div>
         </div>
-      </Card>
+      </div>
       
       {/* Selected Goals Summary */}
       {data.healthGoals && data.healthGoals.length > 0 && (
-        <Card className="p-4 bg-light-blue border-0">
+        <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg">
           <p className="text-sm font-medium mb-2">Выбранные цели ({data.healthGoals.length}):</p>
           <div className="flex flex-wrap gap-2">
             {data.healthGoals.map(goalValue => {
@@ -116,14 +107,14 @@ export default function HealthGoalsSection({ data, onUpdate }: HealthGoalsSectio
               return goal ? (
                 <span 
                   key={goalValue} 
-                  className="inline-flex items-center px-2 py-1 bg-white dark:bg-card rounded-md text-xs"
+                  className="inline-flex items-center px-3 py-1 bg-white dark:bg-card rounded-full text-xs font-medium shadow-sm"
                 >
                   {goal.label}
                 </span>
               ) : null;
             })}
           </div>
-        </Card>
+        </div>
       )}
     </div>
   );
