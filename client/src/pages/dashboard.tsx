@@ -124,37 +124,6 @@ export default function Dashboard() {
           </div>
         )}
         
-        {/* Health Score - EVA Style */}
-        <div className="eva-card-elevated p-6 mb-6 text-center eva-fade-in">
-          <div className="mb-4">
-            <div className="text-3xl font-bold eva-gradient-primary bg-clip-text text-transparent mb-2">88</div>
-            <div className="text-sm text-muted-foreground flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 mr-1 text-success" />
-              Индекс здоровья EVA
-            </div>
-          </div>
-          <div className="flex justify-center space-x-4">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-primary-light rounded-full flex items-center justify-center mb-1">
-                <Heart className="w-5 h-5 text-primary" />
-              </div>
-              <div className="text-xs text-muted-foreground">Сердце</div>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-success-light rounded-full flex items-center justify-center mb-1">
-                <Zap className="w-5 h-5 text-success" />
-              </div>
-              <div className="text-xs text-muted-foreground">Энергия</div>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-warning-light rounded-full flex items-center justify-center mb-1">
-                <Activity className="w-5 h-5 text-warning" />
-              </div>
-              <div className="text-xs text-muted-foreground">Активность</div>
-            </div>
-          </div>
-        </div>
-        
         {/* Health Cards Grid */}
         <div className="space-y-4 mb-6">
           <div className="eva-slide-up" style={{ animationDelay: '0.1s' }}>
