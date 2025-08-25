@@ -47,7 +47,7 @@ export default function Recommendations() {
 
   const { data: recommendations, isLoading, refetch } = useQuery<HealthRecommendations>({
     queryKey: ["/api/recommendations"],
-    enabled: false
+    enabled: true
   });
 
   const { data: healthProfile } = useQuery({
@@ -62,11 +62,7 @@ export default function Recommendations() {
   const hasAnalyses = bloodAnalyses && Array.isArray(bloodAnalyses) && bloodAnalyses.length > 0;
   const canGenerateRecommendations = hasProfile || hasAnalyses;
 
-  useEffect(() => {
-    if (canGenerateRecommendations && !recommendations && !isLoading) {
-      handleGenerateRecommendations();
-    }
-  }, [canGenerateRecommendations]);
+  // Remove auto-generation since enabled is now true
 
   const handleGenerateRecommendations = async () => {
     setIsGenerating(true);
@@ -185,85 +181,87 @@ export default function Recommendations() {
         </div>
 
         {recommendations?.disclaimer && (
-          <Alert className="mb-6 border-yellow-200 bg-yellow-50">
-            <AlertCircle className="h-4 w-4 text-yellow-600" />
-            <AlertTitle className="text-yellow-800">Важная информация</AlertTitle>
-            <AlertDescription className="text-yellow-700 text-sm">
+          <Alert className="mb-4 border-yellow-200 bg-yellow-50 p-3">
+            <AlertCircle className="h-3 w-3 text-yellow-600" />
+            <AlertTitle className="text-yellow-800 text-sm">Важная информация</AlertTitle>
+            <AlertDescription className="text-yellow-700 text-xs mt-1">
               {recommendations.disclaimer}
             </AlertDescription>
           </Alert>
         )}
 
-        {/* Summary */}
+        {/* Summary - Mobile Optimized */}
         {recommendations?.summary && (
-          <Card className="eva-card-elevated mb-6 border-primary/20">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center text-lg">
-                <Heart className="w-5 h-5 mr-2 text-primary" />
+          <Card className="eva-card-elevated mb-4 border-primary/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center text-base">
+                <Heart className="w-4 h-4 mr-1.5 text-primary" />
                 Анализ состояния здоровья
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm leading-relaxed">{recommendations.summary}</p>
+            <CardContent className="pt-0">
+              <p className="text-xs leading-relaxed">{recommendations.summary}</p>
             </CardContent>
           </Card>
         )}
 
-        {/* Priority Areas */}
+        {/* Priority Areas - Mobile Optimized */}
         {recommendations?.priorityAreas && recommendations.priorityAreas.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-3 flex items-center">
-              <Target className="w-5 h-5 mr-2 text-primary" />
+          <div className="mb-4">
+            <h2 className="text-base font-semibold mb-2 flex items-center">
+              <Target className="w-4 h-4 mr-1.5 text-primary" />
               Приоритетные направления
             </h2>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {recommendations.priorityAreas.map((area, index) => (
                 <div
                   key={index}
-                  className={`eva-card p-4 flex items-center justify-between ${getPriorityColor(index)}`}
+                  className={`eva-card p-3 flex items-center justify-between ${getPriorityColor(index)}`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                  <div className="flex items-center gap-2">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                       index === 0 ? 'bg-red-200' : index === 1 ? 'bg-yellow-200' : 'bg-blue-200'
                     }`}>
                       {index + 1}
                     </div>
-                    <span className="font-medium">{area}</span>
+                    <span className="text-sm font-medium">{area}</span>
                   </div>
-                  <ChevronRight className="w-5 h-5 opacity-50" />
+                  <ChevronRight className="w-4 h-4 opacity-50" />
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Tabs for Recommendations */}
+        {/* Tabs for Recommendations - Mobile Optimized */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid grid-cols-5 w-full">
-            <TabsTrigger value="overview" className="text-xs">Обзор</TabsTrigger>
-            <TabsTrigger value="nutrition" className="text-xs">Питание</TabsTrigger>
-            <TabsTrigger value="activity" className="text-xs">Активность</TabsTrigger>
-            <TabsTrigger value="lifestyle" className="text-xs">Образ жизни</TabsTrigger>
-            <TabsTrigger value="supplements" className="text-xs">Добавки</TabsTrigger>
+          <TabsList className="grid grid-cols-3 w-full mb-2">
+            <TabsTrigger value="overview" className="text-[10px] px-1">Обзор</TabsTrigger>
+            <TabsTrigger value="nutrition" className="text-[10px] px-1">Питание</TabsTrigger>
+            <TabsTrigger value="activity" className="text-[10px] px-1">Активность</TabsTrigger>
+          </TabsList>
+          <TabsList className="grid grid-cols-2 w-full">
+            <TabsTrigger value="lifestyle" className="text-[10px] px-1">Образ жизни</TabsTrigger>
+            <TabsTrigger value="supplements" className="text-[10px] px-1">Добавки</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="mt-4 space-y-4">
+          <TabsContent value="overview" className="mt-3 space-y-3">
             {recommendations?.actionPlan && recommendations.actionPlan.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center text-lg">
-                    <TrendingUp className="w-5 h-5 mr-2 text-success" />
+              <Card className="p-3">
+                <CardHeader className="p-0 pb-2">
+                  <CardTitle className="flex items-center text-sm">
+                    <TrendingUp className="w-4 h-4 mr-1.5 text-success" />
                     План действий
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
+                <CardContent className="p-0">
+                  <div className="space-y-2">
                     {recommendations.actionPlan.map((step, index) => (
-                      <div key={index} className="flex gap-3">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                          <span className="text-xs font-bold text-primary">{index + 1}</span>
+                      <div key={index} className="flex gap-2">
+                        <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <span className="text-[10px] font-bold text-primary">{index + 1}</span>
                         </div>
-                        <p className="text-sm">{step}</p>
+                        <p className="text-xs">{step}</p>
                       </div>
                     ))}
                   </div>
@@ -272,19 +270,19 @@ export default function Recommendations() {
             )}
 
             {recommendations?.nextSteps && recommendations.nextSteps.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center text-lg">
-                    <Calendar className="w-5 h-5 mr-2 text-primary" />
+              <Card className="p-3">
+                <CardHeader className="p-0 pb-2">
+                  <CardTitle className="flex items-center text-sm">
+                    <Calendar className="w-4 h-4 mr-1.5 text-primary" />
                     Следующие шаги
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
+                <CardContent className="p-0">
+                  <div className="space-y-1.5">
                     {recommendations.nextSteps.map((step, index) => (
-                      <div key={index} className="flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
-                        <p className="text-sm">{step}</p>
+                      <div key={index} className="flex items-start gap-1.5">
+                        <CheckCircle2 className="w-3 h-3 text-success mt-0.5 flex-shrink-0" />
+                        <p className="text-xs">{step}</p>
                       </div>
                     ))}
                   </div>
@@ -293,20 +291,20 @@ export default function Recommendations() {
             )}
           </TabsContent>
 
-          <TabsContent value="nutrition" className="mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center text-lg">
-                  <Apple className="w-5 h-5 mr-2 text-green-600" />
+          <TabsContent value="nutrition" className="mt-3">
+            <Card className="p-3">
+              <CardHeader className="p-0 pb-2">
+                <CardTitle className="flex items-center text-sm">
+                  <Apple className="w-4 h-4 mr-1.5 text-green-600" />
                   {recommendations?.nutrition?.title || "Питание"}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
+              <CardContent className="p-0">
+                <div className="space-y-2">
                   {recommendations?.nutrition?.items?.map((item, index) => (
-                    <div key={index} className="flex gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">{item}</p>
+                    <div key={index} className="flex gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs">{item}</p>
                     </div>
                   ))}
                 </div>
@@ -314,20 +312,20 @@ export default function Recommendations() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="activity" className="mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center text-lg">
-                  <Activity className="w-5 h-5 mr-2 text-blue-600" />
+          <TabsContent value="activity" className="mt-3">
+            <Card className="p-3">
+              <CardHeader className="p-0 pb-2">
+                <CardTitle className="flex items-center text-sm">
+                  <Activity className="w-4 h-4 mr-1.5 text-blue-600" />
                   {recommendations?.physicalActivity?.title || "Физическая активность"}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
+              <CardContent className="p-0">
+                <div className="space-y-2">
                   {recommendations?.physicalActivity?.items?.map((item, index) => (
-                    <div key={index} className="flex gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">{item}</p>
+                    <div key={index} className="flex gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs">{item}</p>
                     </div>
                   ))}
                 </div>
@@ -335,20 +333,20 @@ export default function Recommendations() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="lifestyle" className="mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center text-lg">
-                  <Moon className="w-5 h-5 mr-2 text-purple-600" />
+          <TabsContent value="lifestyle" className="mt-3">
+            <Card className="p-3">
+              <CardHeader className="p-0 pb-2">
+                <CardTitle className="flex items-center text-sm">
+                  <Moon className="w-4 h-4 mr-1.5 text-purple-600" />
                   {recommendations?.lifestyle?.title || "Образ жизни"}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
+              <CardContent className="p-0">
+                <div className="space-y-2">
                   {recommendations?.lifestyle?.items?.map((item, index) => (
-                    <div key={index} className="flex gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">{item}</p>
+                    <div key={index} className="flex gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs">{item}</p>
                     </div>
                   ))}
                 </div>
@@ -356,20 +354,20 @@ export default function Recommendations() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="supplements" className="mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center text-lg">
-                  <Pill className="w-5 h-5 mr-2 text-orange-600" />
+          <TabsContent value="supplements" className="mt-3">
+            <Card className="p-3">
+              <CardHeader className="p-0 pb-2">
+                <CardTitle className="flex items-center text-sm">
+                  <Pill className="w-4 h-4 mr-1.5 text-orange-600" />
                   {recommendations?.supplements?.title || "Витамины и добавки"}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
+              <CardContent className="p-0">
+                <div className="space-y-2">
                   {recommendations?.supplements?.items?.map((item, index) => (
-                    <div key={index} className="flex gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">{item}</p>
+                    <div key={index} className="flex gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-orange-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs">{item}</p>
                     </div>
                   ))}
                 </div>
