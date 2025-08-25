@@ -483,6 +483,15 @@
   .eva-glow-pulse {
     animation: eva-pulse-glow 2s ease-in-out infinite;
   }
+  
+  /* Text Shadow for better readability on images */
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .text-shadow-strong {
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 4px 16px rgba(0, 0, 0, 0.6);
+  }
 }
 
 /* EVA Animations */

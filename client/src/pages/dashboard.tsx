@@ -55,11 +55,11 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions - EVA Style */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-5 mb-6">
           <Link href="/chat">
             <button
               data-testid="button-ai-chat"
-              className="eva-card-interactive p-6 flex flex-col items-center justify-center space-y-3 text-center text-white h-[180px] eva-scale-in hover:scale-[1.03] transition-all duration-300 relative overflow-hidden w-full rounded-2xl shadow-2xl hover:shadow-[0_30px_60px_rgba(147,_51,_234,_0.5)]"
+              className="p-8 flex flex-col items-center justify-center gap-4 text-center text-white h-[200px] hover:scale-[1.02] transition-all duration-300 relative overflow-hidden w-full rounded-xl shadow-xl hover:shadow-2xl"
               style={{
                 backgroundImage: `url(${aiDoctorBg})`,
                 backgroundSize: 'cover',
@@ -67,24 +67,21 @@ export default function Dashboard() {
                 backgroundRepeat: 'no-repeat',
               }}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-violet-600/80 via-purple-600/75 to-indigo-600/80 backdrop-blur-[2px]"></div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-              <div className="relative z-10 p-4 bg-white/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/30">
-                <MessageCircle className="w-8 h-8 drop-shadow-lg" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/30"></div>
+              <div className="relative z-10 p-3 bg-white/15 backdrop-blur-sm rounded-xl">
+                <MessageCircle className="w-10 h-10" />
               </div>
-              <div className="relative z-10 h-[48px] flex flex-col justify-center">
-                <div className="font-bold text-xl tracking-wide drop-shadow-2xl">ИИ Доктор</div>
-                <div className="text-sm opacity-95 font-medium mt-1 drop-shadow-lg">Консультация</div>
+              <div className="relative z-10 space-y-1">
+                <div className="font-bold text-2xl tracking-wide text-shadow-strong">ИИ Доктор</div>
+                <div className="text-base font-medium text-shadow">Консультация</div>
               </div>
-              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-              <div className="absolute -top-4 -left-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
             </button>
           </Link>
           
           <Link href="/blood-analyses">
             <button
               data-testid="button-blood-upload"
-              className="eva-card-interactive p-6 flex flex-col items-center justify-center space-y-3 text-center text-white h-[180px] eva-scale-in hover:scale-[1.03] transition-all duration-300 relative overflow-hidden w-full rounded-2xl shadow-2xl hover:shadow-[0_30px_60px_rgba(8,_112,_184,_0.5)]"
+              className="p-8 flex flex-col items-center justify-center gap-4 text-center text-white h-[200px] hover:scale-[1.02] transition-all duration-300 relative overflow-hidden w-full rounded-xl shadow-xl hover:shadow-2xl"
               style={{
                 backgroundImage: `url(${bloodAnalysisBg})`,
                 backgroundSize: 'cover',
@@ -92,17 +89,14 @@ export default function Dashboard() {
                 backgroundRepeat: 'no-repeat',
               }}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/80 via-teal-600/75 to-cyan-600/80 backdrop-blur-[2px]"></div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-              <div className="relative z-10 p-4 bg-white/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/30">
-                <Camera className="w-8 h-8 drop-shadow-lg" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/30"></div>
+              <div className="relative z-10 p-3 bg-white/15 backdrop-blur-sm rounded-xl">
+                <Camera className="w-10 h-10" />
               </div>
-              <div className="relative z-10 h-[48px] flex flex-col justify-center">
-                <div className="font-bold text-xl tracking-wide drop-shadow-2xl">Анализ крови</div>
-                <div className="text-sm opacity-95 font-medium mt-1 drop-shadow-lg">Загрузить фото</div>
+              <div className="relative z-10 space-y-1">
+                <div className="font-bold text-2xl tracking-wide text-shadow-strong">Анализ крови</div>
+                <div className="text-base font-medium text-shadow">Загрузить фото</div>
               </div>
-              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-              <div className="absolute -top-4 -left-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
             </button>
           </Link>
         </div>
@@ -110,7 +104,7 @@ export default function Dashboard() {
         {/* Profile Status Card - EVA Style */}
         {!hasProfile ? (
           <div 
-            className="eva-card-elevated p-6 mb-6 text-white eva-slide-up relative overflow-hidden rounded-2xl shadow-2xl hover:shadow-[0_30px_60px_rgba(99,_102,_241,_0.5)] transition-all duration-300 min-h-[150px] hover:scale-[1.01]"
+            className="p-6 mb-6 text-white relative overflow-hidden rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 min-h-[150px] hover:scale-[1.01]"
             style={{
               backgroundImage: `url(${healthProfileBg})`,
               backgroundSize: 'cover',
@@ -118,31 +112,28 @@ export default function Dashboard() {
               backgroundRepeat: 'no-repeat',
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/85 via-purple-600/80 to-blue-600/85 backdrop-blur-[2px]"></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/30"></div>
             <div className="flex items-center justify-between relative z-10">
               <div className="flex-1">
                 <div className="flex items-center mb-3">
-                  <div className="p-3 bg-white/25 backdrop-blur-md rounded-xl mr-3 border border-white/30">
-                    <Shield className="w-6 h-6 drop-shadow-lg" />
+                  <div className="p-3 bg-white/15 backdrop-blur-sm rounded-xl mr-3">
+                    <Shield className="w-7 h-7" />
                   </div>
-                  <h3 className="font-bold text-xl tracking-wide drop-shadow-2xl">Создайте профиль здоровья</h3>
+                  <h3 className="font-bold text-xl tracking-wide text-shadow-strong">Создайте профиль здоровья</h3>
                 </div>
-                <p className="text-sm opacity-95 font-medium leading-relaxed drop-shadow-lg">
+                <p className="text-base font-medium leading-relaxed text-shadow ml-16">
                   Персонализированные рекомендации и отслеживание показателей
                 </p>
               </div>
               <Button 
                 size="sm"
                 onClick={() => navigate("/health-profile")}
-                className="bg-white/90 backdrop-blur-md text-indigo-600 hover:bg-white hover:scale-105 ml-4 rounded-xl px-6 py-2.5 font-bold shadow-xl transition-all border border-white/50"
+                className="bg-white/95 text-gray-800 hover:bg-white hover:scale-105 ml-4 rounded-xl px-6 py-2.5 font-bold shadow-lg transition-all"
                 data-testid="button-create-profile"
               >
                 Создать
               </Button>
             </div>
-            <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-            <div className="absolute -top-6 -left-6 w-28 h-28 bg-white/10 rounded-full blur-2xl"></div>
           </div>
         ) : (
           <div className="eva-card-elevated p-5 mb-6 eva-slide-up relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border-0 hover:scale-[1.01] bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950">
