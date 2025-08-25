@@ -29,7 +29,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.activityLevel === "sedentary"
                 ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             Сидячий
@@ -39,7 +39,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.activityLevel === "light"
                 ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             Легкая активность
@@ -49,7 +49,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.activityLevel === "moderate"
                 ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             Умеренная
@@ -59,7 +59,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.activityLevel === "active"
                 ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             Активный
@@ -69,7 +69,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.activityLevel === "very_active"
                 ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             Очень активный
@@ -89,7 +89,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.exerciseFrequency === "never"
                 ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             Никогда
@@ -99,7 +99,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.exerciseFrequency === "1-2_week"
                 ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             1-2 раза/нед
@@ -109,7 +109,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.exerciseFrequency === "3-4_week"
                 ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             3-4 раза/нед
@@ -119,7 +119,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.exerciseFrequency === "5+_week"
                 ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             5+ раз/нед
@@ -139,7 +139,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.fitnessLevel === "beginner"
                 ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             Начинающий
@@ -149,7 +149,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.fitnessLevel === "intermediate"
                 ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             Средний
@@ -159,7 +159,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.fitnessLevel === "advanced"
                 ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             Продвинутый
