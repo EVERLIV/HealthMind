@@ -28,7 +28,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             onClick={() => onUpdate({ activityLevel: "sedentary" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.activityLevel === "sedentary"
-                ? "bg-medical-blue text-white shadow-md"
+                ? "bg-blue-600 text-white shadow-md"
                 : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
@@ -38,7 +38,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             onClick={() => onUpdate({ activityLevel: "light" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.activityLevel === "light"
-                ? "bg-medical-blue text-white shadow-md"
+                ? "bg-blue-600 text-white shadow-md"
                 : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
@@ -48,7 +48,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             onClick={() => onUpdate({ activityLevel: "moderate" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.activityLevel === "moderate"
-                ? "bg-medical-blue text-white shadow-md"
+                ? "bg-blue-600 text-white shadow-md"
                 : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
@@ -58,7 +58,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             onClick={() => onUpdate({ activityLevel: "active" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.activityLevel === "active"
-                ? "bg-medical-blue text-white shadow-md"
+                ? "bg-blue-600 text-white shadow-md"
                 : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
@@ -68,7 +68,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             onClick={() => onUpdate({ activityLevel: "very_active" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.activityLevel === "very_active"
-                ? "bg-medical-blue text-white shadow-md"
+                ? "bg-blue-600 text-white shadow-md"
                 : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
@@ -88,7 +88,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             onClick={() => onUpdate({ exerciseFrequency: "never" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.exerciseFrequency === "never"
-                ? "bg-medical-blue text-white shadow-md"
+                ? "bg-blue-600 text-white shadow-md"
                 : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
@@ -98,7 +98,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             onClick={() => onUpdate({ exerciseFrequency: "1-2_week" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.exerciseFrequency === "1-2_week"
-                ? "bg-medical-blue text-white shadow-md"
+                ? "bg-blue-600 text-white shadow-md"
                 : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
@@ -108,7 +108,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             onClick={() => onUpdate({ exerciseFrequency: "3-4_week" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.exerciseFrequency === "3-4_week"
-                ? "bg-medical-blue text-white shadow-md"
+                ? "bg-blue-600 text-white shadow-md"
                 : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
@@ -118,7 +118,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             onClick={() => onUpdate({ exerciseFrequency: "5+_week" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.exerciseFrequency === "5+_week"
-                ? "bg-medical-blue text-white shadow-md"
+                ? "bg-blue-600 text-white shadow-md"
                 : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
@@ -138,7 +138,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             onClick={() => onUpdate({ fitnessLevel: "beginner" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.fitnessLevel === "beginner"
-                ? "bg-medical-blue text-white shadow-md"
+                ? "bg-blue-600 text-white shadow-md"
                 : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
@@ -148,7 +148,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             onClick={() => onUpdate({ fitnessLevel: "intermediate" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.fitnessLevel === "intermediate"
-                ? "bg-medical-blue text-white shadow-md"
+                ? "bg-blue-600 text-white shadow-md"
                 : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
@@ -158,7 +158,7 @@ export default function PhysicalHealthSection({ data, onUpdate }: PhysicalHealth
             onClick={() => onUpdate({ fitnessLevel: "advanced" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.fitnessLevel === "advanced"
-                ? "bg-medical-blue text-white shadow-md"
+                ? "bg-blue-600 text-white shadow-md"
                 : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
