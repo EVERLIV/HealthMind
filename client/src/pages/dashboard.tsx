@@ -55,11 +55,11 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions - EVA Style */}
-        <div className="grid grid-cols-2 gap-5 mb-6">
+        <div className="grid grid-cols-2 gap-4 mb-6">
           <Link href="/chat">
             <button
               data-testid="button-ai-chat"
-              className="p-8 flex flex-col items-center justify-center gap-4 text-center text-white h-[200px] hover:scale-[1.02] transition-all duration-300 relative overflow-hidden w-full rounded-xl shadow-xl hover:shadow-2xl"
+              className="p-6 flex flex-col items-center justify-center gap-3 text-center text-white h-[190px] hover:scale-[1.02] transition-all duration-300 relative overflow-hidden w-full rounded-2xl shadow-xl hover:shadow-2xl"
               style={{
                 backgroundImage: `url(${aiDoctorBg})`,
                 backgroundSize: 'cover',
@@ -67,13 +67,13 @@ export default function Dashboard() {
                 backgroundRepeat: 'no-repeat',
               }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/30"></div>
-              <div className="relative z-10 p-3 bg-white/15 backdrop-blur-sm rounded-xl">
-                <MessageCircle className="w-10 h-10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/45 to-black/25"></div>
+              <div className="relative z-10 w-16 h-16 bg-gradient-to-br from-white/25 to-white/15 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg border border-white/20">
+                <MessageCircle className="w-8 h-8 text-white drop-shadow-lg" />
               </div>
-              <div className="relative z-10 space-y-1">
-                <div className="font-bold text-2xl tracking-wide text-shadow-strong">ИИ Доктор</div>
-                <div className="text-base font-medium text-shadow">Консультация</div>
+              <div className="relative z-10 text-center">
+                <div className="font-bold text-xl leading-tight text-white mb-1" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8), 0 4px 24px rgba(0,0,0,0.6)' }}>ИИ Доктор</div>
+                <div className="text-sm font-medium text-white/90" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>Консультация 24/7</div>
               </div>
             </button>
           </Link>
@@ -81,7 +81,7 @@ export default function Dashboard() {
           <Link href="/blood-analyses">
             <button
               data-testid="button-blood-upload"
-              className="p-8 flex flex-col items-center justify-center gap-4 text-center text-white h-[200px] hover:scale-[1.02] transition-all duration-300 relative overflow-hidden w-full rounded-xl shadow-xl hover:shadow-2xl"
+              className="p-6 flex flex-col items-center justify-center gap-3 text-center text-white h-[190px] hover:scale-[1.02] transition-all duration-300 relative overflow-hidden w-full rounded-2xl shadow-xl hover:shadow-2xl"
               style={{
                 backgroundImage: `url(${bloodAnalysisBg})`,
                 backgroundSize: 'cover',
@@ -89,13 +89,13 @@ export default function Dashboard() {
                 backgroundRepeat: 'no-repeat',
               }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/30"></div>
-              <div className="relative z-10 p-3 bg-white/15 backdrop-blur-sm rounded-xl">
-                <Camera className="w-10 h-10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/45 to-black/25"></div>
+              <div className="relative z-10 w-16 h-16 bg-gradient-to-br from-white/25 to-white/15 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg border border-white/20">
+                <Camera className="w-8 h-8 text-white drop-shadow-lg" />
               </div>
-              <div className="relative z-10 space-y-1">
-                <div className="font-bold text-2xl tracking-wide text-shadow-strong">Анализ крови</div>
-                <div className="text-base font-medium text-shadow">Загрузить фото</div>
+              <div className="relative z-10 text-center">
+                <div className="font-bold text-xl leading-tight text-white mb-1" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8), 0 4px 24px rgba(0,0,0,0.6)' }}>Анализ крови</div>
+                <div className="text-sm font-medium text-white/90" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>Загрузить фото</div>
               </div>
             </button>
           </Link>
@@ -104,7 +104,7 @@ export default function Dashboard() {
         {/* Profile Status Card - EVA Style */}
         {!hasProfile ? (
           <div 
-            className="p-6 mb-6 text-white relative overflow-hidden rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 min-h-[150px] hover:scale-[1.01]"
+            className="p-5 mb-6 text-white relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 min-h-[140px] hover:scale-[1.01]"
             style={{
               backgroundImage: `url(${healthProfileBg})`,
               backgroundSize: 'cover',
@@ -112,23 +112,21 @@ export default function Dashboard() {
               backgroundRepeat: 'no-repeat',
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/30"></div>
-            <div className="flex items-center justify-between relative z-10">
-              <div className="flex-1">
-                <div className="flex items-center mb-3">
-                  <div className="p-3 bg-white/15 backdrop-blur-sm rounded-xl mr-3">
-                    <Shield className="w-7 h-7" />
-                  </div>
-                  <h3 className="font-bold text-xl tracking-wide text-shadow-strong">Создайте профиль здоровья</h3>
-                </div>
-                <p className="text-base font-medium leading-relaxed text-shadow ml-16">
-                  Персонализированные рекомендации и отслеживание показателей
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/45 to-black/25"></div>
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="w-14 h-14 bg-gradient-to-br from-white/25 to-white/15 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg border border-white/20 flex-shrink-0">
+                <Shield className="w-7 h-7 text-white drop-shadow-lg" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-lg leading-tight text-white mb-2" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8), 0 4px 24px rgba(0,0,0,0.6)' }}>Создайте профиль здоровья</h3>
+                <p className="text-sm font-medium text-white/90 leading-relaxed" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>
+                  Персонализированные рекомендации
                 </p>
               </div>
               <Button 
                 size="sm"
                 onClick={() => navigate("/health-profile")}
-                className="bg-white/95 text-gray-800 hover:bg-white hover:scale-105 ml-4 rounded-xl px-6 py-2.5 font-bold shadow-lg transition-all"
+                className="bg-white/95 text-gray-800 hover:bg-white hover:scale-105 rounded-xl px-4 py-2 font-bold shadow-lg transition-all flex-shrink-0"
                 data-testid="button-create-profile"
               >
                 Создать
