@@ -26,6 +26,17 @@ export default class OpenAIVisionService {
 
   async analyzeBloodTestImage(imageBase64: string, mimeType: string = 'image/jpeg'): Promise<AnalysisResult> {
     try {
+      // Validate and normalize MIME type
+      const validMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      let validatedMimeType = mimeType?.toLowerCase();
+      
+      if (!validatedMimeType || !validMimeTypes.includes(validatedMimeType)) {
+        console.log('Invalid MIME type:', mimeType, 'defaulting to image/jpeg');
+        validatedMimeType = 'image/jpeg';
+      }
+
+      console.log('Using MIME type:', validatedMimeType);
+      
       const response = await this.client.chat.completions.create({
         model: "gpt-4o",
         messages: [
@@ -70,7 +81,7 @@ export default class OpenAIVisionService {
               {
                 type: "image_url",
                 image_url: {
-                  url: `data:${mimeType};base64,${imageBase64}`,
+                  url: `data:${validatedMimeType};base64,${imageBase64}`,
                   detail: "high"
                 }
               }

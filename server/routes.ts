@@ -225,6 +225,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Image data is required" });
       }
 
+      console.log('Received MIME type:', mimeType);
+      console.log('Image data length:', imageBase64?.length);
+
       const openaiApiKey = process.env.OPENAI_API_KEY;
       if (!openaiApiKey) {
         return res.status(500).json({ error: "OpenAI API key not configured" });

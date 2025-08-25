@@ -124,6 +124,9 @@ export default function BloodAnalysisPage() {
             const [mimeInfo, imageBase64] = base64.split(',');
             const mimeType = mimeInfo.split(':')[1].split(';')[0]; // Extract MIME type
             
+            console.log('Extracted MIME type:', mimeType);
+            console.log('Image size (base64):', imageBase64.length);
+            
             // Analyze with OpenAI Vision AI
             await analyzeImageMutation.mutateAsync({
               analysisId: analysis.id,
