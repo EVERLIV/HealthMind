@@ -10,6 +10,7 @@ import Profile from "@/pages/profile";
 import Statistics from "@/pages/statistics";
 import HealthProfilePage from "@/pages/health-profile-page";
 import ChatPage from "@/pages/chat";
+import BloodAnalysisPage from "@/pages/blood-analysis";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/statistics" component={Statistics} />
       <Route path="/health-profile" component={HealthProfilePage} />
       <Route path="/chat" component={ChatPage} />
+      <Route path="/blood-analysis" component={BloodAnalysisPage} />
       <Route component={NotFound} />
     </Switch>
   );
