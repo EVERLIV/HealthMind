@@ -228,6 +228,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Received MIME type:', mimeType);
       console.log('Image data length:', imageBase64?.length);
 
+      // Validate that we received an image
+      if (!mimeType?.startsWith('image/') || !imageBase64 || imageBase64.length < 1000) {
+        return res.status(400).json({ 
+          error: "Invalid image data. Please upload a valid image file (PNG, JPG, GIF, WEBP)" 
+        });
+      }
+
       const openaiApiKey = process.env.OPENAI_API_KEY;
       if (!openaiApiKey) {
         return res.status(500).json({ error: "OpenAI API key not configured" });

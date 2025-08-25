@@ -127,6 +127,18 @@ export default function BloodAnalysisPage() {
             console.log('Extracted MIME type:', mimeType);
             console.log('Image size (base64):', imageBase64.length);
             
+            // Validate that we have an image
+            if (!mimeType.startsWith('image/') || imageBase64.length < 1000) {
+              toast({
+                title: "Ошибка",
+                description: "Пожалуйста, загрузите действительное изображение (PNG, JPG, GIF, WEBP)",
+                variant: "destructive",
+              });
+              setIsUploading(false);
+              setIsAnalyzing(false);
+              return;
+            }
+            
             // Analyze with OpenAI Vision AI
             await analyzeImageMutation.mutateAsync({
               analysisId: analysis.id,
@@ -291,6 +303,7 @@ export default function BloodAnalysisPage() {
                 <ObjectUploader
                   maxNumberOfFiles={1}
                   maxFileSize={10485760} // 10MB
+                  allowedFileTypes={['image/*']}
                   onGetUploadParameters={handleGetUploadParameters}
                   onComplete={handleComplete}
                   buttonClassName="w-full p-8 border-2 border-dashed border-gray-300 hover:border-trust-green transition-colors rounded-2xl bg-gray-50 hover:bg-gray-100"
@@ -309,7 +322,7 @@ export default function BloodAnalysisPage() {
                       </p>
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      PNG, JPG или PDF до 10MB
+                      Только изображения: PNG, JPG, GIF, WEBP до 10MB
                     </div>
                   </div>
                 </ObjectUploader>
