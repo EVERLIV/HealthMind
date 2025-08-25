@@ -7,11 +7,10 @@ import HealthMetricsCard from "@/components/cards/health-metrics-card";
 import BloodAnalysisCard from "@/components/cards/blood-analysis-card";
 import HealthProfileCard from "@/components/cards/health-profile-card";
 import AsklepiosScoreCard from "@/components/cards/asklepios-score-card";
-import ActivityCard from "@/components/cards/activity-card";
 import AnalysisResultsModal from "@/components/modals/analysis-results-modal";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Heart, Camera, MessageCircle, Activity, TrendingUp, Shield, Zap } from "lucide-react";
+import { Heart, Camera, MessageCircle, Shield } from "lucide-react";
 import aiDoctorBg from '@/assets/images/ai-doctor-bg.png';
 import bloodAnalysisBg from '@/assets/images/blood-analysis-bg.png';
 import healthProfileBg from '@/assets/images/health-profile-bg.png';
@@ -60,7 +59,7 @@ export default function Dashboard() {
           <Link href="/chat">
             <button
               data-testid="button-ai-chat"
-              className="eva-card-interactive p-6 flex flex-col items-center justify-center space-y-3 text-center text-white min-h-[160px] eva-scale-in hover:scale-[1.03] transition-all duration-300 relative overflow-hidden w-full rounded-2xl shadow-2xl hover:shadow-[0_30px_60px_rgba(147,_51,_234,_0.5)]"
+              className="eva-card-interactive p-6 flex flex-col items-center justify-center space-y-3 text-center text-white h-[180px] eva-scale-in hover:scale-[1.03] transition-all duration-300 relative overflow-hidden w-full rounded-2xl shadow-2xl hover:shadow-[0_30px_60px_rgba(147,_51,_234,_0.5)]"
               style={{
                 backgroundImage: `url(${aiDoctorBg})`,
                 backgroundSize: 'cover',
@@ -73,9 +72,9 @@ export default function Dashboard() {
               <div className="relative z-10 p-4 bg-white/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/30">
                 <MessageCircle className="w-8 h-8 drop-shadow-lg" />
               </div>
-              <div className="relative z-10">
+              <div className="relative z-10 h-[48px] flex flex-col justify-center">
                 <div className="font-bold text-xl tracking-wide drop-shadow-2xl">ИИ Доктор</div>
-                <div className="text-sm opacity-95 font-medium mt-1 drop-shadow-lg">Консультация 24/7</div>
+                <div className="text-sm opacity-95 font-medium mt-1 drop-shadow-lg">Консультация</div>
               </div>
               <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
               <div className="absolute -top-4 -left-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
@@ -85,7 +84,7 @@ export default function Dashboard() {
           <Link href="/blood-analyses">
             <button
               data-testid="button-blood-upload"
-              className="eva-card-interactive p-6 flex flex-col items-center justify-center space-y-3 text-center text-white min-h-[160px] eva-scale-in hover:scale-[1.03] transition-all duration-300 relative overflow-hidden w-full rounded-2xl shadow-2xl hover:shadow-[0_30px_60px_rgba(8,_112,_184,_0.5)]"
+              className="eva-card-interactive p-6 flex flex-col items-center justify-center space-y-3 text-center text-white h-[180px] eva-scale-in hover:scale-[1.03] transition-all duration-300 relative overflow-hidden w-full rounded-2xl shadow-2xl hover:shadow-[0_30px_60px_rgba(8,_112,_184,_0.5)]"
               style={{
                 backgroundImage: `url(${bloodAnalysisBg})`,
                 backgroundSize: 'cover',
@@ -98,7 +97,7 @@ export default function Dashboard() {
               <div className="relative z-10 p-4 bg-white/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/30">
                 <Camera className="w-8 h-8 drop-shadow-lg" />
               </div>
-              <div className="relative z-10">
+              <div className="relative z-10 h-[48px] flex flex-col justify-center">
                 <div className="font-bold text-xl tracking-wide drop-shadow-2xl">Анализ крови</div>
                 <div className="text-sm opacity-95 font-medium mt-1 drop-shadow-lg">Загрузить фото</div>
               </div>
@@ -163,64 +162,18 @@ export default function Dashboard() {
         )}
         
         {/* Health Cards Grid */}
-        <div className="grid grid-cols-1 gap-5 mb-6">
-          <div className="eva-slide-up transform transition-all duration-500 hover:translate-y-[-4px]" style={{ animationDelay: '0.1s' }}>
-            <ActivityCard />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div className="eva-slide-up transform transition-all duration-500 hover:translate-y-[-4px]" style={{ animationDelay: '0.2s' }}>
+            <BloodAnalysisCard 
+              analysis={latestAnalysis} 
+              onViewResults={() => setIsAnalysisOpen(true)}
+            />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="eva-slide-up transform transition-all duration-500 hover:translate-y-[-4px]" style={{ animationDelay: '0.2s' }}>
-              <BloodAnalysisCard 
-                analysis={latestAnalysis} 
-                onViewResults={() => setIsAnalysisOpen(true)}
-              />
-            </div>
-            <div className="eva-slide-up transform transition-all duration-500 hover:translate-y-[-4px]" style={{ animationDelay: '0.3s' }}>
-              <HealthProfileCard profile={healthProfile as any} />
-            </div>
+          <div className="eva-slide-up transform transition-all duration-500 hover:translate-y-[-4px]" style={{ animationDelay: '0.3s' }}>
+            <HealthProfileCard profile={healthProfile as any} />
           </div>
         </div>
 
-        {/* Recent Activity - EVA Style */}
-        <div className="eva-card-elevated p-6 eva-fade-in rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border-0 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
-          <h3 className="font-bold text-lg mb-5 flex items-center">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl mr-3 shadow-lg">
-              <Activity className="w-5 h-5 text-white" />
-            </div>
-            Недавняя активность
-          </h3>
-          <div className="space-y-4">
-            <div className="flex items-center space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-              <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-red-500 rounded-xl flex items-center justify-center shadow-lg">
-                <Heart className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <div className="font-semibold text-sm">Анализ крови загружен</div>
-                <div className="text-xs text-muted-foreground font-medium">2 часа назад</div>
-              </div>
-              <div className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-bold">Завершено</div>
-            </div>
-            <div className="flex items-center space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-              <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-green-500 rounded-xl flex items-center justify-center shadow-lg">
-                <MessageCircle className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <div className="font-semibold text-sm">Консультация с ИИ</div>
-                <div className="text-xs text-muted-foreground font-medium">Вчера</div>
-              </div>
-              <div className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-xs font-bold">Активно</div>
-            </div>
-            <div className="flex items-center space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <div className="font-semibold text-sm">Обновлены показатели</div>
-                <div className="text-xs text-muted-foreground font-medium">3 дня назад</div>
-              </div>
-              <div className="px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full text-xs font-bold">Важно</div>
-            </div>
-          </div>
-        </div>
       </main>
 
       <BottomNav />
