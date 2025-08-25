@@ -250,28 +250,28 @@ export class DeepSeekService {
     }
 
     // Убеждаемся, что все секции рекомендаций присутствуют
-    if (!result.nutrition || !result.nutrition.items) {
+    if (!result.nutrition || !result.nutrition.items || !Array.isArray(result.nutrition.items) || result.nutrition.items.length === 0) {
       result.nutrition = {
         title: "Питание",
         items: ["Сбалансируйте рацион", "Увеличьте потребление овощей и фруктов"]
       };
     }
 
-    if (!result.physicalActivity || !result.physicalActivity.items) {
+    if (!result.physicalActivity || !result.physicalActivity.items || !Array.isArray(result.physicalActivity.items) || result.physicalActivity.items.length === 0) {
       result.physicalActivity = {
         title: "Физическая активность",
         items: ["Минимум 30 минут умеренной активности в день", "Регулярные прогулки на свежем воздухе"]
       };
     }
 
-    if (!result.lifestyle || !result.lifestyle.items) {
+    if (!result.lifestyle || !result.lifestyle.items || !Array.isArray(result.lifestyle.items) || result.lifestyle.items.length === 0) {
       result.lifestyle = {
         title: "Образ жизни",
         items: ["Соблюдайте режим сна (7-9 часов)", "Управляйте стрессом"]
       };
     }
 
-    if (!result.supplements || !result.supplements.items) {
+    if (!result.supplements || !result.supplements.items || !Array.isArray(result.supplements.items) || result.supplements.items.length === 0) {
       result.supplements = {
         title: "Витамины и добавки",
         items: [
@@ -282,11 +282,11 @@ export class DeepSeekService {
       };
     }
 
-    if (!result.actionPlan || result.actionPlan.length === 0) {
+    if (!result.actionPlan || !Array.isArray(result.actionPlan) || result.actionPlan.length === 0) {
       result.actionPlan = ["Начните с небольших изменений в питании", "Добавьте физическую активность"];
     }
 
-    if (!result.nextSteps || result.nextSteps.length === 0) {
+    if (!result.nextSteps || !Array.isArray(result.nextSteps) || result.nextSteps.length === 0) {
       result.nextSteps = [
         "Контролируйте показатели здоровья",
         "Начните с минимальных изменений",
