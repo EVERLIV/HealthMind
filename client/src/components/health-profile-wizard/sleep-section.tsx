@@ -82,8 +82,8 @@ export default function SleepSection({ data, onUpdate }: SleepSectionProps) {
             onClick={() => onUpdate({ sleepQuality: "poor" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.sleepQuality === "poor"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Плохое
@@ -92,8 +92,8 @@ export default function SleepSection({ data, onUpdate }: SleepSectionProps) {
             onClick={() => onUpdate({ sleepQuality: "fair" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.sleepQuality === "fair"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Удовлетворительное
@@ -102,8 +102,8 @@ export default function SleepSection({ data, onUpdate }: SleepSectionProps) {
             onClick={() => onUpdate({ sleepQuality: "good" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.sleepQuality === "good"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Хорошее
@@ -112,8 +112,8 @@ export default function SleepSection({ data, onUpdate }: SleepSectionProps) {
             onClick={() => onUpdate({ sleepQuality: "excellent" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.sleepQuality === "excellent"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Отличное
@@ -134,8 +134,8 @@ export default function SleepSection({ data, onUpdate }: SleepSectionProps) {
               onClick={() => handleProblemToggle(problem.value, !data.sleepProblems?.includes(problem.value))}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 data.sleepProblems?.includes(problem.value)
-                  ? "bg-medical-blue text-white shadow-md"
-                  : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
               }`}
             >
               {problem.label}

@@ -98,8 +98,8 @@ export default function MentalHealthSection({ data, onUpdate }: MentalHealthSect
             onClick={() => onUpdate({ moodChanges: "stable" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.moodChanges === "stable"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Стабильное
@@ -108,8 +108,8 @@ export default function MentalHealthSection({ data, onUpdate }: MentalHealthSect
             onClick={() => onUpdate({ moodChanges: "mild" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.moodChanges === "mild"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Легкие колебания
@@ -118,8 +118,8 @@ export default function MentalHealthSection({ data, onUpdate }: MentalHealthSect
             onClick={() => onUpdate({ moodChanges: "moderate" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.moodChanges === "moderate"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Умеренные
@@ -128,8 +128,8 @@ export default function MentalHealthSection({ data, onUpdate }: MentalHealthSect
             onClick={() => onUpdate({ moodChanges: "severe" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.moodChanges === "severe"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Сильные колебания

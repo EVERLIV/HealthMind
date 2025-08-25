@@ -29,8 +29,8 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onClick={() => onUpdate({ dietType: "standard" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.dietType === "standard"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Обычное
@@ -39,8 +39,8 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onClick={() => onUpdate({ dietType: "vegetarian" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.dietType === "vegetarian"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Вегетарианское
@@ -49,8 +49,8 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onClick={() => onUpdate({ dietType: "vegan" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.dietType === "vegan"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Веганское
@@ -59,8 +59,8 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onClick={() => onUpdate({ dietType: "keto" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.dietType === "keto"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Кето
@@ -69,8 +69,8 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onClick={() => onUpdate({ dietType: "mediterranean" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.dietType === "mediterranean"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Средиземноморское
@@ -79,8 +79,8 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onClick={() => onUpdate({ dietType: "other" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.dietType === "other"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Другое
@@ -99,8 +99,8 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onClick={() => onUpdate({ smokingStatus: "never" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.smokingStatus === "never"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Никогда
@@ -109,8 +109,8 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onClick={() => onUpdate({ smokingStatus: "former" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.smokingStatus === "former"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Бросил
@@ -119,8 +119,8 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onClick={() => onUpdate({ smokingStatus: "occasional" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.smokingStatus === "occasional"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Иногда
@@ -129,8 +129,8 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onClick={() => onUpdate({ smokingStatus: "regular" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.smokingStatus === "regular"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Регулярно
@@ -149,8 +149,8 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onClick={() => onUpdate({ alcoholConsumption: "none" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.alcoholConsumption === "none"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Не употребляю
@@ -159,8 +159,8 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onClick={() => onUpdate({ alcoholConsumption: "occasional" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.alcoholConsumption === "occasional"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Редко
@@ -169,8 +169,8 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onClick={() => onUpdate({ alcoholConsumption: "moderate" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.alcoholConsumption === "moderate"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Умеренно
@@ -179,8 +179,8 @@ export default function LifestyleSection({ data, onUpdate }: LifestyleSectionPro
             onClick={() => onUpdate({ alcoholConsumption: "heavy" })}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               data.alcoholConsumption === "heavy"
-                ? "bg-medical-blue text-white shadow-md"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             Часто
