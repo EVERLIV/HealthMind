@@ -156,55 +156,80 @@ export default function BloodAnalysisDetailPage() {
           </p>
         </Card>
 
-        {/* Biomarkers */}
+        {/* Biomarkers - Compact Grid */}
         <div className="mt-6">
           <h2 className="text-lg font-semibold mb-4">Показатели анализа</h2>
-          <div className="space-y-3">
+          
+          {/* Quick Stats */}
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            <div className="bg-green-50 p-2 rounded-lg text-center">
+              <div className="text-2xl font-bold text-green-600">
+                {results.markers?.filter((m: BloodMarker) => m.status === 'normal').length || 0}
+              </div>
+              <div className="text-xs text-green-700">В норме</div>
+            </div>
+            <div className="bg-yellow-50 p-2 rounded-lg text-center">
+              <div className="text-2xl font-bold text-yellow-600">
+                {results.markers?.filter((m: BloodMarker) => m.status === 'high' || m.status === 'low').length || 0}
+              </div>
+              <div className="text-xs text-yellow-700">Отклонения</div>
+            </div>
+            <div className="bg-red-50 p-2 rounded-lg text-center">
+              <div className="text-2xl font-bold text-red-600">
+                {results.markers?.filter((m: BloodMarker) => m.status === 'critical').length || 0}
+              </div>
+              <div className="text-xs text-red-700">Критично</div>
+            </div>
+          </div>
+
+          {/* Compact Biomarker Cards */}
+          <div className="grid grid-cols-2 gap-2">
             {results.markers?.map((marker: BloodMarker, index: number) => (
               <Card
                 key={index}
-                className={`p-4 cursor-pointer transition-all ${
-                  expandedMarker === marker.name ? 'shadow-md' : ''
-                }`}
+                className={`p-3 cursor-pointer transition-all ${
+                  expandedMarker === marker.name ? 'col-span-2 shadow-lg' : ''
+                } ${marker.status === 'critical' ? 'border-red-300 bg-red-50/20' : ''}`}
                 onClick={() => setExpandedMarker(
                   expandedMarker === marker.name ? null : marker.name
                 )}
                 data-testid={`marker-card-${index}`}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3 flex-1">
-                    <div className="mt-1">
-                      {getCategoryIcon(marker.name)}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-semibold text-sm">{marker.name}</h3>
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(marker.status)}`}>
-                          {getStatusIcon(marker.status)}
-                          {getStatusText(marker.status)}
-                        </span>
-                      </div>
-                      <p className="text-lg font-bold mt-1">{marker.value}</p>
-                      
-                      {expandedMarker === marker.name && (
-                        <div className="mt-4 space-y-3 animate-in slide-in-from-top duration-200">
-                          {marker.education && (
-                            <div className="bg-blue-50 p-3 rounded-lg">
-                              <p className="text-xs font-medium text-blue-900 mb-1">📚 Что это?</p>
-                              <p className="text-xs text-blue-700">{marker.education}</p>
-                            </div>
-                          )}
-                          {marker.recommendation && (
-                            <div className="bg-green-50 p-3 rounded-lg">
-                              <p className="text-xs font-medium text-green-900 mb-1">💡 Рекомендация</p>
-                              <p className="text-xs text-green-700">{marker.recommendation}</p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                <div className="flex items-start justify-between mb-1">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-5 h-5">{getCategoryIcon(marker.name)}</div>
+                    <h3 className="font-medium text-xs truncate max-w-[100px]">{marker.name}</h3>
                   </div>
+                  <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium ${getStatusColor(marker.status)}`}>
+                    {getStatusIcon(marker.status)}
+                  </span>
                 </div>
+                <p className="text-sm font-bold">{marker.value}</p>
+                
+                {expandedMarker === marker.name && (
+                  <div className="mt-3 space-y-2 animate-in slide-in-from-top duration-200">
+                    <div className="text-xs px-2 py-1 rounded bg-gray-100">
+                      <span className={`font-medium ${
+                        marker.status === 'normal' ? 'text-green-700' : 
+                        marker.status === 'critical' ? 'text-red-700' : 'text-yellow-700'
+                      }`}>
+                        Статус: {getStatusText(marker.status)}
+                      </span>
+                    </div>
+                    {marker.education && (
+                      <div className="bg-blue-50 p-2 rounded">
+                        <p className="text-[10px] font-medium text-blue-900 mb-0.5">📚 Описание</p>
+                        <p className="text-[10px] text-blue-700 leading-relaxed">{marker.education}</p>
+                      </div>
+                    )}
+                    {marker.recommendation && (
+                      <div className="bg-green-50 p-2 rounded">
+                        <p className="text-[10px] font-medium text-green-900 mb-0.5">💡 Персональная рекомендация</p>
+                        <p className="text-[10px] text-green-700 leading-relaxed">{marker.recommendation}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </Card>
             ))}
           </div>
