@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService } from "./objectStorage";
 import DeepSeekAnalysisService from "./deepseekService";
+import OpenAIVisionService from "./openaiVisionService";
 import { insertBloodAnalysisSchema, insertChatSessionSchema, insertChatMessageSchema, insertHealthMetricsSchema, insertHealthProfileSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -224,13 +225,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Image data is required" });
       }
 
-      const deepSeekApiKey = process.env.DEEPSEEK_API_KEY;
-      if (!deepSeekApiKey) {
-        return res.status(500).json({ error: "DeepSeek API key not configured" });
+      const openaiApiKey = process.env.OPENAI_API_KEY;
+      if (!openaiApiKey) {
+        return res.status(500).json({ error: "OpenAI API key not configured" });
       }
 
-      const deepSeekService = new DeepSeekAnalysisService(deepSeekApiKey);
-      const analysisResults = await deepSeekService.analyzeBloodTestImage(imageBase64);
+      const openaiService = new OpenAIVisionService(openaiApiKey);
+      const analysisResults = await openaiService.analyzeBloodTestImage(imageBase64);
 
       // Update blood analysis with results
       const updatedAnalysis = await storage.updateBloodAnalysis(req.params.id, {
@@ -279,7 +280,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ analysis: updatedAnalysis, results: analysisResults });
     } catch (error) {
-      console.error("Error analyzing image with DeepSeek:", error);
+      console.error("Error analyzing image with OpenAI Vision:", error);
       res.status(500).json({ error: "Analysis failed" });
     }
   });
