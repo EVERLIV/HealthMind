@@ -78,7 +78,7 @@ export default function Dashboard() {
             </button>
           </Link>
           
-          <Link href="/blood-analysis">
+          <Link href="/blood-analyses">
             <button
               data-testid="button-blood-upload"
               className="eva-card-interactive p-6 flex flex-col items-center space-y-3 text-center text-white min-h-[120px] eva-scale-in hover:scale-105 transition-all duration-300 relative overflow-hidden w-full"
