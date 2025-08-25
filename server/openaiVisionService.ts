@@ -27,7 +27,7 @@ export default class OpenAIVisionService {
   async analyzeBloodTestImage(imageBase64: string): Promise<AnalysisResult> {
     try {
       const response = await this.client.chat.completions.create({
-        model: "gpt-4-vision-preview",
+        model: "gpt-4o",
         messages: [
           {
             role: "system",
@@ -169,7 +169,7 @@ export default class OpenAIVisionService {
   async analyzeBloodTestText(text: string): Promise<AnalysisResult> {
     try {
       const response = await this.client.chat.completions.create({
-        model: "gpt-4-turbo-preview",
+        model: "gpt-4o",
         messages: [
           {
             role: "system",
@@ -208,8 +208,7 @@ ${text}
           }
         ],
         max_tokens: 2000,
-        temperature: 0.2,
-        response_format: { type: "json_object" }
+        temperature: 0.2
       });
 
       const content = response.choices[0].message.content;
