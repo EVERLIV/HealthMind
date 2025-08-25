@@ -11,6 +11,38 @@ import { useToast } from "@/hooks/use-toast";
 import MobileNav from "@/components/layout/mobile-nav";
 import BottomNav from "@/components/layout/bottom-nav";
 
+// Helper function to compress images
+function compressImage(file: Blob, quality = 0.8): Promise<Blob> {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      // Calculate new dimensions
+      let { width, height } = img;
+      const maxDimension = 1024;
+      
+      if (width > maxDimension || height > maxDimension) {
+        const ratio = Math.min(maxDimension / width, maxDimension / height);
+        width *= ratio;
+        height *= ratio;
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      
+      // Draw and compress
+      ctx?.drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => {
+        resolve(blob || file); // Fallback to original file if compression fails
+      }, 'image/jpeg', quality);
+    };
+    
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 export default function BloodAnalysisPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [analysisMode, setAnalysisMode] = useState<'photo' | 'text'>('photo');
@@ -116,8 +148,11 @@ export default function BloodAnalysisPage() {
         const file = result.successful[0];
         console.log('File info:', file);
         
-        // Use the original file data
+        // Use the original file data with compression
         const fileData = file.data as Blob;
+        
+        // Compress image if it's too large
+        const compressedFile = await compressImage(fileData);
         const reader = new FileReader();
         
         reader.onloadend = async () => {
@@ -158,7 +193,7 @@ export default function BloodAnalysisPage() {
           }
         };
         
-        reader.readAsDataURL(fileData);
+        reader.readAsDataURL(compressedFile);
       } catch (error) {
         console.error("Error processing upload:", error);
         setIsUploading(false);
@@ -308,7 +343,7 @@ export default function BloodAnalysisPage() {
               <>
                 <ObjectUploader
                   maxNumberOfFiles={1}
-                  maxFileSize={10485760} // 10MB
+                  maxFileSize={5242880} // 5MB (уменьшаем лимит)
                   allowedFileTypes={['image/*']}
                   onGetUploadParameters={handleGetUploadParameters}
                   onComplete={handleComplete}
@@ -328,7 +363,7 @@ export default function BloodAnalysisPage() {
                       </p>
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Только изображения: PNG, JPG, GIF, WEBP до 10MB
+                      Только изображения: PNG, JPG, GIF, WEBP до 5MB
                     </div>
                   </div>
                 </ObjectUploader>
