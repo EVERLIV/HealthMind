@@ -7,7 +7,7 @@ import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import Biomarkers from "@/pages/biomarkers";
 import Profile from "@/pages/profile";
-import Statistics from "@/pages/statistics";
+import Recommendations from "@/pages/recommendations";
 import HealthProfilePage from "@/pages/health-profile-page";
 import ChatPage from "@/pages/chat";
 import BloodAnalysisPage from "@/pages/blood-analysis";
@@ -20,7 +20,7 @@ function Router() {
       <Route path="/" component={Dashboard} />
       <Route path="/biomarkers" component={Biomarkers} />
       <Route path="/profile" component={Profile} />
-      <Route path="/statistics" component={Statistics} />
+      <Route path="/recommendations" component={Recommendations} />
       <Route path="/health-profile" component={HealthProfilePage} />
       <Route path="/chat" component={ChatPage} />
       <Route path="/blood-analysis" component={BloodAnalysisPage} />

@@ -1,11 +1,11 @@
 import { Link, useLocation } from "wouter";
-import { Home, BarChart3, BriefcaseMedical, User } from "lucide-react";
+import { Home, Brain, BriefcaseMedical, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { path: "/", icon: Home, label: "Главная" },
   { path: "/blood-analyses", icon: BriefcaseMedical, label: "Анализы" },
-  { path: "/statistics", icon: BarChart3, label: "Статистика" },
+  { path: "/recommendations", icon: Brain, label: "Рекомендации" },
   { path: "/profile", icon: User, label: "Профиль" },
 ];
 

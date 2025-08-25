@@ -1,218 +1,344 @@
-interface EnhancedBloodAnalysisResults {
-  markers: Array<{
-    name: string;
-    value: string;
-    normalRange: string;
-    status: 'normal' | 'high' | 'low';
-    recommendation: string;
-    education: string;
-    lifestyle: string;
-  }>;
-  supplements: Array<{
-    name: string;
-    reason: string;
-    dosage: string;
-    duration: string;
-  }>;
-  generalRecommendation: string;
-  riskFactors: string[];
-  followUpTests: string[];
-  urgencyLevel: 'low' | 'medium' | 'high';
-  nextCheckup: string;
+import OpenAI from 'openai';
+
+interface HealthProfile {
+  age: number;
+  gender: string;
+  height: number;
+  weight: number;
+  bmi: number;
+  activityLevel: string;
+  goals: string[];
+  chronicConditions: string[];
+  allergies: string[];
+  medications: string[];
+  supplements: string[];
 }
 
-const systemPrompt = `Вы - высококвалифицированный медицинский лаборант и ИИ-помощник, специализирующийся на анализе результатов лабораторных исследований крови с расширенными возможностями OCR и интерпретации биомаркеров.
+interface BloodMarker {
+  name: string;
+  value: string;
+  status: 'normal' | 'low' | 'high' | 'critical';
+  education?: string;
+  recommendation?: string;
+}
 
-РАСШИРЕННЫЕ OCR ВОЗМОЖНОСТИ:
-- Распознавание различных форматов лабораторий (Инвитро, Гемотест, CMD, KDL, местные лаборатории)
-- Обработка рукописных записей врачей
-- Распознавание таблиц, списков и различных макетов
-- Извлечение данных из PDF-сканов и фотографий низкого качества
-- Обработка многостраничных результатов
+interface RecommendationSection {
+  title: string;
+  items: string[];
+}
 
-РАСШИРЕННАЯ БАЗА БИОМАРКЕРОВ:
-Основные показатели:
-- Гемоглобин: мужчины 130-170 г/л, женщины 120-150 г/л
-- Эритроциты: мужчины 4.0-5.5×10¹²/л, женщины 3.5-5.0×10¹²/л
-- Лейкоциты: 4.0-9.0×10⁹/л
-- Тромбоциты: 150-400×10⁹/л
-- Холестерин общий: <5.2 ммоль/л
-- Холестерин ЛПНП: <3.0 ммоль/л
-- Холестерин ЛПВП: мужчины >1.0, женщины >1.2 ммоль/л
-- Триглицериды: <1.7 ммоль/л
-- Глюкоза: 3.9-6.1 ммоль/л
-- Креатинин: мужчины 62-115, женщины 53-97 мкмоль/л
-- Мочевина: 2.5-8.3 ммоль/л
-- Билирубин общий: 8.5-20.5 мкмоль/л
-- АЛТ: мужчины <41, женщины <31 Ед/л
-- АСТ: мужчины <37, женщины <31 Ед/л
+interface HealthRecommendations {
+  disclaimer: string;
+  summary: string;
+  priorityAreas: string[];
+  nutrition: RecommendationSection;
+  physicalActivity: RecommendationSection;
+  lifestyle: RecommendationSection;
+  supplements: RecommendationSection;
+  actionPlan: string[];
+  nextSteps: string[];
+}
 
-ОБРАЗОВАТЕЛЬНЫЙ КОНТЕНТ:
-Для каждого биомаркера включайте:
-- Краткое объяснение функции в организме
-- Причины повышения/понижения
-- Связь с другими показателями
-- Рекомендации по питанию и образу жизни
-- Когда нужна консультация врача
-
-ВАЖНО: Всегда подчеркивайте, что результаты носят информационный характер и не заменяют консультацию врача.`;
-
-export class DeepSeekAnalysisService {
-  private apiKey: string;
-  private baseUrl: string = 'https://api.deepseek.com/v1/chat/completions';
+export class DeepSeekService {
+  private client: OpenAI;
 
   constructor(apiKey: string) {
-    this.apiKey = apiKey;
+    this.client = new OpenAI({
+      apiKey: apiKey,
+      baseURL: 'https://api.deepseek.com/v1'
+    });
   }
 
-  async analyzeBloodTestText(text: string): Promise<EnhancedBloodAnalysisResults> {
-    const prompt = `Проанализируйте следующие результаты анализа крови:
-${text}
+  async generateHealthRecommendations(
+    profile: HealthProfile | null,
+    bloodMarkers: BloodMarker[]
+  ): Promise<HealthRecommendations> {
+    try {
+      const systemPrompt = `## 1. Роль и цель
 
-Обратите особое внимание на:
-1. Все числовые значения и их единицы измерения
-2. Возможные опечатки или нестандартные обозначения
-3. Взаимосвязи между показателями
-4. Образовательную ценность для пациента
+Ты — ИИ-ассистент по здоровью. Твоя цель — анализировать данные о здоровье пользователя (анализы крови, биомаркеры, профиль здоровья) и предоставлять персонализированные, безопасные и научно обоснованные рекомендации по улучшению здоровья. Ты не являешься врачом, и твои рекомендации не заменяют медицинскую консультацию.
 
-Верните результат ТОЛЬКО в формате JSON (без дополнительного текста) со следующей структурой:
+## 2. Ключевые принципы
+
+1. **Безопасность превыше всего:** Никогда не давай советов, которые могут навредить. При любых критических отклонениях в анализах — немедленно и настойчиво рекомендуй обратиться к врачу.
+2. **Научная обоснованность:** Все рекомендации должны быть основаны на современных научных данных и клинических рекомендациях.
+3. **Персонализация:** Учитывай индивидуальные особенности пользователя: возраст, пол, хронические заболевания, образ жизни, цели.
+4. **Понятность:** Избегай сложной медицинской терминологии. Объясняй все просто и доступно.
+5. **Конфиденциальность:** Напомни пользователю о важности защиты своих медицинских данных.
+
+## 3. Структура ответа
+
+Отвечай ТОЛЬКО в формате JSON со следующей структурой:
 {
-  "markers": [{"name": "название", "value": "значение", "normalRange": "норма", "status": "normal/high/low", "recommendation": "рекомендация", "education": "информация", "lifestyle": "советы"}],
-  "supplements": [{"name": "название", "reason": "причина", "dosage": "дозировка", "duration": "длительность"}],
-  "generalRecommendation": "общие рекомендации",
-  "riskFactors": ["фактор1", "фактор2"],
-  "followUpTests": ["тест1", "тест2"],
-  "urgencyLevel": "low/medium/high",
-  "nextCheckup": "когда повторить"
+  "disclaimer": "Полный текст дисклеймера о том, что это не медицинская консультация",
+  "summary": "Краткое резюме состояния здоровья (1-2 абзаца)",
+  "priorityAreas": ["Приоритетное направление 1", "Приоритетное направление 2", "Приоритетное направление 3"],
+  "nutrition": {
+    "title": "Питание",
+    "items": ["Конкретная рекомендация 1", "Конкретная рекомендация 2", "..."]
+  },
+  "physicalActivity": {
+    "title": "Физическая активность",
+    "items": ["Конкретная рекомендация 1", "Конкретная рекомендация 2", "..."]
+  },
+  "lifestyle": {
+    "title": "Образ жизни",
+    "items": ["Конкретная рекомендация по сну", "Рекомендация по стрессу", "..."]
+  },
+  "supplements": {
+    "title": "Витамины и добавки",
+    "items": ["Рекомендация только при явных дефицитах", "Напоминание о консультации с врачом"]
+  },
+  "actionPlan": ["Шаг 1: что сделать в первую очередь", "Шаг 2: следующий шаг", "..."],
+  "nextSteps": ["Какие показатели контролировать", "Когда пересдать анализы", "Консультация с врачом"]
 }`;
 
-    return this.callDeepSeekAPI(prompt);
-  }
+      const userPrompt = this.buildUserPrompt(profile, bloodMarkers);
 
-  async analyzeBloodTestImage(imageBase64: string): Promise<EnhancedBloodAnalysisResults> {
-    // DeepSeek API не поддерживает изображения, возвращаем сообщение об ошибке
-    console.warn('DeepSeek API не поддерживает анализ изображений. Используйте текстовый ввод.');
-    return {
-      markers: [{
-        name: "Требуется текстовый ввод",
-        value: "—",
-        normalRange: "—",
-        status: "normal",
-        recommendation: "DeepSeek API не поддерживает анализ изображений. Пожалуйста, введите данные анализа в текстовом виде.",
-        education: "Вы можете ввести значения анализов вручную для получения подробной интерпретации от ИИ.",
-        lifestyle: "Используйте режим 'Ввести вручную' для анализа ваших результатов."
-      }],
-      supplements: [],
-      generalRecommendation: "Пожалуйста, используйте текстовый ввод данных анализа. DeepSeek AI может проанализировать только текстовые данные.",
-      riskFactors: [],
-      followUpTests: [],
-      urgencyLevel: "low",
-      nextCheckup: "После ввода данных"
-    };
-  }
-
-  private async callDeepSeekAPI(prompt: string): Promise<EnhancedBloodAnalysisResults> {
-    try {
-      const messages = [
-        {
-          role: "system",
-          content: systemPrompt
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ];
-
-      const response = await fetch(this.baseUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: "deepseek-chat",
-          messages: messages,
-          temperature: 0.2,
-          max_tokens: 4000
-        }),
+      const response = await this.client.chat.completions.create({
+        model: "deepseek-chat",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          {
+            role: "user",
+            content: userPrompt
+          }
+        ],
+        max_tokens: 3000,
+        temperature: 0.3,
       });
 
-      if (!response.ok) {
-        throw new Error(`DeepSeek API error: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      let content = data.choices[0]?.message?.content;
-
+      const content = response.choices[0].message.content;
       if (!content) {
-        throw new Error('Не получен ответ от DeepSeek API');
+        throw new Error("Не удалось получить ответ от DeepSeek");
       }
-
-      // Remove markdown code blocks if present
-      content = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
 
       try {
-        const parsedResults = JSON.parse(content) as EnhancedBloodAnalysisResults;
-        return this.validateAndFormatResults(parsedResults);
+        const result = JSON.parse(content) as HealthRecommendations;
+        return this.validateAndEnrichRecommendations(result);
       } catch (parseError) {
-        console.error('Ошибка парсинга ответа DeepSeek:', parseError);
-        return this.createFallbackResults();
+        console.error("Ошибка парсинга JSON от DeepSeek:", content);
+        return this.getDefaultRecommendations();
       }
-
     } catch (error) {
-      console.error('Ошибка вызова DeepSeek API:', error);
-      return this.createFallbackResults();
+      console.error("Ошибка при генерации рекомендаций с DeepSeek:", error);
+      throw new Error("Не удалось сгенерировать рекомендации");
     }
   }
 
-  private validateAndFormatResults(results: EnhancedBloodAnalysisResults): EnhancedBloodAnalysisResults {
-    // Валидация и очистка результатов
-    return {
-      markers: results.markers?.map(marker => ({
-        name: marker.name || 'Неизвестный показатель',
-        value: marker.value || 'Не указано',
-        normalRange: marker.normalRange || 'Не указано',
-        status: ['normal', 'high', 'low'].includes(marker.status) ? marker.status : 'normal',
-        recommendation: marker.recommendation || 'Нет рекомендаций',
-        education: marker.education || 'Дополнительная информация отсутствует',
-        lifestyle: marker.lifestyle || 'Общие рекомендации по здоровому образу жизни'
-      })) || [],
-      supplements: results.supplements?.map(supplement => ({
-        name: supplement.name || 'Добавка',
-        reason: supplement.reason || 'Для поддержания здоровья',
-        dosage: supplement.dosage || 'Согласно инструкции',
-        duration: supplement.duration || 'Уточните у врача'
-      })) || [],
-      generalRecommendation: results.generalRecommendation || 'Проконсультируйтесь с врачом для детальной интерпретации результатов.',
-      riskFactors: results.riskFactors || [],
-      followUpTests: results.followUpTests || [],
-      urgencyLevel: ['low', 'medium', 'high'].includes(results.urgencyLevel) ? results.urgencyLevel : 'low',
-      nextCheckup: results.nextCheckup || 'Через 3-6 месяцев'
-    };
+  private buildUserPrompt(profile: HealthProfile | null, bloodMarkers: BloodMarker[]): string {
+    let prompt = "Проанализируй следующие данные о здоровье пользователя:\n\n";
+
+    if (profile) {
+      prompt += "**ПРОФИЛЬ ЗДОРОВЬЯ:**\n";
+      prompt += `- Возраст: ${profile.age} лет\n`;
+      prompt += `- Пол: ${profile.gender}\n`;
+      prompt += `- Рост: ${profile.height} см\n`;
+      prompt += `- Вес: ${profile.weight} кг\n`;
+      prompt += `- ИМТ: ${profile.bmi.toFixed(1)}\n`;
+      prompt += `- Уровень активности: ${profile.activityLevel}\n`;
+      
+      if (profile.goals && profile.goals.length > 0) {
+        prompt += `- Цели: ${profile.goals.join(', ')}\n`;
+      }
+      
+      if (profile.chronicConditions && profile.chronicConditions.length > 0) {
+        prompt += `- Хронические заболевания: ${profile.chronicConditions.join(', ')}\n`;
+      }
+      
+      if (profile.allergies && profile.allergies.length > 0) {
+        prompt += `- Аллергии: ${profile.allergies.join(', ')}\n`;
+      }
+      
+      if (profile.medications && profile.medications.length > 0) {
+        prompt += `- Принимаемые лекарства: ${profile.medications.join(', ')}\n`;
+      }
+      
+      if (profile.supplements && profile.supplements.length > 0) {
+        prompt += `- Принимаемые добавки: ${profile.supplements.join(', ')}\n`;
+      }
+      
+      prompt += "\n";
+    }
+
+    if (bloodMarkers && bloodMarkers.length > 0) {
+      prompt += "**РЕЗУЛЬТАТЫ АНАЛИЗОВ КРОВИ:**\n";
+      
+      // Группируем маркеры по статусу
+      const criticalMarkers = bloodMarkers.filter(m => m.status === 'critical');
+      const abnormalMarkers = bloodMarkers.filter(m => m.status === 'high' || m.status === 'low');
+      const normalMarkers = bloodMarkers.filter(m => m.status === 'normal');
+
+      if (criticalMarkers.length > 0) {
+        prompt += "\n⚠️ КРИТИЧЕСКИЕ ОТКЛОНЕНИЯ:\n";
+        criticalMarkers.forEach(marker => {
+          prompt += `- ${marker.name}: ${marker.value} (КРИТИЧНО!)\n`;
+        });
+      }
+
+      if (abnormalMarkers.length > 0) {
+        prompt += "\n❗ ОТКЛОНЕНИЯ ОТ НОРМЫ:\n";
+        abnormalMarkers.forEach(marker => {
+          prompt += `- ${marker.name}: ${marker.value} (${marker.status === 'high' ? 'повышен' : 'понижен'})\n`;
+        });
+      }
+
+      if (normalMarkers.length > 0) {
+        prompt += "\n✅ В ПРЕДЕЛАХ НОРМЫ:\n";
+        normalMarkers.forEach(marker => {
+          prompt += `- ${marker.name}: ${marker.value}\n`;
+        });
+      }
+    }
+
+    prompt += "\n\nНа основе этих данных предоставь персонализированные рекомендации по улучшению здоровья. ";
+    prompt += "Обязательно учти все отклонения в анализах и особенности профиля пользователя. ";
+    prompt += "Если есть критические отклонения - это должно быть первым приоритетом в рекомендациях.";
+
+    return prompt;
   }
 
-  private createFallbackResults(): EnhancedBloodAnalysisResults {
+  private validateAndEnrichRecommendations(result: HealthRecommendations): HealthRecommendations {
+    // Убеждаемся, что все обязательные поля присутствуют
+    if (!result.disclaimer) {
+      result.disclaimer = "❗ Важно: Я — ваш ИИ-ассистент по здоровью. Мои рекомендации основаны на анализе предоставленных данных и не являются диагнозом или заменой консультации с врачом. Перед применением любых рекомендаций, особенно при наличии хронических заболеваний, проконсультируйтесь со специалистом.";
+    }
+
+    if (!result.summary) {
+      result.summary = "На основе анализа ваших данных подготовлены персонализированные рекомендации для улучшения здоровья.";
+    }
+
+    if (!result.priorityAreas || result.priorityAreas.length === 0) {
+      result.priorityAreas = ["Общее укрепление здоровья", "Профилактика заболеваний"];
+    }
+
+    // Убеждаемся, что все секции рекомендаций присутствуют
+    if (!result.nutrition || !result.nutrition.items) {
+      result.nutrition = {
+        title: "Питание",
+        items: ["Сбалансируйте рацион", "Увеличьте потребление овощей и фруктов"]
+      };
+    }
+
+    if (!result.physicalActivity || !result.physicalActivity.items) {
+      result.physicalActivity = {
+        title: "Физическая активность",
+        items: ["Минимум 30 минут умеренной активности в день", "Регулярные прогулки на свежем воздухе"]
+      };
+    }
+
+    if (!result.lifestyle || !result.lifestyle.items) {
+      result.lifestyle = {
+        title: "Образ жизни",
+        items: ["Соблюдайте режим сна (7-9 часов)", "Управляйте стрессом"]
+      };
+    }
+
+    if (!result.supplements || !result.supplements.items) {
+      result.supplements = {
+        title: "Витамины и добавки",
+        items: ["Проконсультируйтесь с врачом перед приемом любых добавок"]
+      };
+    }
+
+    if (!result.actionPlan || result.actionPlan.length === 0) {
+      result.actionPlan = ["Начните с небольших изменений в питании", "Добавьте физическую активность"];
+    }
+
+    if (!result.nextSteps || result.nextSteps.length === 0) {
+      result.nextSteps = ["Контролируйте показатели здоровья", "Обратитесь к врачу для детальной консультации"];
+    }
+
+    return result;
+  }
+
+  private getDefaultRecommendations(): HealthRecommendations {
     return {
-      markers: [
-        {
-          name: 'Анализ не распознан',
-          value: 'Не удалось обработать',
-          normalRange: 'Не определено',
-          status: 'normal',
-          recommendation: 'Загрузите более качественное изображение или введите данные вручную',
-          education: 'Для точного анализа необходимо четкое изображение результатов',
-          lifestyle: 'Соблюдайте здоровый образ жизни'
-        }
+      disclaimer: "❗ Важно: Я — ваш ИИ-ассистент по здоровью. Мои рекомендации основаны на анализе предоставленных данных и не являются диагнозом или заменой консультации с врачом. Перед применением любых рекомендаций проконсультируйтесь со специалистом.",
+      summary: "Для получения персонализированных рекомендаций необходимо проанализировать ваши данные о здоровье. Пожалуйста, загрузите результаты анализов и заполните профиль здоровья.",
+      priorityAreas: [
+        "Общее укрепление здоровья",
+        "Профилактика заболеваний",
+        "Улучшение качества жизни"
       ],
-      supplements: [],
-      generalRecommendation: 'Не удалось проанализировать результаты. Пожалуйста, проконсультируйтесь с врачом.',
-      riskFactors: ['Неполная информация'],
-      followUpTests: [],
-      urgencyLevel: 'medium',
-      nextCheckup: 'Обратитесь к врачу для консультации'
+      nutrition: {
+        title: "Питание",
+        items: [
+          "Сбалансируйте рацион питания",
+          "Увеличьте потребление овощей и фруктов",
+          "Ограничьте потребление сахара и соли",
+          "Пейте достаточное количество воды (30 мл на кг веса)"
+        ]
+      },
+      physicalActivity: {
+        title: "Физическая активность",
+        items: [
+          "Минимум 150 минут умеренной активности в неделю",
+          "Добавьте силовые упражнения 2 раза в неделю",
+          "Делайте перерывы каждый час при сидячей работе",
+          "Начните с простых упражнений и постепенно увеличивайте нагрузку"
+        ]
+      },
+      lifestyle: {
+        title: "Образ жизни",
+        items: [
+          "Соблюдайте режим сна (7-9 часов в сутки)",
+          "Управляйте стрессом через медитацию или дыхательные практики",
+          "Откажитесь от вредных привычек",
+          "Проводите больше времени на свежем воздухе"
+        ]
+      },
+      supplements: {
+        title: "Витамины и добавки",
+        items: [
+          "Сдайте анализы на основные витамины и минералы",
+          "Проконсультируйтесь с врачом перед приемом любых добавок",
+          "Не превышайте рекомендуемые дозировки",
+          "Отдавайте предпочтение получению витаминов из пищи"
+        ]
+      },
+      actionPlan: [
+        "Шаг 1: Пройдите полное медицинское обследование",
+        "Шаг 2: Заполните профиль здоровья в приложении",
+        "Шаг 3: Загрузите результаты анализов",
+        "Шаг 4: Начните с простых изменений в образе жизни",
+        "Шаг 5: Отслеживайте прогресс и корректируйте план"
+      ],
+      nextSteps: [
+        "Запишитесь на консультацию к терапевту",
+        "Сдайте общий анализ крови и биохимию",
+        "Начните вести дневник питания",
+        "Установите регулярные напоминания о физической активности",
+        "Повторите анализы через 3 месяца для оценки динамики"
+      ]
     };
   }
 }
 
-export default DeepSeekAnalysisService;
+// Legacy DeepSeekAnalysisService for blood test analysis
+export class DeepSeekAnalysisService extends DeepSeekService {
+  constructor(apiKey: string) {
+    super(apiKey);
+  }
+  
+  async analyzeBloodTestText(text: string): Promise<any> {
+    // Legacy method for backward compatibility
+    const profile = null;
+    const bloodMarkers: any[] = [];
+    const recommendations = await this.generateHealthRecommendations(profile, bloodMarkers);
+    return {
+      markers: [],
+      supplements: [],
+      generalRecommendation: recommendations.summary,
+      riskFactors: [],
+      followUpTests: recommendations.nextSteps,
+      urgencyLevel: "low",
+      nextCheckup: "Через 3 месяца"
+    };
+  }
+}
+
+export default DeepSeekService;

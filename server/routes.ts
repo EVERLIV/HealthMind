@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService } from "./objectStorage";
-import DeepSeekAnalysisService from "./deepseekService";
+import { DeepSeekAnalysisService, DeepSeekService } from "./deepseekService";
 import OpenAIVisionService from "./openaiVisionService";
 import { insertBloodAnalysisSchema, insertChatSessionSchema, insertChatMessageSchema, insertHealthMetricsSchema, insertHealthProfileSchema } from "@shared/schema";
 
@@ -292,6 +292,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error analyzing image with OpenAI Vision:", error);
       res.status(500).json({ error: "Analysis failed" });
+    }
+  });
+
+  // Recommendations route
+  app.get("/api/recommendations", async (req, res) => {
+    try {
+      const deepSeekApiKey = process.env.DEEPSEEK_API_KEY;
+      if (!deepSeekApiKey) {
+        return res.status(500).json({ error: "DeepSeek API key not configured" });
+      }
+
+      // Get user's health profile
+      const healthProfile = await storage.getHealthProfile(DEFAULT_USER_ID);
+      
+      // Get user's latest blood analyses
+      const bloodAnalyses = await storage.getBloodAnalysesByUser(DEFAULT_USER_ID);
+      
+      // Extract markers from the latest analyzed blood tests
+      const bloodMarkers: any[] = [];
+      for (const analysis of bloodAnalyses) {
+        if (analysis.status === 'analyzed' && analysis.results) {
+          const results = analysis.results as any;
+          if (results.markers && Array.isArray(results.markers)) {
+            bloodMarkers.push(...results.markers);
+          }
+        }
+      }
+
+      // Prepare profile data
+      let profile = null;
+      if (healthProfile && healthProfile.profileData) {
+        const profileData = healthProfile.profileData as any;
+        const height = profileData.height || 170;
+        const weight = profileData.weight || 70;
+        const bmi = weight / ((height / 100) * (height / 100));
+        
+        profile = {
+          age: profileData.age || 30,
+          gender: profileData.gender || 'неизвестен',
+          height: height,
+          weight: weight,
+          bmi: bmi,
+          activityLevel: profileData.activityLevel || 'умеренный',
+          goals: profileData.goals || [],
+          chronicConditions: profileData.chronicConditions || [],
+          allergies: profileData.allergies || [],
+          medications: profileData.medications || [],
+          supplements: profileData.supplements || []
+        };
+      }
+
+      // Generate recommendations using DeepSeek
+      const deepSeekService = new DeepSeekService(deepSeekApiKey);
+      const recommendations = await deepSeekService.generateHealthRecommendations(
+        profile,
+        bloodMarkers
+      );
+
+      res.json(recommendations);
+    } catch (error) {
+      console.error("Error generating recommendations:", error);
+      res.status(500).json({ error: "Failed to generate recommendations" });
     }
   });
 
