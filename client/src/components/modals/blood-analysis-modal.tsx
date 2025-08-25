@@ -224,6 +224,7 @@ export default function BloodAnalysisModal({ open, onOpenChange }: BloodAnalysis
               onGetUploadParameters={handleGetUploadParameters}
               onComplete={handleComplete}
               buttonClassName="w-full p-4 border-2 border-dashed border-border hover:border-trust-green transition-colors rounded-xl bg-transparent"
+              asButton={false}
             >
               <div className="flex flex-col items-center space-y-2">
                 <Upload className="w-8 h-8 text-muted-foreground" />

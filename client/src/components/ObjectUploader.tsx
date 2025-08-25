@@ -20,6 +20,7 @@ interface ObjectUploaderProps {
   ) => void;
   buttonClassName?: string;
   children: ReactNode;
+  asButton?: boolean; // If false, renders as div instead of Button
 }
 
 /**
@@ -57,6 +58,7 @@ export function ObjectUploader({
   onComplete,
   buttonClassName,
   children,
+  asButton = true,
 }: ObjectUploaderProps) {
   const [showModal, setShowModal] = useState(false);
   const [uppy] = useState(() =>
@@ -78,9 +80,19 @@ export function ObjectUploader({
 
   return (
     <div>
-      <Button onClick={() => setShowModal(true)} className={buttonClassName}>
-        {children}
-      </Button>
+      {asButton ? (
+        <Button onClick={() => setShowModal(true)} className={buttonClassName}>
+          {children}
+        </Button>
+      ) : (
+        <div 
+          onClick={() => setShowModal(true)} 
+          className={buttonClassName}
+          style={{ cursor: 'pointer' }}
+        >
+          {children}
+        </div>
+      )}
 
       <DashboardModal
         uppy={uppy}

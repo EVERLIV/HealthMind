@@ -287,24 +287,23 @@ export default function BloodAnalysisPage() {
                   maxFileSize={10485760} // 10MB
                   onGetUploadParameters={handleGetUploadParameters}
                   onComplete={handleComplete}
-                  buttonClassName="w-full"
+                  buttonClassName="w-full p-8 border-2 border-dashed border-gray-300 hover:border-trust-green transition-colors rounded-2xl bg-gray-50 hover:bg-gray-100"
+                  asButton={false}
                 >
-                  <div className="w-full p-8 border-2 border-dashed border-gray-300 hover:border-trust-green transition-colors rounded-2xl bg-gray-50 hover:bg-gray-100">
-                    <div className="flex flex-col items-center space-y-3">
-                      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
-                        <Upload className="w-8 h-8 text-trust-green" />
-                      </div>
-                      <div className="text-center">
-                        <p className="font-semibold text-foreground">
-                          {isUploading ? "Загружаем..." : "Нажмите для загрузки"}
-                        </p>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          или перетащите файл сюда
-                        </p>
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        PNG, JPG или PDF до 10MB
-                      </div>
+                  <div className="flex flex-col items-center space-y-3">
+                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
+                      <Upload className="w-8 h-8 text-trust-green" />
+                    </div>
+                    <div className="text-center">
+                      <p className="font-semibold text-foreground">
+                        {isUploading ? "Загружаем..." : "Нажмите для загрузки"}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        или перетащите файл сюда
+                      </p>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      PNG, JPG или PDF до 10MB
                     </div>
                   </div>
                 </ObjectUploader>
