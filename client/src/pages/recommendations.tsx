@@ -53,6 +53,7 @@ interface HealthRecommendations {
 export default function Recommendations() {
   const [activeTab, setActiveTab] = useState("overview");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
 
   const { data: recommendations, isLoading, refetch } = useQuery<HealthRecommendations>({
     queryKey: ["/api/recommendations"],
@@ -108,6 +109,149 @@ export default function Recommendations() {
       default:
         return "text-gray-600 bg-gray-50";
     }
+  };
+
+  // Анализ профиля и данных пользователя
+  const analyzeUserData = () => {
+    const analysis = {
+      goodPoints: [] as string[],
+      concerningPoints: [] as string[],
+      criticalPoints: [] as string[]
+    };
+
+    // Анализ профиля здоровья
+    if (healthProfile && (healthProfile as any)?.profileData) {
+      const profile = (healthProfile as any).profileData;
+      
+      // Анализ ИМТ
+      if (profile.weight && profile.height) {
+        const bmi = profile.weight / ((profile.height / 100) * (profile.height / 100));
+        if (bmi >= 18.5 && bmi <= 24.9) {
+          analysis.goodPoints.push(`ИМТ в норме (${bmi.toFixed(1)})`);
+        } else if (bmi < 18.5) {
+          analysis.concerningPoints.push(`Недостаточный вес (ИМТ ${bmi.toFixed(1)})`);
+        } else if (bmi >= 25 && bmi < 30) {
+          analysis.concerningPoints.push(`Избыточный вес (ИМТ ${bmi.toFixed(1)})`);
+        } else if (bmi >= 30) {
+          analysis.criticalPoints.push(`Ожирение (ИМТ ${bmi.toFixed(1)})`);
+        }
+      }
+
+      // Анализ активности
+      if (profile.activityLevel === 'high' || profile.exerciseFrequency === 'daily') {
+        analysis.goodPoints.push('Высокий уровень физической активности');
+      } else if (profile.activityLevel === 'low' || profile.exerciseFrequency === 'never') {
+        analysis.concerningPoints.push('Низкий уровень физической активности');
+      }
+
+      // Анализ сна
+      if (profile.sleepHours >= 7 && profile.sleepHours <= 9) {
+        analysis.goodPoints.push(`Хорошая продолжительность сна (${profile.sleepHours}ч)`);
+      } else if (profile.sleepHours < 6) {
+        analysis.criticalPoints.push(`Недостаток сна (${profile.sleepHours}ч)`);
+      } else if (profile.sleepHours > 10) {
+        analysis.concerningPoints.push(`Избыток сна (${profile.sleepHours}ч)`);
+      }
+
+      // Анализ стресса
+      if (profile.stressLevel <= 3) {
+        analysis.goodPoints.push('Низкий уровень стресса');
+      } else if (profile.stressLevel >= 7) {
+        analysis.criticalPoints.push('Высокий уровень стресса');
+      }
+
+      // Анализ вредных привычек
+      if (profile.smokingStatus === 'never') {
+        analysis.goodPoints.push('Некурящий');
+      } else if (profile.smokingStatus === 'regular') {
+        analysis.criticalPoints.push('Регулярное курение');
+      }
+
+      if (profile.alcoholConsumption === 'none') {
+        analysis.goodPoints.push('Не употребляет алкоголь');
+      } else if (profile.alcoholConsumption === 'heavy') {
+        analysis.criticalPoints.push('Чрезмерное употребление алкоголя');
+      }
+
+      // Анализ хронических заболеваний
+      if (profile.chronicConditions && profile.chronicConditions.length > 0) {
+        analysis.criticalPoints.push(`Хронические заболевания: ${profile.chronicConditions.join(', ')}`);
+      } else {
+        analysis.goodPoints.push('Отсутствие хронических заболеваний');
+      }
+    }
+
+    // Анализ анализов крови
+    if (bloodAnalyses && Array.isArray(bloodAnalyses)) {
+      bloodAnalyses.forEach((analysis_item: any) => {
+        if (analysis_item.status === 'analyzed' && analysis_item.results?.markers) {
+          analysis_item.results.markers.forEach((marker: any) => {
+            if (marker.status === 'normal') {
+              analysis.goodPoints.push(`${marker.name}: в норме`);
+            } else if (marker.status === 'critical') {
+              analysis.criticalPoints.push(`${marker.name}: критическое отклонение`);
+            } else {
+              analysis.concerningPoints.push(`${marker.name}: отклонение от нормы`);
+            }
+          });
+        }
+      });
+    }
+
+    return analysis;
+  };
+
+  const userAnalysis = analyzeUserData();
+
+  // Получение детальных рекомендаций для приоритетного направления
+  const getPriorityDetails = (priority: string) => {
+    const detailsMap: Record<string, { description: string; actions: string[] }> = {
+      'Нормализация холестерина': {
+        description: 'Снижение уровня холестерина для защиты сердечно-сосудистой системы',
+        actions: [
+          'Увеличить потребление растворимой клетчатки (овсянка, яблоки, бобовые)',
+          'Добавить Омега-3 жирные кислоты 1000-2000 мг в день',
+          'Ограничить насыщенные жиры до 10% от калорий',
+          'Добавить 30 минут кардио 5 раз в неделю',
+          'Рассмотреть прием растительных стеролов 2г в день'
+        ]
+      },
+      'Контроль веса': {
+        description: 'Достижение и поддержание здорового веса',
+        actions: [
+          'Создать дефицит калорий 500-750 ккал в день',
+          'Увеличить потребление белка до 1.2-1.6г на кг веса',
+          'Добавить силовые тренировки 3 раза в неделю',
+          'Контролировать размер порций',
+          'Вести дневник питания'
+        ]
+      },
+      'Улучшение сна': {
+        description: 'Нормализация качества и продолжительности сна',
+        actions: [
+          'Соблюдать режим сна: ложиться и вставать в одно время',
+          'Исключить экраны за 1 час до сна',
+          'Создать прохладную темную обстановку (18-20°C)',
+          'Избегать кофеина после 14:00',
+          'Рассмотреть прием магния 300-400мг перед сном'
+        ]
+      },
+      'Снижение стресса': {
+        description: 'Управление стрессом и улучшение психического здоровья',
+        actions: [
+          'Практиковать медитацию 10-15 минут ежедневно',
+          'Использовать техники глубокого дыхания',
+          'Заниматься йогой или тай-чи',
+          'Планировать время для отдыха и хобби',
+          'Рассмотреть прием адаптогенов (ашваганда, родиола)'
+        ]
+      }
+    };
+    
+    return detailsMap[priority] || {
+      description: 'Персонализированные рекомендации для улучшения здоровья',
+      actions: ['Обратитесь к специалисту для детальной консультации']
+    };
   };
 
   if (isLoading || isGenerating) {
@@ -223,9 +367,11 @@ export default function Recommendations() {
             </h2>
             <div className="space-y-1.5">
               {recommendations.priorityAreas.map((area, index) => (
-                <div
+                <button
                   key={index}
-                  className={`eva-card p-3 flex items-center justify-between ${getPriorityColor(index)}`}
+                  onClick={() => setSelectedPriority(selectedPriority === area ? null : area)}
+                  className={`eva-card p-3 flex items-center justify-between ${getPriorityColor(index)} w-full text-left transition-all hover:shadow-md`}
+                  data-testid={`priority-${index}`}
                 >
                   <div className="flex items-center gap-2">
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
@@ -235,10 +381,36 @@ export default function Recommendations() {
                     </div>
                     <span className="text-sm font-medium">{area}</span>
                   </div>
-                  <ChevronRight className="w-4 h-4 opacity-50" />
-                </div>
+                  <ChevronRight className={`w-4 h-4 transition-transform ${
+                    selectedPriority === area ? 'rotate-90' : ''
+                  }`} />
+                </button>
               ))}
             </div>
+            
+            {/* Детали выбранного приоритета */}
+            {selectedPriority && (
+              <Card className="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200">
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-sm flex items-center">
+                    <Target className="w-4 h-4 mr-1.5 text-blue-600" />
+                    {selectedPriority}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    {getPriorityDetails(selectedPriority).description}
+                  </p>
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium">Конкретные действия:</p>
+                    {getPriorityDetails(selectedPriority).actions.map((action, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <CheckCircle2 className="w-3 h-3 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <span className="text-xs">{action}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            )}
           </div>
         )}
 
@@ -310,6 +482,75 @@ export default function Recommendations() {
           </TabsList>
 
           <TabsContent value="overview" className="mt-3 space-y-3">
+            {/* Детальный анализ здоровья */}
+            <div className="space-y-3">
+              {/* Хорошие показатели */}
+              {userAnalysis.goodPoints.length > 0 && (
+                <Card className="p-3 bg-green-50 dark:bg-green-900/20 border-green-200">
+                  <CardHeader className="p-0 pb-2">
+                    <CardTitle className="flex items-center text-sm">
+                      <CheckCircle2 className="w-4 h-4 mr-1.5 text-green-600" />
+                      Хорошие показатели ({userAnalysis.goodPoints.length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="space-y-1.5">
+                      {userAnalysis.goodPoints.map((point, index) => (
+                        <div key={index} className="flex items-start gap-1.5">
+                          <CheckCircle2 className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
+                          <p className="text-xs text-green-800 dark:text-green-200">{point}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Вызывающие беспокойство показатели */}
+              {userAnalysis.concerningPoints.length > 0 && (
+                <Card className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200">
+                  <CardHeader className="p-0 pb-2">
+                    <CardTitle className="flex items-center text-sm">
+                      <AlertCircle className="w-4 h-4 mr-1.5 text-yellow-600" />
+                      Требуют внимания ({userAnalysis.concerningPoints.length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="space-y-1.5">
+                      {userAnalysis.concerningPoints.map((point, index) => (
+                        <div key={index} className="flex items-start gap-1.5">
+                          <AlertCircle className="w-3 h-3 text-yellow-600 mt-0.5 flex-shrink-0" />
+                          <p className="text-xs text-yellow-800 dark:text-yellow-200">{point}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Критические показатели */}
+              {userAnalysis.criticalPoints.length > 0 && (
+                <Card className="p-3 bg-red-50 dark:bg-red-900/20 border-red-200">
+                  <CardHeader className="p-0 pb-2">
+                    <CardTitle className="flex items-center text-sm">
+                      <AlertCircle className="w-4 h-4 mr-1.5 text-red-600" />
+                      Критически важно ({userAnalysis.criticalPoints.length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="space-y-1.5">
+                      {userAnalysis.criticalPoints.map((point, index) => (
+                        <div key={index} className="flex items-start gap-1.5">
+                          <AlertCircle className="w-3 h-3 text-red-600 mt-0.5 flex-shrink-0" />
+                          <p className="text-xs text-red-800 dark:text-red-200">{point}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
             {recommendations?.actionPlan && recommendations.actionPlan.length > 0 && (
               <Card className="p-3">
                 <CardHeader className="p-0 pb-2">
