@@ -153,14 +153,6 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
     }
   };
   
-  const handleStepClick = (stepId: number) => {
-    // Allow navigation to any previous step or the next immediate step
-    if (stepId <= currentStep + 1) {
-      setCurrentStep(stepId);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-  
   const handleUpdateData = (data: Partial<HealthProfileData>) => {
     setProfileData(prev => ({ ...prev, ...data }));
   };
@@ -201,46 +193,6 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
                 className="h-1.5 md:h-2 bg-white transition-all duration-500 ease-out rounded-full"
                 style={{ width: `${progress}%` }}
               />
-            </div>
-          </div>
-          
-          {/* Mobile-optimized Step Navigation */}
-          <div className="px-3 md:px-6 py-3 md:py-4 bg-gray-50 dark:bg-gray-900/50 border-b">
-            <div className="flex gap-1 md:gap-2 overflow-x-auto pb-1 scrollbar-hide">
-              {steps.map((step) => {
-                const StepIcon = step.icon;
-                const isCompleted = completedSteps.has(step.id);
-                const isCurrent = step.id === currentStep;
-                const isClickable = step.id <= currentStep + 1;
-                
-                return (
-                  <Button
-                    key={step.id}
-                    variant={isCurrent ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => handleStepClick(step.id)}
-                    disabled={!isClickable}
-                    className={`
-                      flex items-center gap-1 md:gap-2 whitespace-nowrap transition-all min-w-fit
-                      px-2 md:px-3 py-1 md:py-1.5 h-7 md:h-8 text-[10px] md:text-xs
-                      ${isCurrent ? 'bg-gradient-to-r from-medical-blue to-trust-green text-white shadow-lg' : ''}
-                      ${isCompleted && !isCurrent ? 'text-green-600' : ''}
-                      ${!isClickable ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:scale-105'}
-                    `}
-                    data-testid={`step-${step.id}`}
-                  >
-                    {isCompleted && !isCurrent ? (
-                      <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 shrink-0" />
-                    ) : isCurrent ? (
-                      <StepIcon className="w-3 h-3 md:w-4 md:h-4 shrink-0" />
-                    ) : (
-                      <Circle className="w-3 h-3 md:w-4 md:h-4 shrink-0" />
-                    )}
-                    <span className="hidden lg:inline">{step.title}</span>
-                    <span className="lg:hidden">{step.shortTitle}</span>
-                  </Button>
-                );
-              })}
             </div>
           </div>
           
@@ -291,8 +243,7 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
                 data-testid="button-previous"
               >
                 <ChevronLeft className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 group-hover:-translate-x-1 transition-transform" />
-                <span className="hidden sm:inline">Назад</span>
-                <span className="sm:hidden">←</span>
+                <span>Назад</span>
               </Button>
               
               {/* Mobile-optimized Step Dots */}
@@ -322,13 +273,11 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
                   {saveProfileMutation.isPending ? (
                     <>
                       <Sparkles className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 animate-spin" />
-                      <span className="hidden sm:inline">Сохранение...</span>
-                      <span className="sm:hidden">...</span>
+                      <span>Сохранение...</span>
                     </>
                   ) : (
                     <>
-                      <span className="hidden sm:inline">Завершить</span>
-                      <span className="sm:hidden">Готово</span>
+                      <span>Завершить</span>
                       <Check className="w-3 h-3 md:w-4 md:h-4 ml-1 md:ml-2 group-hover:scale-110 transition-transform" />
                     </>
                   )}
@@ -339,8 +288,7 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
                   className="bg-gradient-to-r from-medical-blue to-trust-green hover:opacity-90 text-white shadow-lg group h-8 md:h-10 text-[11px] md:text-sm px-3 md:px-4"
                   data-testid="button-next"
                 >
-                  <span className="hidden sm:inline">Далее</span>
-                  <span className="sm:hidden">→</span>
+                  <span>Далее</span>
                   <ChevronRight className="w-3 h-3 md:w-4 md:h-4 ml-1 md:ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               )}

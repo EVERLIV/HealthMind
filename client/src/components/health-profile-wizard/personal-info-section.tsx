@@ -90,12 +90,12 @@ export default function PersonalInfoSection({ data, onUpdate }: PersonalInfoSect
                 <Input
                   id="age"
                   type="number"
-                  placeholder="Например: 35"
+                  placeholder="35"
                   value={data.age || ""}
                   onChange={(e) => onUpdate({ age: parseInt(e.target.value) || undefined })}
                   min={1}
                   max={120}
-                  className="max-w-[100px] md:max-w-[150px] h-8 md:h-10 text-sm md:text-base"
+                  className="max-w-[120px] md:max-w-[150px] h-8 md:h-10 text-sm md:text-base placeholder:text-xs md:placeholder:text-sm"
                   data-testid="input-age"
                 />
                 <span className="text-xs md:text-sm text-muted-foreground">лет</span>
@@ -202,7 +202,7 @@ export default function PersonalInfoSection({ data, onUpdate }: PersonalInfoSect
                     onChange={(e) => handleHeightChange(parseInt(e.target.value) || 0)}
                     min={50}
                     max={250}
-                    className="max-w-[80px] md:max-w-[120px] h-8 md:h-10 text-sm md:text-base"
+                    className="max-w-[100px] md:max-w-[120px] h-8 md:h-10 text-sm md:text-base placeholder:text-xs md:placeholder:text-sm"
                     data-testid="input-height"
                   />
                   <span className="text-xs md:text-sm text-muted-foreground">см</span>
@@ -237,7 +237,7 @@ export default function PersonalInfoSection({ data, onUpdate }: PersonalInfoSect
                     min={20}
                     max={300}
                     step={0.1}
-                    className="max-w-[80px] md:max-w-[120px] h-8 md:h-10 text-sm md:text-base"
+                    className="max-w-[100px] md:max-w-[120px] h-8 md:h-10 text-sm md:text-base placeholder:text-xs md:placeholder:text-sm"
                     data-testid="input-weight"
                   />
                   <span className="text-xs md:text-sm text-muted-foreground">кг</span>
