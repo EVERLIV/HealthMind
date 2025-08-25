@@ -30,9 +30,10 @@ export default function BloodAnalysisPage() {
   });
 
   const analyzeImageMutation = useMutation({
-    mutationFn: async ({ analysisId, imageBase64 }: { analysisId: string; imageBase64: string }) => {
+    mutationFn: async ({ analysisId, imageBase64, mimeType }: { analysisId: string; imageBase64: string; mimeType?: string }) => {
       const response = await apiRequest("POST", `/api/blood-analyses/${analysisId}/analyze-image`, {
         imageBase64,
+        mimeType,
       });
       return response.json();
     },
@@ -120,12 +121,14 @@ export default function BloodAnalysisPage() {
         reader.onloadend = async () => {
           try {
             const base64 = reader.result as string;
-            const imageBase64 = base64.split(',')[1]; // Remove data:image/jpeg;base64, prefix
+            const [mimeInfo, imageBase64] = base64.split(',');
+            const mimeType = mimeInfo.split(':')[1].split(';')[0]; // Extract MIME type
             
-            // Analyze with DeepSeek AI
+            // Analyze with OpenAI Vision AI
             await analyzeImageMutation.mutateAsync({
               analysisId: analysis.id,
               imageBase64,
+              mimeType,
             });
           } catch (error) {
             console.error("Error analyzing image:", error);

@@ -220,7 +220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/blood-analyses/:id/analyze-image", async (req, res) => {
     try {
-      const { imageBase64 } = req.body;
+      const { imageBase64, mimeType } = req.body;
       if (!imageBase64) {
         return res.status(400).json({ error: "Image data is required" });
       }
@@ -231,7 +231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const openaiService = new OpenAIVisionService(openaiApiKey);
-      const analysisResults = await openaiService.analyzeBloodTestImage(imageBase64);
+      const analysisResults = await openaiService.analyzeBloodTestImage(imageBase64, mimeType);
 
       // Update blood analysis with results
       const updatedAnalysis = await storage.updateBloodAnalysis(req.params.id, {

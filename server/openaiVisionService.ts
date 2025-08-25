@@ -24,7 +24,7 @@ export default class OpenAIVisionService {
     });
   }
 
-  async analyzeBloodTestImage(imageBase64: string): Promise<AnalysisResult> {
+  async analyzeBloodTestImage(imageBase64: string, mimeType: string = 'image/jpeg'): Promise<AnalysisResult> {
     try {
       const response = await this.client.chat.completions.create({
         model: "gpt-4o",
@@ -70,7 +70,7 @@ export default class OpenAIVisionService {
               {
                 type: "image_url",
                 image_url: {
-                  url: `data:image/jpeg;base64,${imageBase64}`,
+                  url: `data:${mimeType};base64,${imageBase64}`,
                   detail: "high"
                 }
               }
