@@ -57,8 +57,22 @@ export default function Recommendations() {
 
   const { data: recommendations, isLoading, refetch } = useQuery<HealthRecommendations>({
     queryKey: ["/api/recommendations"],
-    enabled: true
+    enabled: true,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true
   });
+
+  // Отладочный вывод для проверки данных
+  useEffect(() => {
+    if (recommendations) {
+      console.log('Полученные рекомендации:', recommendations);
+      if (recommendations.nutrition) {
+        console.log('Питание:', recommendations.nutrition.items);
+      }
+    }
+  }, [recommendations]);
 
   const { data: healthProfile } = useQuery({
     queryKey: ["/api/health-profile"],
@@ -77,7 +91,8 @@ export default function Recommendations() {
   const handleGenerateRecommendations = async () => {
     setIsGenerating(true);
     try {
-      await refetch();
+      // Принудительно обновляем данные без кэша
+      await refetch({ cancelRefetch: true });
     } finally {
       setIsGenerating(false);
     }
