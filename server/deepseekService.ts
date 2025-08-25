@@ -138,10 +138,26 @@ export class DeepSeekService {
       }
 
       try {
-        const result = JSON.parse(content) as HealthRecommendations;
+        // Очищаем ответ от возможных маркеров кода
+        let cleanContent = content;
+        // Удаляем возможные маркеры кода ```json и ```
+        if (cleanContent.includes('```json')) {
+          cleanContent = cleanContent.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+        } else if (cleanContent.includes('```')) {
+          cleanContent = cleanContent.replace(/```\s*/g, '');
+        }
+        
+        // Удаляем лишние пробелы в начале и конце
+        cleanContent = cleanContent.trim();
+        
+        console.log("Ответ от DeepSeek (первые 500 символов):", cleanContent.substring(0, 500));
+        
+        const result = JSON.parse(cleanContent) as HealthRecommendations;
+        console.log("Парсинг успешен, получены рекомендации с ", result.nutrition?.items?.length || 0, "пунктами питания");
         return this.validateAndEnrichRecommendations(result);
       } catch (parseError) {
-        console.error("Ошибка парсинга JSON от DeepSeek:", content);
+        console.error("Ошибка парсинга JSON от DeepSeek:", parseError);
+        console.error("Полный ответ:", content);
         return this.getDefaultRecommendations();
       }
     } catch (error) {

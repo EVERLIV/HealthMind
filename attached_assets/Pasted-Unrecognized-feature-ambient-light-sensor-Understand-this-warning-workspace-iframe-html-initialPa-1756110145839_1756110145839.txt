@@ -1,0 +1,17 @@
+Unrecognized feature: 'ambient-light-sensor'.Understand this warning
+workspace_iframe.html?initialPath=%2Frecommendations&id=%3Ar1dq%3A:32 Unrecognized feature: 'battery'.Understand this warning
+workspace_iframe.html?initialPath=%2Frecommendations&id=%3Ar1dq%3A:32 Unrecognized feature: 'execution-while-not-rendered'.Understand this warning
+workspace_iframe.html?initialPath=%2Frecommendations&id=%3Ar1dq%3A:32 Unrecognized feature: 'execution-while-out-of-viewport'.Understand this warning
+workspace_iframe.html?initialPath=%2Frecommendations&id=%3Ar1dq%3A:32 Unrecognized feature: 'layout-animations'.Understand this warning
+workspace_iframe.html?initialPath=%2Frecommendations&id=%3Ar1dq%3A:32 Unrecognized feature: 'legacy-image-formats'.Understand this warning
+workspace_iframe.html?initialPath=%2Frecommendations&id=%3Ar1dq%3A:32 Unrecognized feature: 'navigation-override'.Understand this warning
+workspace_iframe.html?initialPath=%2Frecommendations&id=%3Ar1dq%3A:32 Unrecognized feature: 'oversized-images'.Understand this warning
+workspace_iframe.html?initialPath=%2Frecommendations&id=%3Ar1dq%3A:32 Unrecognized feature: 'publickey-credentials'.Understand this warning
+workspace_iframe.html?initialPath=%2Frecommendations&id=%3Ar1dq%3A:32 Unrecognized feature: 'speaker-selection'.Understand this warning
+workspace_iframe.html?initialPath=%2Frecommendations&id=%3Ar1dq%3A:32 Unrecognized feature: 'unoptimized-images'.Understand this warning
+workspace_iframe.html?initialPath=%2Frecommendations&id=%3Ar1dq%3A:32 Unrecognized feature: 'unsized-media'.Understand this warning
+workspace_iframe.html?initialPath=%2Frecommendations&id=%3Ar1dq%3A:32 Allow attribute will take precedence over 'allowfullscreen'.Understand this warning
+workspace_iframe.html?initialPath=%2Frecommendations&id=%3Ar1dq%3A:32 Allow attribute will take precedence over 'allowpaymentrequest'.Understand this warning
+Console.js:61 Полученные рекомендации: Object
+Console.js:61 Питание: Array(4)
+1523 log entries are not shown.

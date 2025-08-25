@@ -64,16 +64,6 @@ export default function Recommendations() {
     refetchOnWindowFocus: true
   });
 
-  // Отладочный вывод для проверки данных
-  useEffect(() => {
-    if (recommendations) {
-      console.log('Полученные рекомендации:', recommendations);
-      if (recommendations.nutrition) {
-        console.log('Питание:', recommendations.nutrition.items);
-      }
-    }
-  }, [recommendations]);
-
   const { data: healthProfile } = useQuery({
     queryKey: ["/api/health-profile"],
   });
