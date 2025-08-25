@@ -29,10 +29,19 @@ interface RecommendationSection {
   items: string[];
 }
 
+interface BiomarkerRecommendation {
+  currentValue: string;
+  targetValue: string;
+  howToImprove: string[];
+  supplements: string[];
+  retestFrequency: string;
+}
+
 interface HealthRecommendations {
   disclaimer: string;
   summary: string;
   priorityAreas: string[];
+  biomarkerRecommendations?: Record<string, BiomarkerRecommendation>;
   nutrition: RecommendationSection;
   physicalActivity: RecommendationSection;
   lifestyle: RecommendationSection;
@@ -228,6 +237,61 @@ export default function Recommendations() {
                   </div>
                   <ChevronRight className="w-4 h-4 opacity-50" />
                 </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Biomarker Recommendations - Mobile Optimized */}
+        {recommendations?.biomarkerRecommendations && Object.keys(recommendations.biomarkerRecommendations).length > 0 && (
+          <div className="mb-4">
+            <h2 className="text-base font-semibold mb-2 flex items-center">
+              <TrendingUp className="w-4 h-4 mr-1.5 text-primary" />
+              Рекомендации по биомаркерам
+            </h2>
+            <div className="space-y-2">
+              {Object.entries(recommendations.biomarkerRecommendations).map(([markerName, rec]) => (
+                <Card key={markerName} className="p-3">
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h3 className="font-semibold text-sm">{markerName}</h3>
+                      <Badge variant="outline" className="text-[10px]">
+                        {rec.currentValue}
+                      </Badge>
+                    </div>
+                    
+                    <div className="text-xs text-muted-foreground">
+                      Цель: {rec.targetValue}
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <p className="text-xs font-medium">Как улучшить:</p>
+                      {rec.howToImprove.map((item, idx) => (
+                        <div key={idx} className="flex gap-1.5">
+                          <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                          <span className="text-xs">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {rec.supplements && rec.supplements.length > 0 && (
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium">Добавки:</p>
+                        {rec.supplements.map((supp, idx) => (
+                          <div key={idx} className="flex gap-1.5">
+                            <Pill className="w-3 h-3 text-orange-600 mt-0.5 flex-shrink-0" />
+                            <span className="text-xs">{supp}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Calendar className="w-3 h-3" />
+                      Пересдать: {rec.retestFrequency}
+                    </div>
+                  </div>
+                </Card>
               ))}
             </div>
           </div>

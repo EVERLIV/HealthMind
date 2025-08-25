@@ -315,7 +315,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (analysis.status === 'analyzed' && analysis.results) {
           const results = analysis.results as any;
           if (results.markers && Array.isArray(results.markers)) {
-            bloodMarkers.push(...results.markers);
+            // Map markers to include all necessary fields
+            const mappedMarkers = results.markers.map((marker: any) => ({
+              name: marker.name,
+              value: marker.value,
+              unit: marker.unit || '',
+              normalRange: marker.normalRange || marker.referenceRange || '',
+              status: marker.isOutOfRange ? 
+                (marker.value > marker.normalRange ? 'high' : 'low') : 
+                'normal',
+              education: marker.education,
+              recommendation: marker.recommendation
+            }));
+            bloodMarkers.push(...mappedMarkers);
           }
         }
       }
