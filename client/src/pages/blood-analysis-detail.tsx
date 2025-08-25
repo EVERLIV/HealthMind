@@ -1,0 +1,265 @@
+import { useQuery } from "@tanstack/react-query";
+import { useParams, Link } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { ArrowLeft, TrendingUp, TrendingDown, Minus, AlertTriangle, Info, Heart, Shield, Brain } from "lucide-react";
+import MobileNav from "@/components/layout/mobile-nav";
+import BottomNav from "@/components/layout/bottom-nav";
+import { useState } from "react";
+
+interface BloodMarker {
+  name: string;
+  value: string;
+  status: 'normal' | 'low' | 'high' | 'critical';
+  recommendation?: string;
+  education?: string;
+}
+
+export default function BloodAnalysisDetailPage() {
+  const { id } = useParams();
+  const [expandedMarker, setExpandedMarker] = useState<string | null>(null);
+  
+  const { data: analysis, isLoading } = useQuery({
+    queryKey: [`/api/blood-analyses/${id}`],
+  });
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'high':
+        return <TrendingUp className="w-4 h-4" />;
+      case 'low':
+        return <TrendingDown className="w-4 h-4" />;
+      case 'critical':
+        return <AlertTriangle className="w-4 h-4" />;
+      default:
+        return <Minus className="w-4 h-4" />;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'normal':
+        return 'bg-green-100 text-green-700 border-green-200';
+      case 'high':
+        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'low':
+        return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'critical':
+        return 'bg-red-100 text-red-700 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'normal':
+        return 'В норме';
+      case 'high':
+        return 'Повышен';
+      case 'low':
+        return 'Понижен';
+      case 'critical':
+        return 'Критично';
+      default:
+        return 'Неизвестно';
+    }
+  };
+
+  const getCategoryIcon = (name: string) => {
+    const lowerName = name.toLowerCase();
+    if (lowerName.includes('гемоглобин') || lowerName.includes('эритроцит')) {
+      return <Heart className="w-4 h-4 text-red-500" />;
+    }
+    if (lowerName.includes('лейкоцит') || lowerName.includes('лимфоцит')) {
+      return <Shield className="w-4 h-4 text-blue-500" />;
+    }
+    if (lowerName.includes('тромбоцит')) {
+      return <Brain className="w-4 h-4 text-purple-500" />;
+    }
+    return <Info className="w-4 h-4 text-gray-500" />;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="eva-page">
+        <MobileNav />
+        <main className="eva-page-content flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-trust-green"></div>
+        </main>
+        <BottomNav />
+      </div>
+    );
+  }
+
+  if (!analysis || !(analysis as any).results) {
+    return (
+      <div className="eva-page">
+        <MobileNav />
+        <main className="eva-page-content">
+          <div className="text-center py-12">
+            <p>Анализ не найден</p>
+            <Link href="/blood-analyses">
+              <Button className="mt-4">К списку анализов</Button>
+            </Link>
+          </div>
+        </main>
+        <BottomNav />
+      </div>
+    );
+  }
+
+  const results = (analysis as any).results;
+  const normalCount = results.markers?.filter((m: BloodMarker) => m.status === 'normal').length || 0;
+  const totalCount = results.markers?.length || 0;
+  const healthScore = totalCount > 0 ? Math.round((normalCount / totalCount) * 100) : 0;
+
+  return (
+    <div className="eva-page">
+      <MobileNav />
+      
+      <main className="eva-page-content pb-24">
+        {/* Header */}
+        <div className="bg-white sticky top-0 z-10 -mx-4 px-4 py-3 border-b border-gray-200">
+          <div className="flex items-center space-x-3">
+            <Link href="/blood-analyses">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-gray-100"
+                data-testid="button-back"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </Link>
+            <h1 className="text-xl font-bold">Результаты анализа</h1>
+          </div>
+        </div>
+
+        {/* Health Score Card */}
+        <Card className="mt-6 p-6 bg-gradient-to-br from-trust-green/5 to-medical-blue/5 border-trust-green/20">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-semibold">Общее состояние</h2>
+              <p className="text-sm text-muted-foreground">
+                {normalCount} из {totalCount} показателей в норме
+              </p>
+            </div>
+            <div className="text-3xl font-bold text-trust-green">
+              {healthScore}%
+            </div>
+          </div>
+          <Progress value={healthScore} className="h-2 mb-4" />
+          <p className="text-sm text-muted-foreground">
+            {results.summary}
+          </p>
+        </Card>
+
+        {/* Biomarkers */}
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold mb-4">Показатели анализа</h2>
+          <div className="space-y-3">
+            {results.markers?.map((marker: BloodMarker, index: number) => (
+              <Card
+                key={index}
+                className={`p-4 cursor-pointer transition-all ${
+                  expandedMarker === marker.name ? 'shadow-md' : ''
+                }`}
+                onClick={() => setExpandedMarker(
+                  expandedMarker === marker.name ? null : marker.name
+                )}
+                data-testid={`marker-card-${index}`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-3 flex-1">
+                    <div className="mt-1">
+                      {getCategoryIcon(marker.name)}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-semibold text-sm">{marker.name}</h3>
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(marker.status)}`}>
+                          {getStatusIcon(marker.status)}
+                          {getStatusText(marker.status)}
+                        </span>
+                      </div>
+                      <p className="text-lg font-bold mt-1">{marker.value}</p>
+                      
+                      {expandedMarker === marker.name && (
+                        <div className="mt-4 space-y-3 animate-in slide-in-from-top duration-200">
+                          {marker.education && (
+                            <div className="bg-blue-50 p-3 rounded-lg">
+                              <p className="text-xs font-medium text-blue-900 mb-1">📚 Что это?</p>
+                              <p className="text-xs text-blue-700">{marker.education}</p>
+                            </div>
+                          )}
+                          {marker.recommendation && (
+                            <div className="bg-green-50 p-3 rounded-lg">
+                              <p className="text-xs font-medium text-green-900 mb-1">💡 Рекомендация</p>
+                              <p className="text-xs text-green-700">{marker.recommendation}</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Recommendations */}
+        {results.recommendations && results.recommendations.length > 0 && (
+          <Card className="mt-6 p-4 bg-green-50 border-green-200">
+            <h3 className="font-semibold text-sm mb-3 text-green-900">
+              🎯 Общие рекомендации
+            </h3>
+            <ul className="space-y-2">
+              {results.recommendations.map((rec: string, index: number) => (
+                <li key={index} className="text-xs text-green-700 flex items-start gap-2">
+                  <span className="text-green-500 mt-0.5">•</span>
+                  <span>{rec}</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        )}
+
+        {/* Risk Factors */}
+        {results.riskFactors && results.riskFactors.length > 0 && (
+          <Card className="mt-6 p-4 bg-yellow-50 border-yellow-200">
+            <h3 className="font-semibold text-sm mb-3 text-yellow-900">
+              ⚠️ Факторы риска
+            </h3>
+            <ul className="space-y-2">
+              {results.riskFactors.map((risk: string, index: number) => (
+                <li key={index} className="text-xs text-yellow-700 flex items-start gap-2">
+                  <span className="text-yellow-500 mt-0.5">!</span>
+                  <span>{risk}</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        )}
+
+        {/* Action Buttons */}
+        <div className="mt-8 space-y-3">
+          <Link href="/chat">
+            <Button className="w-full bg-medical-blue hover:bg-medical-blue/90">
+              💬 Обсудить с ИИ-врачом
+            </Button>
+          </Link>
+          <Link href="/blood-analysis">
+            <Button variant="outline" className="w-full">
+              📷 Загрузить новый анализ
+            </Button>
+          </Link>
+        </div>
+      </main>
+
+      <BottomNav />
+    </div>
+  );
+}

@@ -69,7 +69,7 @@ export default function BloodAnalysisPage() {
       });
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["/api/blood-analyses"] });
       toast({
         title: "Анализ завершен",
@@ -78,6 +78,10 @@ export default function BloodAnalysisPage() {
       setIsUploading(false);
       setIsAnalyzing(false);
       setAnalysisComplete(true);
+      // Redirect to the analysis detail page after 2 seconds
+      setTimeout(() => {
+        window.location.href = `/blood-analyses/${result.analysis?.id}`;
+      }, 2000);
     },
     onError: () => {
       toast({
@@ -97,7 +101,7 @@ export default function BloodAnalysisPage() {
       });
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["/api/blood-analyses"] });
       toast({
         title: "Анализ завершен",
@@ -106,6 +110,10 @@ export default function BloodAnalysisPage() {
       setTextInput('');
       setIsAnalyzing(false);
       setAnalysisComplete(true);
+      // Redirect to the analysis detail page after 2 seconds
+      setTimeout(() => {
+        window.location.href = `/blood-analyses/${result.analysis?.id}`;
+      }, 2000);
     },
     onError: () => {
       toast({

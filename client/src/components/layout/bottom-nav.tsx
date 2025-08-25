@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { path: "/", icon: Home, label: "Главная" },
+  { path: "/blood-analyses", icon: BriefcaseMedical, label: "Анализы" },
   { path: "/statistics", icon: BarChart3, label: "Статистика" },
-  { path: "/biomarkers", icon: BriefcaseMedical, label: "Биомаркеры" },
   { path: "/profile", icon: User, label: "Профиль" },
 ];
 

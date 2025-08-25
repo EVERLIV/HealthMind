@@ -11,6 +11,8 @@ import Statistics from "@/pages/statistics";
 import HealthProfilePage from "@/pages/health-profile-page";
 import ChatPage from "@/pages/chat";
 import BloodAnalysisPage from "@/pages/blood-analysis";
+import BloodAnalysesListPage from "@/pages/blood-analyses-list";
+import BloodAnalysisDetailPage from "@/pages/blood-analysis-detail";
 
 function Router() {
   return (
@@ -22,6 +24,8 @@ function Router() {
       <Route path="/health-profile" component={HealthProfilePage} />
       <Route path="/chat" component={ChatPage} />
       <Route path="/blood-analysis" component={BloodAnalysisPage} />
+      <Route path="/blood-analyses" component={BloodAnalysesListPage} />
+      <Route path="/blood-analyses/:id" component={BloodAnalysisDetailPage} />
       <Route component={NotFound} />
     </Switch>
   );
