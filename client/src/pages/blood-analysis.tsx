@@ -112,10 +112,12 @@ export default function BloodAnalysisPage() {
         // Create blood analysis entry
         const analysis = await createAnalysisMutation.mutateAsync();
         
-        // Get uploaded image and convert to base64 for DeepSeek
-        const uploadURL = result.successful[0].uploadURL as string;
-        const response = await fetch(uploadURL);
-        const blob = await response.blob();
+        // Get the original file from Uppy result instead of downloading from URL
+        const file = result.successful[0];
+        console.log('File info:', file);
+        
+        // Use the original file data
+        const fileData = file.data as Blob;
         const reader = new FileReader();
         
         reader.onloadend = async () => {
@@ -124,11 +126,15 @@ export default function BloodAnalysisPage() {
             const [mimeInfo, imageBase64] = base64.split(',');
             const mimeType = mimeInfo.split(':')[1].split(';')[0]; // Extract MIME type
             
+            console.log('Original file type:', file.type);
             console.log('Extracted MIME type:', mimeType);
             console.log('Image size (base64):', imageBase64.length);
             
+            // Use the original file type if available, fallback to extracted MIME type
+            const actualMimeType = file.type || mimeType;
+            
             // Validate that we have an image
-            if (!mimeType.startsWith('image/') || imageBase64.length < 1000) {
+            if (!actualMimeType.startsWith('image/') || imageBase64.length < 1000) {
               toast({
                 title: "Ошибка",
                 description: "Пожалуйста, загрузите действительное изображение (PNG, JPG, GIF, WEBP)",
@@ -143,7 +149,7 @@ export default function BloodAnalysisPage() {
             await analyzeImageMutation.mutateAsync({
               analysisId: analysis.id,
               imageBase64,
-              mimeType,
+              mimeType: actualMimeType,
             });
           } catch (error) {
             console.error("Error analyzing image:", error);
@@ -152,7 +158,7 @@ export default function BloodAnalysisPage() {
           }
         };
         
-        reader.readAsDataURL(blob);
+        reader.readAsDataURL(fileData);
       } catch (error) {
         console.error("Error processing upload:", error);
         setIsUploading(false);
