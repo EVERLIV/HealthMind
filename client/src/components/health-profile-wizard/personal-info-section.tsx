@@ -125,49 +125,49 @@ export default function PersonalInfoSection({ data, onUpdate }: PersonalInfoSect
                 <button
                   onClick={() => onUpdate({ gender: "male" })}
                   className={`
-                    px-2 md:px-4 py-2 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all
+                    px-2 md:px-4 py-2 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all border
                     ${data.gender === "male"
-                      ? "bg-gradient-to-r from-medical-blue to-trust-green text-white shadow-lg scale-105"
-                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                      ? "bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700 shadow-lg scale-105"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700"
                     }
                   `}
                   data-testid="button-gender-male"
                 >
                   <div className="flex flex-col items-center gap-0.5 md:gap-1">
                     <span className="text-base md:text-lg">👨</span>
-                    <span className="text-[10px] md:text-xs">Мужской</span>
+                    <span className="text-[10px] md:text-xs font-semibold">Мужской</span>
                   </div>
                 </button>
                 <button
                   onClick={() => onUpdate({ gender: "female" })}
                   className={`
-                    px-2 md:px-4 py-2 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all
+                    px-2 md:px-4 py-2 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all border
                     ${data.gender === "female"
-                      ? "bg-gradient-to-r from-medical-blue to-trust-green text-white shadow-lg scale-105"
-                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                      ? "bg-pink-50 dark:bg-pink-950 text-pink-700 dark:text-pink-300 border-pink-300 dark:border-pink-700 shadow-lg scale-105"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700"
                     }
                   `}
                   data-testid="button-gender-female"
                 >
                   <div className="flex flex-col items-center gap-0.5 md:gap-1">
                     <span className="text-base md:text-lg">👩</span>
-                    <span className="text-[10px] md:text-xs">Женский</span>
+                    <span className="text-[10px] md:text-xs font-semibold">Женский</span>
                   </div>
                 </button>
                 <button
                   onClick={() => onUpdate({ gender: "other" })}
                   className={`
-                    px-2 md:px-4 py-2 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all
+                    px-2 md:px-4 py-2 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all border
                     ${data.gender === "other"
-                      ? "bg-gradient-to-r from-medical-blue to-trust-green text-white shadow-lg scale-105"
-                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                      ? "bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700 shadow-lg scale-105"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700"
                     }
                   `}
                   data-testid="button-gender-other"
                 >
                   <div className="flex flex-col items-center gap-0.5 md:gap-1">
                     <span className="text-base md:text-lg">👤</span>
-                    <span className="text-[10px] md:text-xs">Другой</span>
+                    <span className="text-[10px] md:text-xs font-semibold">Другой</span>
                   </div>
                 </button>
               </div>
