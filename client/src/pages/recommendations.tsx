@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import MobileNav from "@/components/layout/mobile-nav";
 import BottomNav from "@/components/layout/bottom-nav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import { 
   Heart, 
   Apple, 
@@ -21,8 +23,28 @@ import {
   Sparkles,
   TrendingUp,
   Calendar,
-  Loader2
+  Loader2,
+  ArrowLeft,
+  RotateCcw,
+  BookOpen,
+  ExternalLink,
+  Award,
+  Zap,
+  Shield,
+  Users,
+  Clock,
+  Info,
+  X,
+  Eye,
+  Star,
+  AlertTriangle,
+  Link as LinkIcon,
+  Dna,
+  TestTube,
+  User,
+  GraduationCap
 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface RecommendationSection {
   title: string;
@@ -35,6 +57,8 @@ interface BiomarkerRecommendation {
   howToImprove: string[];
   supplements: string[];
   retestFrequency: string;
+  explanation?: string;
+  sources?: string[];
 }
 
 interface HealthRecommendations {
@@ -51,11 +75,12 @@ interface HealthRecommendations {
 }
 
 export default function Recommendations() {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [, navigate] = useLocation();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
+  const [selectedBiomarker, setSelectedBiomarker] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("overview");
 
-  const { data: recommendations, isLoading, refetch } = useQuery<HealthRecommendations>({
+  const { data: recommendations, isLoading, refetch, error } = useQuery<HealthRecommendations>({
     queryKey: ["/api/recommendations"],
     enabled: true,
     staleTime: 0,
@@ -76,249 +101,97 @@ export default function Recommendations() {
   const hasAnalyses = bloodAnalyses && Array.isArray(bloodAnalyses) && bloodAnalyses.length > 0;
   const canGenerateRecommendations = hasProfile || hasAnalyses;
 
-  // Remove auto-generation since enabled is now true
-
   const handleGenerateRecommendations = async () => {
     setIsGenerating(true);
     try {
-      // Принудительно обновляем данные без кэша
       await refetch({ cancelRefetch: true });
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const getIconForSection = (section: string) => {
-    switch (section) {
-      case "nutrition":
-        return <Apple className="w-5 h-5" />;
-      case "physicalActivity":
-        return <Activity className="w-5 h-5" />;
-      case "lifestyle":
-        return <Moon className="w-5 h-5" />;
-      case "supplements":
-        return <Pill className="w-5 h-5" />;
-      default:
-        return <Heart className="w-5 h-5" />;
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case "nutrition": return <Apple className="w-4 h-4" />;
+      case "physicalActivity": return <Activity className="w-4 h-4" />;
+      case "lifestyle": return <Moon className="w-4 h-4" />;
+      case "supplements": return <Pill className="w-4 h-4" />;
+      case "biomarkers": return <Dna className="w-4 h-4" />;
+      default: return <Heart className="w-4 h-4" />;
+    }
+  };
+
+  const getPriorityIcon = (index: number) => {
+    switch (index) {
+      case 0: return <AlertTriangle className="w-3 h-3" />;
+      case 1: return <Target className="w-3 h-3" />;
+      case 2: return <TrendingUp className="w-3 h-3" />;
+      default: return <CheckCircle2 className="w-3 h-3" />;
     }
   };
 
   const getPriorityColor = (index: number) => {
     switch (index) {
-      case 0:
-        return "text-red-600 bg-red-50";
-      case 1:
-        return "text-yellow-600 bg-yellow-50";
-      case 2:
-        return "text-blue-600 bg-blue-50";
-      default:
-        return "text-gray-600 bg-gray-50";
+      case 0: return "border-red-200 bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400";
+      case 1: return "border-orange-200 bg-orange-50 dark:bg-orange-950/20 text-orange-700 dark:text-orange-400";
+      case 2: return "border-blue-200 bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400";
+      default: return "border-gray-200 bg-gray-50 dark:bg-gray-950/20 text-gray-700 dark:text-gray-400";
     }
   };
 
-  // Анализ профиля и данных пользователя
-  const analyzeUserData = () => {
-    const analysis = {
-      goodPoints: [] as string[],
-      concerningPoints: [] as string[],
-      criticalPoints: [] as string[]
-    };
-
-    // Анализ профиля здоровья
-    if (healthProfile && (healthProfile as any)?.profileData) {
-      const profile = (healthProfile as any).profileData;
-      
-      // Анализ ИМТ
-      if (profile.weight && profile.height) {
-        const bmi = profile.weight / ((profile.height / 100) * (profile.height / 100));
-        if (bmi >= 18.5 && bmi <= 24.9) {
-          analysis.goodPoints.push(`ИМТ в норме (${bmi.toFixed(1)})`);
-        } else if (bmi < 18.5) {
-          analysis.concerningPoints.push(`Недостаточный вес (ИМТ ${bmi.toFixed(1)})`);
-        } else if (bmi >= 25 && bmi < 30) {
-          analysis.concerningPoints.push(`Избыточный вес (ИМТ ${bmi.toFixed(1)})`);
-        } else if (bmi >= 30) {
-          analysis.criticalPoints.push(`Ожирение (ИМТ ${bmi.toFixed(1)})`);
-        }
-      }
-
-      // Анализ активности
-      if (profile.activityLevel === 'high' || profile.exerciseFrequency === 'daily') {
-        analysis.goodPoints.push('Высокий уровень физической активности');
-      } else if (profile.activityLevel === 'low' || profile.exerciseFrequency === 'never') {
-        analysis.concerningPoints.push('Низкий уровень физической активности');
-      }
-
-      // Анализ сна
-      if (profile.sleepHours >= 7 && profile.sleepHours <= 9) {
-        analysis.goodPoints.push(`Хорошая продолжительность сна (${profile.sleepHours}ч)`);
-      } else if (profile.sleepHours < 6) {
-        analysis.criticalPoints.push(`Недостаток сна (${profile.sleepHours}ч)`);
-      } else if (profile.sleepHours > 10) {
-        analysis.concerningPoints.push(`Избыток сна (${profile.sleepHours}ч)`);
-      }
-
-      // Анализ стресса
-      if (profile.stressLevel <= 3) {
-        analysis.goodPoints.push('Низкий уровень стресса');
-      } else if (profile.stressLevel >= 7) {
-        analysis.criticalPoints.push('Высокий уровень стресса');
-      }
-
-      // Анализ вредных привычек
-      if (profile.smokingStatus === 'never') {
-        analysis.goodPoints.push('Некурящий');
-      } else if (profile.smokingStatus === 'regular') {
-        analysis.criticalPoints.push('Регулярное курение');
-      }
-
-      if (profile.alcoholConsumption === 'none') {
-        analysis.goodPoints.push('Не употребляет алкоголь');
-      } else if (profile.alcoholConsumption === 'heavy') {
-        analysis.criticalPoints.push('Чрезмерное употребление алкоголя');
-      }
-
-      // Анализ хронических заболеваний
-      if (profile.chronicConditions && profile.chronicConditions.length > 0) {
-        analysis.criticalPoints.push(`Хронические заболевания: ${profile.chronicConditions.join(', ')}`);
-      } else {
-        analysis.goodPoints.push('Отсутствие хронических заболеваний');
-      }
-    }
-
-    // Анализ анализов крови
-    if (bloodAnalyses && Array.isArray(bloodAnalyses)) {
-      bloodAnalyses.forEach((analysis_item: any) => {
-        if (analysis_item.status === 'analyzed' && analysis_item.results?.markers) {
-          analysis_item.results.markers.forEach((marker: any) => {
-            if (marker.status === 'normal') {
-              analysis.goodPoints.push(`${marker.name}: в норме`);
-            } else if (marker.status === 'critical') {
-              analysis.criticalPoints.push(`${marker.name}: критическое отклонение`);
-            } else {
-              analysis.concerningPoints.push(`${marker.name}: отклонение от нормы`);
-            }
-          });
-        }
-      });
-    }
-
-    return analysis;
-  };
-
-  const userAnalysis = analyzeUserData();
-
-  // Получение детальных рекомендаций для приоритетного направления
-  const getPriorityDetails = (priority: string) => {
-    // Анализ данных пользователя для персонализации
-    const profile = (healthProfile as any)?.profileData || {};
-    const analysis = bloodAnalyses && Array.isArray(bloodAnalyses) ? bloodAnalyses[0] : null;
-    const markers = analysis?.results?.markers || [];
-    
-    // Находим конкретные показатели
-    const cholesterolMarker = markers.find((m: any) => m.name?.toLowerCase().includes('холестерин'));
-    const bmi = profile.weight && profile.height ? profile.weight / ((profile.height / 100) * (profile.height / 100)) : null;
-    const stressLevel = profile.stressLevel || 5;
-    const sleepHours = profile.sleepHours || 7;
-
-    const detailsMap: Record<string, { description: string; actions: string[] }> = {
-      'Нормализация холестерина': {
-        description: `Ваш уровень холестерина ${cholesterolMarker?.value || 'повышен'} и требует коррекции для снижения риска сердечно-сосудистых заболеваний`,
-        actions: [
-          'Овсянка на завтрак (250г) - снижает ЛНПП холестерин на 5-10% за 6 недель',
-          'Омега-3 2000мг/день - снижает триглицериды на 20-30% и улучшает соотношение холестерина',
-          'Коэнзим Q10 100мг - защищает сосуды от окислительного стресса при повышенном холестерине',
-          'Кардио 40 мин ежедневно - повышает ЛПВП холестерин на 5-9%',
-          'Чеснок 2-3 зубчика/день - снижает общий холестерин на 7-10%',
-          'Растворимая клетчатка 25-30г/день - связывает холестерин в кишечнике'
-        ]
-      },
-      'Контроль веса': {
-        description: `Ваш ИМТ ${bmi?.toFixed(1) || '>нормы'} указывает на избыточный вес, что повышает риск диабета и сердечных заболеваний`,
-        actions: [
-          `Дефицит 500ккал/день - для снижения на 0.5-1кг/нед без потери мышц`,
-          `Белок ${profile.weight ? (profile.weight * 1.6).toFixed(0) : '100'}г/день - сохраняет мышечную массу и ускоряет метаболизм`,
-          'Л-карнитин 2г/день - ускоряет сжигание жира на 15-20%',
-          'Хром пиколинат 200мкг - снижает тягу к сладкому и аппетит',
-          'Силовые тренировки 3р/нед - увеличивают расход калорий на 15%',
-          'Клетчатка перед едой 5г - снижает усвоение калорий на 10%'
-        ]
-      },
-      'Улучшение сна': {
-        description: `Вы спите ${sleepHours} часов, что ${sleepHours < 7 ? 'меньше рекомендуемого и повышает риск ожирения, диабета и депрессии' : 'влияет на восстановление и общее самочувствие'}`,
-        actions: [
-          `Магний цитрат 400мг за 30мин до сна - улучшает засыпание на 31%`,
-          'Мелатонин 1-3мг за 1ч до сна - сокращает время засыпания на 15мин',
-          'Глицин 3г перед сном - улучшает глубину сна и восстановление',
-          'Температура 18-20°C - оптимальна для выработки мелатонина',
-          'Блокировка синего света за 2ч до сна - сохраняет циркадные ритмы',
-          `Ложиться в ${23 - (7 - sleepHours)}:00 - для получения 7-8 часов сна`
-        ]
-      },
-      'Снижение стресса': {
-        description: `Ваш уровень стресса ${stressLevel}/10 ${stressLevel >= 7 ? 'критически высок, что увеличивает кортизол и риск заболеваний' : 'требует контроля для сохранения здоровья'}`,
-        actions: [
-          'Ашвагандха 600мг/день - снижает кортизол на 23-30% за 8 недель',
-          'Магний B6 200мг - регулирует нервную систему и снижает тревожность',
-          'Л-теанин 200мг утром - повышает фокус без возбуждения',
-          'Медитация 15мин/день - снижает кортизол на 23%',
-          'Йога 3р/нед - уменьшает стрессовые маркеры на 40%',
-          `Дыхание 4-7-8 ${stressLevel >= 7 ? '3-4 раза/день' : 'при необходимости'} - быстро снижает тревогу`
-        ]
-      }
-    };
-    
-    // Если не нашли конкретное направление, генерируем на основе данных
-    if (!detailsMap[priority]) {
-      const defaultActions = [];
-      
-      // Добавляем рекомендации на основе конкретных данных
-      if (profile.activityLevel === 'low') {
-        defaultActions.push('Начните с 30 минут ходьбы в день - это снизит риски на 40%');
-      }
-      if (profile.smokingStatus === 'regular') {
-        defaultActions.push('План отказа от курения - снизит риск сердечных заболеваний на 50%');
-      }
-      if (profile.waterIntake < 2000) {
-        defaultActions.push('Увеличьте воду до 2.5л/день - улучшит метаболизм на 15%');
-      }
-      
-      if (defaultActions.length === 0) {
-        defaultActions.push(
-          'Пройдите полное обследование для точной оценки',
-          'Начните вести дневник здоровья для отслеживания прогресса',
-          'Установите цели по улучшению основных показателей'
-        );
-      }
-      
-      return {
-        description: `Персонализированные рекомендации на основе вашего профиля здоровья`,
-        actions: defaultActions
-      };
-    }
-    
-    return detailsMap[priority];
+  const getSourceIcon = (source: string) => {
+    if (source.includes('pubmed') || source.includes('ncbi')) return <GraduationCap className="w-3 h-3" />;
+    if (source.includes('cochrane')) return <Award className="w-3 h-3" />;
+    if (source.includes('who') || source.includes('nih')) return <Shield className="w-3 h-3" />;
+    return <BookOpen className="w-3 h-3" />;
   };
 
   if (isLoading || isGenerating) {
     return (
-      <div className="eva-page">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
         <MobileNav />
-        <main className="eva-page-content">
-          <div className="eva-page-header">
-            <h1 className="eva-page-title">Рекомендации</h1>
-            <p className="eva-page-subtitle">Анализируем ваши данные...</p>
+        <main className="px-3 py-4 pb-24">
+          <div className="mb-4">
+            <div className="bg-gradient-to-r from-medical-blue via-blue-500 to-trust-green relative overflow-hidden rounded-xl">
+              <div className="relative p-4 text-white">
+                <div className="flex items-center gap-3 mb-3">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate("/")}
+                    className="h-8 w-8 rounded-full hover:bg-white/20 text-white"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                  </Button>
+                  <div className="p-1.5 bg-white/20 backdrop-blur-sm rounded-lg border border-white/30">
+                    <Brain className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h1 className="text-lg font-bold">Рекомендации ИИ</h1>
+                    <p className="text-white/90 text-xs">Персональный план здоровья</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="relative">
-              <Brain className="w-20 h-20 text-primary mb-4 animate-pulse" />
-              <Sparkles className="w-8 h-8 text-yellow-500 absolute -top-2 -right-2 animate-pulse" />
+            <div className="relative mb-6">
+              <div className="p-4 bg-gradient-to-br from-medical-blue/20 to-trust-green/20 rounded-xl backdrop-blur-sm border border-white/20">
+                <Brain className="w-12 h-12 text-medical-blue animate-pulse" />
+              </div>
+              <Sparkles className="w-6 h-6 text-yellow-500 absolute -top-2 -right-2 animate-bounce" />
             </div>
-            <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-            <p className="text-center text-muted-foreground">
-              ИИ анализирует ваш профиль здоровья и результаты анализов...
-            </p>
+            
+            <div className="text-center space-y-3">
+              <Loader2 className="w-8 h-8 animate-spin text-medical-blue mx-auto" />
+              <h3 className="font-bold text-lg">ИИ анализирует ваши данные</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
+                🧬 Обрабатываем профиль здоровья и биомаркеры<br/>
+                📊 Генерируем персональные рекомендации<br/>
+                🔬 Проверяем научные источники
+              </p>
+            </div>
           </div>
         </main>
         <BottomNav />
@@ -326,36 +199,83 @@ export default function Recommendations() {
     );
   }
 
-  if (!canGenerateRecommendations) {
+  if (error || !canGenerateRecommendations) {
     return (
-      <div className="eva-page">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
         <MobileNav />
-        <main className="eva-page-content">
-          <div className="eva-page-header">
-            <h1 className="eva-page-title">Рекомендации</h1>
-            <p className="eva-page-subtitle">Персональный план здоровья</p>
+        <main className="px-3 py-4 pb-24">
+          <div className="mb-4">
+            <div className="bg-gradient-to-r from-medical-blue via-blue-500 to-trust-green relative overflow-hidden rounded-xl">
+              <div className="relative p-4 text-white">
+                <div className="flex items-center gap-3 mb-3">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate("/")}
+                    className="h-8 w-8 rounded-full hover:bg-white/20 text-white"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                  </Button>
+                  <div className="p-1.5 bg-white/20 backdrop-blur-sm rounded-lg border border-white/30">
+                    <Brain className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h1 className="text-lg font-bold">Рекомендации ИИ</h1>
+                    <p className="text-white/90 text-xs">Персональный план здоровья</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           
-          <Card className="eva-card-elevated p-6 text-center">
-            <Brain className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-lg font-semibold mb-2">Недостаточно данных</h2>
-            <p className="text-muted-foreground mb-4">
-              Для генерации персональных рекомендаций необходимо заполнить профиль здоровья или загрузить анализы крови
-            </p>
-            <div className="space-y-2">
-              <Button 
-                onClick={() => window.location.href = "/health-profile"}
-                className="w-full"
-              >
-                Заполнить профиль
-              </Button>
-              <Button 
-                onClick={() => window.location.href = "/blood-analysis"}
-                variant="outline"
-                className="w-full"
-              >
-                Загрузить анализы
-              </Button>
+          <Card className="border-0 shadow-lg bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm text-center p-6">
+            <div className="space-y-4">
+              <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-full w-fit mx-auto">
+                <Brain className="w-8 h-8 text-muted-foreground" />
+              </div>
+              
+              <div>
+                <h2 className="text-lg font-bold mb-2">
+                  {error ? 'Ошибка генерации' : 'Недостаточно данных'}
+                </h2>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                  {error 
+                    ? 'Не удалось сгенерировать рекомендации. Попробуйте позже.'
+                    : 'Для создания персональных рекомендаций необходимо заполнить профиль здоровья или загрузить анализы крови'
+                  }
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                {error ? (
+                  <Button 
+                    onClick={handleGenerateRecommendations}
+                    className="w-full bg-gradient-to-r from-medical-blue to-trust-green"
+                    disabled={isGenerating}
+                  >
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Попробовать снова
+                  </Button>
+                ) : (
+                  <>
+                    <Button 
+                      onClick={() => navigate("/health-profile")}
+                      className="w-full bg-gradient-to-r from-medical-blue to-trust-green"
+                    >
+                      <User className="w-4 h-4 mr-2" />
+                      Заполнить профиль
+                    </Button>
+                    <Button 
+                      onClick={() => navigate("/blood-analysis")}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      <TestTube className="w-4 h-4 mr-2" />
+                      Загрузить анализы
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           </Card>
         </main>
@@ -365,148 +285,132 @@ export default function Recommendations() {
   }
 
   return (
-    <div className="eva-page">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
       <MobileNav />
       
-      <main className="eva-page-content">
-        <div className="eva-page-header">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="eva-page-title">Рекомендации</h1>
-              <p className="eva-page-subtitle">Персональный план здоровья</p>
+      <main className="px-3 py-4 pb-24">
+        {/* Mobile-Optimized Header */}
+        <div className="mb-4">
+          <div className="bg-gradient-to-r from-medical-blue via-blue-500 to-trust-green relative overflow-hidden rounded-xl">
+            <div className="relative p-4 text-white">
+              <div className="flex items-center gap-3 mb-3">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate("/")}
+                  className="h-8 w-8 rounded-full hover:bg-white/20 text-white"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </Button>
+                <div className="p-1.5 bg-white/20 backdrop-blur-sm rounded-lg border border-white/30">
+                  <Brain className="w-4 h-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-lg font-bold">Рекомендации ИИ</h1>
+                  <p className="text-white/90 text-xs">Научно обоснованный план</p>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleGenerateRecommendations}
+                    disabled={isGenerating}
+                    className="h-7 px-2 rounded-lg hover:bg-white/20 text-white text-xs"
+                  >
+                    <RotateCcw className="w-3 h-3 mr-1" />
+                    Обновить
+                  </Button>
+                </div>
+              </div>
+
+              {/* AI Quality Indicators */}
+              <div className="flex items-center gap-2">
+                <Badge className="bg-white/20 text-white border-white/30 text-xs px-2 py-0.5">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  ИИ-анализ
+                </Badge>
+                <Badge className="bg-white/20 text-white border-white/30 text-xs px-2 py-0.5">
+                  <GraduationCap className="w-3 h-3 mr-1" />
+                  Научные источники
+                </Badge>
+              </div>
             </div>
-            <Brain className="w-8 h-8 text-primary" />
           </div>
         </div>
 
+        {/* Important Disclaimer */}
         {recommendations?.disclaimer && (
-          <Alert className="mb-4 border-yellow-200 bg-yellow-50 p-3">
-            <AlertCircle className="h-3 w-3 text-yellow-600" />
-            <AlertTitle className="text-yellow-800 text-sm">Важная информация</AlertTitle>
-            <AlertDescription className="text-yellow-700 text-xs mt-1">
+          <Alert className="mb-4 border-amber-200 bg-amber-50 dark:bg-amber-950/20 p-3">
+            <AlertCircle className="h-4 w-4 text-amber-600" />
+            <AlertTitle className="text-amber-800 dark:text-amber-400 text-sm font-medium">
+              Медицинская информация
+            </AlertTitle>
+            <AlertDescription className="text-amber-700 dark:text-amber-300 text-xs mt-1 leading-relaxed">
               {recommendations.disclaimer}
             </AlertDescription>
           </Alert>
         )}
 
-        {/* Summary - Mobile Optimized */}
+        {/* AI Analysis Summary */}
         {recommendations?.summary && (
-          <Card className="eva-card-elevated mb-4 border-primary/20">
-            <CardHeader className="pb-3">
+          <Card className="border-0 shadow-lg bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm mb-4">
+            <CardHeader className="pb-2">
               <CardTitle className="flex items-center text-base">
-                <Heart className="w-4 h-4 mr-1.5 text-primary" />
+                <div className="p-1.5 bg-medical-blue/10 rounded-lg mr-2">
+                  <Heart className="w-4 h-4 text-medical-blue" />
+                </div>
                 Анализ состояния здоровья
+                <Badge className="ml-auto bg-green-100 text-green-700 text-xs">AI</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <p className="text-xs leading-relaxed">{recommendations.summary}</p>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {recommendations.summary}
+              </p>
             </CardContent>
           </Card>
         )}
 
-        {/* Priority Areas - Mobile Optimized */}
+        {/* Priority Areas */}
         {recommendations?.priorityAreas && recommendations.priorityAreas.length > 0 && (
-          <div className="mb-4">
-            <h2 className="text-base font-semibold mb-2 flex items-center">
-              <Target className="w-4 h-4 mr-1.5 text-primary" />
-              Приоритетные направления
-            </h2>
-            <div className="space-y-1.5">
-              {recommendations.priorityAreas.map((area, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedPriority(selectedPriority === area ? null : area)}
-                  className={`eva-card p-3 flex items-center justify-between ${getPriorityColor(index)} w-full text-left transition-all hover:shadow-md`}
-                  data-testid={`priority-${index}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                      index === 0 ? 'bg-red-200' : index === 1 ? 'bg-yellow-200' : 'bg-blue-200'
-                    }`}>
-                      {index + 1}
-                    </div>
-                    <span className="text-sm font-medium">{area}</span>
-                  </div>
-                  <ChevronRight className={`w-4 h-4 transition-transform ${
-                    selectedPriority === area ? 'rotate-90' : ''
-                  }`} />
-                </button>
-              ))}
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <Target className="w-4 h-4 text-medical-blue" />
+              <h2 className="text-base font-bold">Приоритетные направления</h2>
+              <Badge className="bg-red-100 text-red-700 text-xs">Важно</Badge>
             </div>
             
-            {/* Детали выбранного приоритета */}
-            {selectedPriority && (
-              <Card className="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200">
-                <div className="space-y-3">
-                  <h3 className="font-semibold text-sm flex items-center">
-                    <Target className="w-4 h-4 mr-1.5 text-blue-600" />
-                    {selectedPriority}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    {getPriorityDetails(selectedPriority).description}
-                  </p>
-                  <div className="space-y-2">
-                    <p className="text-xs font-medium">Конкретные действия:</p>
-                    {getPriorityDetails(selectedPriority).actions.map((action, idx) => (
-                      <div key={idx} className="flex gap-2">
-                        <CheckCircle2 className="w-3 h-3 text-blue-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-xs">{action}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </Card>
-            )}
-          </div>
-        )}
-
-        {/* Biomarker Recommendations - Mobile Optimized */}
-        {recommendations?.biomarkerRecommendations && Object.keys(recommendations.biomarkerRecommendations).length > 0 && (
-          <div className="mb-4">
-            <h2 className="text-base font-semibold mb-2 flex items-center">
-              <TrendingUp className="w-4 h-4 mr-1.5 text-primary" />
-              Рекомендации по биомаркерам
-            </h2>
             <div className="space-y-2">
-              {Object.entries(recommendations.biomarkerRecommendations).map(([markerName, rec]) => (
-                <Card key={markerName} className="p-3">
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-start">
-                      <h3 className="font-semibold text-sm">{markerName}</h3>
-                      <Badge variant="outline" className="text-[10px]">
-                        {rec.currentValue}
-                      </Badge>
+              {recommendations.priorityAreas.map((area, index) => (
+                <Card 
+                  key={index} 
+                  className={`border-0 shadow-md ${getPriorityColor(index)} p-3`}
+                  data-testid={`priority-area-${index}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`p-1.5 rounded-lg ${
+                      index === 0 ? 'bg-red-200' : 
+                      index === 1 ? 'bg-orange-200' : 
+                      'bg-blue-200'
+                    }`}>
+                      {getPriorityIcon(index)}
                     </div>
-                    
-                    <div className="text-xs text-muted-foreground">
-                      Цель: {rec.targetValue}
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <p className="text-xs font-medium">Как улучшить:</p>
-                      {rec.howToImprove.map((item, idx) => (
-                        <div key={idx} className="flex gap-1.5">
-                          <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
-                          <span className="text-xs">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    {rec.supplements && rec.supplements.length > 0 && (
-                      <div className="space-y-1">
-                        <p className="text-xs font-medium">Добавки:</p>
-                        {rec.supplements.map((supp, idx) => (
-                          <div key={idx} className="flex gap-1.5">
-                            <Pill className="w-3 h-3 text-orange-600 mt-0.5 flex-shrink-0" />
-                            <span className="text-xs">{supp}</span>
-                          </div>
-                        ))}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${
+                          index === 0 ? 'bg-red-200 text-red-800' : 
+                          index === 1 ? 'bg-orange-200 text-orange-800' : 
+                          'bg-blue-200 text-blue-800'
+                        }`}>
+                          #{index + 1}
+                        </span>
+                        <span className="font-medium text-sm">{area}</span>
                       </div>
-                    )}
-                    
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Calendar className="w-3 h-3" />
-                      Пересдать: {rec.retestFrequency}
+                      <p className="text-xs opacity-80">
+                        {index === 0 ? 'Требует немедленного внимания' : 
+                         index === 1 ? 'Важно для улучшения здоровья' : 
+                         'Рекомендуется для профилактики'}
+                      </p>
                     </div>
                   </div>
                 </Card>
@@ -515,241 +419,348 @@ export default function Recommendations() {
           </div>
         )}
 
-        {/* Tabs for Recommendations - Mobile Optimized */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid grid-cols-3 w-full mb-2">
-            <TabsTrigger value="overview" className="text-[10px] px-1">Обзор</TabsTrigger>
-            <TabsTrigger value="nutrition" className="text-[10px] px-1">Питание</TabsTrigger>
-            <TabsTrigger value="activity" className="text-[10px] px-1">Активность</TabsTrigger>
-          </TabsList>
-          <TabsList className="grid grid-cols-2 w-full">
-            <TabsTrigger value="lifestyle" className="text-[10px] px-1">Образ жизни</TabsTrigger>
-            <TabsTrigger value="supplements" className="text-[10px] px-1">Добавки</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="mt-3 space-y-3">
-            {/* Детальный анализ здоровья */}
-            <div className="space-y-3">
-              {/* Хорошие показатели */}
-              {userAnalysis.goodPoints.length > 0 && (
-                <Card className="p-3 bg-green-50 dark:bg-green-900/20 border-green-200">
-                  <CardHeader className="p-0 pb-2">
-                    <CardTitle className="flex items-center text-sm">
-                      <CheckCircle2 className="w-4 h-4 mr-1.5 text-green-600" />
-                      Хорошие показатели ({userAnalysis.goodPoints.length})
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <div className="space-y-1.5">
-                      {userAnalysis.goodPoints.map((point, index) => (
-                        <div key={index} className="flex items-start gap-1.5">
-                          <CheckCircle2 className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
-                          <p className="text-xs text-green-800 dark:text-green-200">{point}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Вызывающие беспокойство показатели */}
-              {userAnalysis.concerningPoints.length > 0 && (
-                <Card className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200">
-                  <CardHeader className="p-0 pb-2">
-                    <CardTitle className="flex items-center text-sm">
-                      <AlertCircle className="w-4 h-4 mr-1.5 text-yellow-600" />
-                      Требуют внимания ({userAnalysis.concerningPoints.length})
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <div className="space-y-1.5">
-                      {userAnalysis.concerningPoints.map((point, index) => (
-                        <div key={index} className="flex items-start gap-1.5">
-                          <AlertCircle className="w-3 h-3 text-yellow-600 mt-0.5 flex-shrink-0" />
-                          <p className="text-xs text-yellow-800 dark:text-yellow-200">{point}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Критические показатели */}
-              {userAnalysis.criticalPoints.length > 0 && (
-                <Card className="p-3 bg-red-50 dark:bg-red-900/20 border-red-200">
-                  <CardHeader className="p-0 pb-2">
-                    <CardTitle className="flex items-center text-sm">
-                      <AlertCircle className="w-4 h-4 mr-1.5 text-red-600" />
-                      Критически важно ({userAnalysis.criticalPoints.length})
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <div className="space-y-1.5">
-                      {userAnalysis.criticalPoints.map((point, index) => (
-                        <div key={index} className="flex items-start gap-1.5">
-                          <AlertCircle className="w-3 h-3 text-red-600 mt-0.5 flex-shrink-0" />
-                          <p className="text-xs text-red-800 dark:text-red-200">{point}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+        {/* Biomarker Recommendations */}
+        {recommendations?.biomarkerRecommendations && Object.keys(recommendations.biomarkerRecommendations).length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <Dna className="w-4 h-4 text-medical-blue" />
+              <h2 className="text-base font-bold">Рекомендации по биомаркерам</h2>
+              <Badge className="bg-blue-100 text-blue-700 text-xs">Персональные</Badge>
             </div>
-
-            {recommendations?.actionPlan && recommendations.actionPlan.length > 0 && (
-              <Card className="p-3">
-                <CardHeader className="p-0 pb-2">
-                  <CardTitle className="flex items-center text-sm">
-                    <TrendingUp className="w-4 h-4 mr-1.5 text-success" />
-                    План действий
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <div className="space-y-2">
-                    {recommendations.actionPlan.map((step, index) => (
-                      <div key={index} className="flex gap-2">
-                        <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                          <span className="text-[10px] font-bold text-primary">{index + 1}</span>
+            
+            <div className="grid grid-cols-1 gap-3">
+              {Object.entries(recommendations.biomarkerRecommendations).map(([markerName, rec]) => (
+                <Card 
+                  key={markerName} 
+                  className="border-0 shadow-lg bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm cursor-pointer hover:shadow-xl transition-all duration-300"
+                  onClick={() => setSelectedBiomarker(markerName)}
+                  data-testid={`biomarker-recommendation-${markerName}`}
+                >
+                  <CardContent className="p-4">
+                    <div className="space-y-3">
+                      {/* Header */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                            <TestTube className="w-3 h-3 text-blue-600" />
+                          </div>
+                          <h3 className="font-bold text-sm">{markerName}</h3>
                         </div>
-                        <p className="text-xs">{step}</p>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {recommendations?.nextSteps && recommendations.nextSteps.length > 0 && (
-              <Card className="p-3">
-                <CardHeader className="p-0 pb-2">
-                  <CardTitle className="flex items-center text-sm">
-                    <Calendar className="w-4 h-4 mr-1.5 text-primary" />
-                    Следующие шаги
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <div className="space-y-1.5">
-                    {recommendations.nextSteps.map((step, index) => (
-                      <div key={index} className="flex items-start gap-1.5">
-                        <CheckCircle2 className="w-3 h-3 text-success mt-0.5 flex-shrink-0" />
-                        <p className="text-xs">{step}</p>
+                      
+                      {/* Values */}
+                      <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-xs text-muted-foreground">Текущий:</span>
+                          <Badge variant="outline" className="text-xs font-mono">
+                            {rec.currentValue}
+                          </Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-muted-foreground">Цель:</span>
+                          <Badge className="bg-green-100 text-green-700 text-xs font-mono">
+                            {rec.targetValue}
+                          </Badge>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="nutrition" className="mt-3">
-            <Card className="p-3">
-              <CardHeader className="p-0 pb-2">
-                <CardTitle className="flex items-center text-sm">
-                  <Apple className="w-4 h-4 mr-1.5 text-green-600" />
-                  {recommendations?.nutrition?.title || "Питание"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="space-y-2">
-                  {recommendations?.nutrition?.items?.map((item, index) => (
-                    <div key={index} className="flex gap-2">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-xs">{item}</p>
+                      
+                      {/* Quick Actions Preview */}
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium">Как улучшить:</p>
+                        <div className="space-y-1">
+                          {rec.howToImprove.slice(0, 2).map((item, idx) => (
+                            <div key={idx} className="flex gap-2 items-start">
+                              <CheckCircle2 className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
+                              <span className="text-xs text-muted-foreground line-clamp-1">{item}</span>
+                            </div>
+                          ))}
+                          {rec.howToImprove.length > 2 && (
+                            <p className="text-xs text-medical-blue font-medium">
+                              +{rec.howToImprove.length - 2} рекомендаций...
+                            </p>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
-          <TabsContent value="activity" className="mt-3">
-            <Card className="p-3">
-              <CardHeader className="p-0 pb-2">
-                <CardTitle className="flex items-center text-sm">
-                  <Activity className="w-4 h-4 mr-1.5 text-blue-600" />
-                  {recommendations?.physicalActivity?.title || "Физическая активность"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="space-y-2">
-                  {recommendations?.physicalActivity?.items?.map((item, index) => (
-                    <div key={index} className="flex gap-2">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-xs">{item}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="lifestyle" className="mt-3">
-            <Card className="p-3">
-              <CardHeader className="p-0 pb-2">
-                <CardTitle className="flex items-center text-sm">
-                  <Moon className="w-4 h-4 mr-1.5 text-purple-600" />
-                  {recommendations?.lifestyle?.title || "Образ жизни"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="space-y-2">
-                  {recommendations?.lifestyle?.items?.map((item, index) => (
-                    <div key={index} className="flex gap-2">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-xs">{item}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="supplements" className="mt-3">
-            <Card className="p-3">
-              <CardHeader className="p-0 pb-2">
-                <CardTitle className="flex items-center text-sm">
-                  <Pill className="w-4 h-4 mr-1.5 text-orange-600" />
-                  {recommendations?.supplements?.title || "Витамины и добавки"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="space-y-2">
-                  {recommendations?.supplements?.items?.map((item, index) => (
-                    <div key={index} className="flex gap-2">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-orange-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-xs">{item}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-
-        {/* Regenerate Button */}
-        <div className="mt-6 pb-4">
-          <Button 
-            onClick={handleGenerateRecommendations}
-            className="w-full"
-            disabled={isGenerating}
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Генерация рекомендаций...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4 mr-2" />
-                Обновить рекомендации
-              </>
-            )}
-          </Button>
+        {/* Category Navigation */}
+        <div className="mb-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Apple className="w-4 h-4 text-medical-blue" />
+            <h2 className="text-base font-bold">Детальные рекомендации</h2>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { key: "nutrition", label: "Питание", icon: Apple },
+              { key: "physicalActivity", label: "Активность", icon: Activity },
+              { key: "lifestyle", label: "Образ жизни", icon: Moon },
+              { key: "supplements", label: "Добавки", icon: Pill },
+            ].map(({ key, label, icon: Icon }) => (
+              <Button
+                key={key}
+                variant={selectedCategory === key ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(key)}
+                className={`h-auto py-3 px-3 flex-col gap-1 ${
+                  selectedCategory === key 
+                    ? 'bg-gradient-to-r from-medical-blue to-trust-green text-white' 
+                    : ''
+                }`}
+                data-testid={`category-${key}`}
+              >
+                <Icon className="w-4 h-4" />
+                <span className="text-xs">{label}</span>
+              </Button>
+            ))}
+          </div>
         </div>
+
+        {/* Category Content */}
+        {recommendations && selectedCategory && (
+          <Card className="border-0 shadow-lg bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm mb-6">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center text-base">
+                {getCategoryIcon(selectedCategory)}
+                <span className="ml-2">
+                  {selectedCategory === "nutrition" && "Питание"}
+                  {selectedCategory === "physicalActivity" && "Физическая активность"}
+                  {selectedCategory === "lifestyle" && "Образ жизни"}
+                  {selectedCategory === "supplements" && "Добавки"}
+                </span>
+                <Badge className="ml-auto bg-green-100 text-green-700 text-xs">
+                  {(recommendations as any)[selectedCategory]?.items?.length || 0} советов
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-3">
+                {(recommendations as any)[selectedCategory]?.items?.map((item: string, idx: number) => (
+                  <div key={idx} className="flex gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div className="flex-shrink-0 mt-0.5">
+                      <div className="w-6 h-6 bg-medical-blue/10 rounded-full flex items-center justify-center">
+                        <span className="text-xs font-bold text-medical-blue">{idx + 1}</span>
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm leading-relaxed">{item}</p>
+                    </div>
+                  </div>
+                )) || (
+                  <div className="text-center p-6">
+                    <Info className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">
+                      Рекомендации для этой категории пока не доступны
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Action Plan */}
+        {recommendations?.actionPlan && recommendations.actionPlan.length > 0 && (
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 via-white to-blue-50/30 dark:from-green-950/20 dark:via-slate-800 dark:to-blue-900/20 mb-6">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center text-base">
+                <div className="p-1.5 bg-green-100 dark:bg-green-900/30 rounded-lg mr-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-600" />
+                </div>
+                План действий
+                <Badge className="ml-auto bg-green-100 text-green-700 text-xs">
+                  <Calendar className="w-3 h-3 mr-1" />
+                  Пошагово
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-3">
+                {recommendations.actionPlan.map((step, idx) => (
+                  <div key={idx} className="flex gap-3 p-3 bg-white/80 dark:bg-slate-800/80 rounded-lg backdrop-blur-sm">
+                    <div className="flex-shrink-0">
+                      <div className="w-6 h-6 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                        <span className="text-xs font-bold text-green-600">{idx + 1}</span>
+                      </div>
+                    </div>
+                    <p className="text-sm leading-relaxed">{step}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Next Steps */}
+        {recommendations?.nextSteps && recommendations.nextSteps.length > 0 && (
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 via-white to-purple-50/30 dark:from-blue-950/20 dark:via-slate-800 dark:to-purple-900/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center text-base">
+                <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg mr-2">
+                  <TrendingUp className="w-4 h-4 text-blue-600" />
+                </div>
+                Следующие шаги
+                <Badge className="ml-auto bg-blue-100 text-blue-700 text-xs">
+                  <Clock className="w-3 h-3 mr-1" />
+                  Долгосрочно
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-3">
+                {recommendations.nextSteps.map((step, idx) => (
+                  <div key={idx} className="flex gap-3 p-3 bg-white/80 dark:bg-slate-800/80 rounded-lg backdrop-blur-sm">
+                    <div className="flex-shrink-0">
+                      <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                        <TrendingUp className="w-3 h-3 text-blue-600" />
+                      </div>
+                    </div>
+                    <p className="text-sm leading-relaxed">{step}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </main>
 
       <BottomNav />
+
+      {/* Biomarker Details Modal */}
+      <Dialog open={!!selectedBiomarker} onOpenChange={() => setSelectedBiomarker(null)}>
+        <DialogContent className="max-w-sm mx-auto max-h-[90vh] p-0">
+          <ScrollArea className="max-h-[90vh]">
+            <DialogHeader className="p-4 pb-2">
+              <DialogTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <TestTube className="w-4 h-4 text-medical-blue" />
+                  <span className="text-base">{selectedBiomarker}</span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => setSelectedBiomarker(null)}
+                  className="h-6 w-6"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="px-4 pb-4">
+              {selectedBiomarker && recommendations?.biomarkerRecommendations?.[selectedBiomarker] && (
+                <div className="space-y-4">
+                  {(() => {
+                    const rec = recommendations.biomarkerRecommendations[selectedBiomarker];
+                    return (
+                      <>
+                        {/* Current vs Target Values */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
+                            <p className="text-xs text-muted-foreground mb-1">Текущий</p>
+                            <p className="font-mono font-bold text-sm">{rec.currentValue}</p>
+                          </div>
+                          <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg text-center">
+                            <p className="text-xs text-muted-foreground mb-1">Цель</p>
+                            <p className="font-mono font-bold text-sm text-green-600">{rec.targetValue}</p>
+                          </div>
+                        </div>
+
+                        {/* Explanation */}
+                        {rec.explanation && (
+                          <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                            <h4 className="font-semibold text-sm mb-2 flex items-center">
+                              <Info className="w-3 h-3 mr-1 text-blue-600" />
+                              Объяснение
+                            </h4>
+                            <p className="text-xs leading-relaxed text-muted-foreground">
+                              {rec.explanation}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* How to Improve */}
+                        {rec.howToImprove && rec.howToImprove.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold text-sm mb-2 flex items-center">
+                              <CheckCircle2 className="w-3 h-3 mr-1 text-green-600" />
+                              Как улучшить
+                            </h4>
+                            <div className="space-y-2">
+                              {rec.howToImprove.map((item, idx) => (
+                                <div key={idx} className="flex gap-2 p-2 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                                  <div className="w-5 h-5 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <span className="text-xs font-bold text-green-600">{idx + 1}</span>
+                                  </div>
+                                  <span className="text-xs leading-relaxed">{item}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Supplements */}
+                        {rec.supplements && rec.supplements.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold text-sm mb-2 flex items-center">
+                              <Pill className="w-3 h-3 mr-1 text-orange-600" />
+                              Рекомендуемые добавки
+                            </h4>
+                            <div className="space-y-2">
+                              {rec.supplements.map((supp, idx) => (
+                                <div key={idx} className="flex gap-2 p-2 bg-orange-50 dark:bg-orange-950/20 rounded-lg">
+                                  <Pill className="w-3 h-3 text-orange-600 mt-0.5 flex-shrink-0" />
+                                  <span className="text-xs leading-relaxed">{supp}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Retest Frequency */}
+                        <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                          <h4 className="font-semibold text-sm mb-1 flex items-center">
+                            <Calendar className="w-3 h-3 mr-1 text-blue-600" />
+                            Частота повторных тестов
+                          </h4>
+                          <p className="text-xs text-muted-foreground">{rec.retestFrequency}</p>
+                        </div>
+
+                        {/* Scientific Sources */}
+                        {rec.sources && rec.sources.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold text-sm mb-2 flex items-center">
+                              <GraduationCap className="w-3 h-3 mr-1 text-purple-600" />
+                              Научные источники
+                            </h4>
+                            <div className="space-y-2">
+                              {rec.sources.map((source, idx) => (
+                                <div key={idx} className="flex gap-2 p-2 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
+                                  {getSourceIcon(source)}
+                                  <span className="text-xs leading-relaxed text-purple-700 dark:text-purple-400">
+                                    {source}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
