@@ -28,17 +28,42 @@ export const getQueryFn: <T>(options: {
   on401: UnauthorizedBehavior;
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
-  async ({ queryKey }) => {
-    const res = await fetch(queryKey.join("/") as string, {
-      credentials: "include",
-    });
-
-    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-      return null;
+  async ({ queryKey, signal }) => {
+    const url = queryKey.join("/") as string;
+    
+    // Special timeout for recommendations API (2 minutes)
+    const timeoutMs = url.includes('/api/recommendations') ? 120000 : 30000;
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    
+    // Combine with existing signal if provided
+    if (signal?.aborted) {
+      clearTimeout(timeoutId);
+      throw new Error('Query was cancelled');
     }
+    
+    try {
+      const res = await fetch(url, {
+        credentials: "include",
+        signal: controller.signal,
+      });
 
-    await throwIfResNotOk(res);
-    return await res.json();
+      clearTimeout(timeoutId);
+
+      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+        return null;
+      }
+
+      await throwIfResNotOk(res);
+      return await res.json();
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      if (error?.name === 'AbortError') {
+        throw new Error('Запрос занимает слишком много времени. Попробуйте позже.');
+      }
+      throw error;
+    }
   };
 
 export const queryClient = new QueryClient({
