@@ -409,6 +409,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get biomarker history across all analyses
+  app.get("/api/biomarkers/:id/history", async (req, res) => {
+    try {
+      const biomarkerId = req.params.id;
+      const analyses = await storage.getBloodAnalysesByUser(DEFAULT_USER_ID);
+      const history: any[] = [];
+
+      for (const analysis of analyses) {
+        const results = await storage.getBiomarkerResults(analysis.id);
+        const biomarkerResult = results.find(r => r.biomarkerId === biomarkerId);
+        
+        if (biomarkerResult) {
+          history.push({
+            date: analysis.createdAt,
+            analysisId: analysis.id,
+            value: parseFloat(biomarkerResult.value),
+            unit: biomarkerResult.unit,
+            status: biomarkerResult.status,
+            analysisName: `Анализ от ${new Date(analysis.createdAt!).toLocaleDateString('ru-RU')}`
+          });
+        }
+      }
+
+      // Sort by date descending
+      history.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching biomarker history:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Chat routes
   app.get("/api/chat-sessions", async (req, res) => {
     try {
