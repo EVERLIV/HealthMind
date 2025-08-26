@@ -17,13 +17,13 @@ import BloodAnalysisDetailPage from "@/pages/blood-analysis-detail";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
+      <Route path="/" component={BloodAnalysisPage} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route path="/biomarkers" component={Biomarkers} />
       <Route path="/profile" component={Profile} />
       <Route path="/recommendations" component={Recommendations} />
       <Route path="/health-profile" component={HealthProfilePage} />
       <Route path="/chat" component={ChatPage} />
-      <Route path="/blood-analysis" component={BloodAnalysisPage} />
       <Route path="/blood-analyses" component={BloodAnalysesListPage} />
       <Route path="/blood-analyses/:id" component={BloodAnalysisDetailPage} />
       <Route component={NotFound} />
