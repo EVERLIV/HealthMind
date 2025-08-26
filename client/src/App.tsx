@@ -24,8 +24,8 @@ function Router() {
       <Route path="/recommendations" component={Recommendations} />
       <Route path="/health-profile" component={HealthProfilePage} />
       <Route path="/chat" component={ChatPage} />
-      <Route path="/blood-analyses" component={BloodAnalysesListPage} />
-      <Route path="/blood-analyses/:id" component={BloodAnalysisDetailPage} />
+      <Route path="/blood-analysis" component={BloodAnalysesListPage} />
+      <Route path="/blood-analysis/:id" component={BloodAnalysisDetailPage} />
       <Route component={NotFound} />
     </Switch>
   );
