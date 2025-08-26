@@ -274,28 +274,15 @@ export default function Profile() {
         {hasProfile && (
           <Card className="border-0 shadow-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm mb-6">
             <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-br from-medical-blue/15 to-trust-green/10 rounded-xl border border-medical-blue/20 shadow-sm">
-                    <Heart className="w-5 h-5 text-medical-blue" />
-                  </div>
-                  <div>
-                    <span className="text-lg font-bold">Основные показатели</span>
-                    <p className="text-xs text-muted-foreground font-normal mt-0.5">Ключевые параметры вашего здоровья</p>
-                  </div>
-                </CardTitle>
-                <Button
-                  data-testid="button-edit-profile"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate("/health-profile")}
-                  className="rounded-xl border-2 hover:shadow-md transition-all duration-200"
-                >
-                  <Settings className="w-4 h-4 mr-1" />
-                  <span className="hidden sm:inline">Редактировать</span>
-                  <span className="sm:hidden">Изменить</span>
-                </Button>
-              </div>
+              <CardTitle className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-medical-blue/15 to-trust-green/10 rounded-xl border border-medical-blue/20 shadow-sm">
+                  <Heart className="w-5 h-5 text-medical-blue" />
+                </div>
+                <div>
+                  <span className="text-lg font-bold">Основные показатели</span>
+                  <p className="text-xs text-muted-foreground font-normal mt-0.5">Ключевые параметры вашего здоровья</p>
+                </div>
+              </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
