@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import HealthProfileWizard from "@/components/health-profile-wizard";
@@ -32,6 +32,18 @@ import {
 export default function HealthProfilePage() {
   const [, navigate] = useLocation();
   const [showWizard, setShowWizard] = useState(false);
+  
+  // Check if we should open wizard directly from URL parameter
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('edit') === 'true') {
+      setShowWizard(true);
+      // Clean URL by removing the parameter
+      const url = new URL(window.location);
+      url.searchParams.delete('edit');
+      window.history.replaceState({}, '', url);
+    }
+  }, []);
   
   const { data: profile } = useQuery<any>({
     queryKey: ["/api/health-profile"],
