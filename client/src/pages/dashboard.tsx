@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import aiDoctorBg from '@/assets/images/ai-doctor-bg.png';
 import bloodAnalysisBg from '@/assets/images/blood-analysis-bg.png';
+import biomarkersBg from '@assets/generated_images/Medical_biomarkers_dashboard_background_70006ade.png';
+import profileBg from '@assets/generated_images/Health_profile_medical_background_02e78c15.png';
 
 export default function Dashboard() {
   const [, navigate] = useLocation();
@@ -146,10 +148,14 @@ export default function Dashboard() {
             <button
               data-testid="button-biomarkers"
               className="p-4 flex flex-col items-center justify-center gap-3 text-center text-white h-[160px] hover:scale-[1.02] transition-all duration-300 relative overflow-hidden w-full rounded-2xl shadow-xl hover:shadow-2xl"
+              style={{
+                backgroundImage: `url(${biomarkersBg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+              }}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-violet-500 to-purple-700"></div>
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(120,119,198,0.3),transparent_50%)]"></div>
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(120,119,198,0.2),transparent_50%)]"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 via-purple-700/60 to-purple-500/40"></div>
               <div className="relative z-10 w-12 h-12 bg-gradient-to-br from-white/25 to-white/15 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg border border-white/20">
                 <BarChart3 className="w-6 h-6 text-white drop-shadow-lg" />
               </div>
@@ -165,10 +171,14 @@ export default function Dashboard() {
             <button
               data-testid="button-health-profile"
               className="p-4 flex flex-col items-center justify-center gap-3 text-center text-white h-[160px] hover:scale-[1.02] transition-all duration-300 relative overflow-hidden w-full rounded-2xl shadow-xl hover:shadow-2xl"
+              style={{
+                backgroundImage: `url(${profileBg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+              }}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-green-500 to-teal-600"></div>
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(45,212,191,0.3),transparent_50%)]"></div>
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,rgba(34,197,94,0.2),transparent_50%)]"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/80 via-emerald-700/60 to-emerald-500/40"></div>
               {hasProfile && (
                 <div className="absolute top-2 right-2 w-3 h-3 bg-white rounded-full shadow-lg animate-pulse"></div>
               )}
