@@ -9,7 +9,6 @@ import { ObjectUploader } from "@/components/ObjectUploader";
 import type { UploadResult } from "@uppy/core";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import MobileNav from "@/components/layout/mobile-nav";
 import BottomNav from "@/components/layout/bottom-nav";
 
 // Helper function to compress images
@@ -194,7 +193,7 @@ export default function BloodAnalysisPage() {
             updateProcessingState('recognizing', 65, 'Распознаем текст...', 'OpenAI Vision анализирует изображение');
             
             // Start the AI analysis
-            updateProcessingState('analyzing', 75, 'Обрабатываем с DeepSeek ИИ...', 'Извлекаем биомаркеры и создаем рекомендации');
+            updateProcessingState('analyzing', 75, 'Обрабатываем с ИИ...', 'Извлекаем биомаркеры и создаем рекомендации');
             
             updateProcessingState('saving', 90, 'Сохраняем биомаркеры...', 'Добавляем в "Мои биомаркеры" и "Мои анализы"');
             
@@ -232,7 +231,7 @@ export default function BloodAnalysisPage() {
       
       const analysisResponse = await createAnalysisMutation.mutateAsync();
       
-      updateProcessingState('analyzing', 50, 'Обрабатываем с DeepSeek ИИ...', 'Извлекаем биомаркеры из вашего текста');
+      updateProcessingState('analyzing', 50, 'Обрабатываем с ИИ...', 'Извлекаем биомаркеры из вашего текста');
       
       updateProcessingState('saving', 80, 'Сохраняем биомаркеры...', 'Добавляем в "Мои биомаркеры" и "Мои анализы"');
       
@@ -322,7 +321,6 @@ export default function BloodAnalysisPage() {
   if (processingState.stage === 'complete') {
     return (
       <div className="eva-page">
-        <MobileNav />
         
         <main className="eva-page-content min-h-screen flex flex-col items-center justify-center">
           <div className="text-center space-y-6 max-w-sm">
@@ -378,35 +376,11 @@ export default function BloodAnalysisPage() {
 
   return (
     <div className="eva-page">
-      <MobileNav />
-      
-      <main className="eva-page-content">
+      <main className="eva-page-content pt-6">
         {/* Processing indicator - shown during processing */}
         {processingState.stage !== 'idle' && processingState.stage !== 'complete' && (
           <ProcessingStages />
         )}
-        {/* Header */}
-        <div className="bg-white sticky top-0 z-10 -mx-4 px-4 py-3 border-b border-gray-200 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Link href="/">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hover:bg-gray-100"
-                  data-testid="button-back"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </Button>
-              </Link>
-              <h1 className="text-xl font-bold">Анализ крови</h1>
-            </div>
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-              <Clock className="w-4 h-4" />
-              <span>2-3 мин</span>
-            </div>
-          </div>
-        </div>
 
         {/* Main Content */}
         <div className="max-w-lg mx-auto">
@@ -422,7 +396,7 @@ export default function BloodAnalysisPage() {
                   <Sparkles className="w-3 h-3 text-white" />
                 </div>
               </div>
-              <h2 className="text-2xl font-bold text-foreground mb-2">
+              <h2 className="text-3xl font-bold text-foreground mb-2">
                 ИИ анализ крови
               </h2>
               <p className="text-muted-foreground mb-4">
@@ -551,7 +525,7 @@ export default function BloodAnalysisPage() {
                             <Brain className="w-5 h-5 text-green-600" />
                           </div>
                           <div>
-                            <div className="text-green-700 font-semibold text-sm">DeepSeek AI</div>
+                            <div className="text-green-700 font-semibold text-sm">ИИ анализ</div>
                             <p className="text-xs text-green-600">Анализирует показатели и дает рекомендации</p>
                           </div>
                         </div>
@@ -600,7 +574,7 @@ export default function BloodAnalysisPage() {
                     size="lg"
                   >
                     <Brain className="w-5 h-5 mr-2" />
-                    Обработать с DeepSeek ИИ
+                    Обработать с ИИ
                     <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
                 </div>
