@@ -86,7 +86,12 @@ export default function Recommendations() {
     staleTime: 0,
     gcTime: 0,
     refetchOnMount: 'always',
-    refetchOnWindowFocus: true
+    refetchOnWindowFocus: true,
+    retry: 2,
+    retryDelay: 1000,
+    meta: {
+      errorMessage: "Не удалось сгенерировать рекомендации"
+    }
   });
 
   const { data: healthProfile } = useQuery({
@@ -240,7 +245,7 @@ export default function Recommendations() {
                 </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                   {error 
-                    ? 'Не удалось сгенерировать рекомендации. Попробуйте позже.'
+                    ? `${error.message || 'Не удалось сгенерировать рекомендации'}. ИИ-анализ может занимать до 2 минут.`
                     : 'Для создания персональных рекомендаций необходимо заполнить профиль здоровья или загрузить анализы крови'
                   }
                 </p>
