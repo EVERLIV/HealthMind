@@ -284,7 +284,7 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
             </div>
           </div>
           
-          {/* Enhanced Navigation Footer */}
+          {/* Clean Navigation Footer - Only Buttons */}
           <div className="px-4 md:px-8 py-4 md:py-6 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-t border-slate-200/50 dark:border-slate-700/50">
             <div className="flex justify-between items-center">
               <Button
@@ -297,58 +297,6 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
                 <ChevronLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
                 <span className="font-medium">Назад</span>
               </Button>
-              
-              {/* Mobile-Simplified Step Indicators */}
-              <div className="flex items-center gap-1 md:gap-2 px-3 py-2 bg-white/80 dark:bg-slate-800/80 rounded-full backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50">
-                {/* Mobile: Simple dots only */}
-                <div className="flex md:hidden items-center gap-1">
-                  {steps.map((step) => (
-                    <div
-                      key={step.id}
-                      className={`
-                        rounded-full transition-all duration-300
-                        ${step.id === currentStep ? 'w-6 h-2 bg-gradient-to-r ' + steps[currentStep - 1].color : ''}
-                        ${step.id < currentStep ? 'w-2 h-2 bg-green-500' : ''}
-                        ${step.id > currentStep ? 'w-2 h-2 bg-slate-300 dark:bg-slate-600' : ''}
-                      `}
-                    />
-                  ))}
-                </div>
-                
-                {/* Desktop: Full step indicators */}
-                <div className="hidden md:flex items-center gap-2">
-                  {steps.map((step, index) => (
-                    <div key={step.id} className="flex items-center">
-                      <div
-                        className={`
-                          rounded-full transition-all duration-300 flex items-center justify-center border-2
-                          ${step.id === currentStep 
-                            ? 'w-8 h-8 bg-gradient-to-r ' + steps[currentStep - 1].color + ' border-transparent text-white shadow-lg' 
-                            : ''}
-                          ${step.id < currentStep ? 'w-6 h-6 bg-green-500 border-green-500 text-white shadow-md' : ''}
-                          ${step.id > currentStep ? 'w-6 h-6 bg-slate-200 dark:bg-slate-600 border-slate-300 dark:border-slate-500 text-slate-500' : ''}
-                        `}
-                      >
-                        {step.id < currentStep ? (
-                          <Check className="w-3 h-3" />
-                        ) : (
-                          <span className="text-xs font-bold">{step.id}</span>
-                        )}
-                      </div>
-                      {index < steps.length - 1 && (
-                        <div className={`w-3 h-0.5 mx-1 rounded-full transition-colors duration-300 ${
-                          step.id < currentStep ? 'bg-green-400' : 'bg-slate-300 dark:bg-slate-600'
-                        }`} />
-                      )}
-                    </div>
-                  ))}
-                </div>
-                
-                {/* Mobile: Current step info */}
-                <div className="md:hidden ml-2 text-xs font-medium text-slate-600 dark:text-slate-400">
-                  {currentStep}/{steps.length}
-                </div>
-              </div>
               
               {currentStep === steps.length ? (
                 <Button
