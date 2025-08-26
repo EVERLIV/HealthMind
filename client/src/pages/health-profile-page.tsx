@@ -39,9 +39,9 @@ export default function HealthProfilePage() {
     if (urlParams.get('edit') === 'true') {
       setShowWizard(true);
       // Clean URL by removing the parameter
-      const url = new URL(window.location);
+      const url = new URL(window.location.href);
       url.searchParams.delete('edit');
-      window.history.replaceState({}, '', url);
+      window.history.replaceState({}, '', url.toString());
     }
   }, []);
   
@@ -51,7 +51,8 @@ export default function HealthProfilePage() {
   
   const handleComplete = () => {
     setShowWizard(false);
-    window.location.reload(); // Reload to get fresh data
+    // Redirect to beautiful profile page with new design
+    navigate('/profile');
   };
   
   // Calculate profile completion percentage
