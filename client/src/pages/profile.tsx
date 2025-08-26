@@ -130,7 +130,7 @@ export default function Profile() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
         <MobileNav />
-        <main className="px-3 py-4 pb-20">
+        <main className="px-3 py-4 pb-24">
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl p-6 animate-pulse">
@@ -175,7 +175,7 @@ export default function Profile() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
       <MobileNav />
       
-      <main className="px-3 py-4 pb-20">
+      <main className="px-3 py-4 pb-24">
         {/* Modern Medical Header */}
         <div className="mb-6">
           <div className="bg-gradient-to-r from-medical-blue via-blue-500 to-trust-green relative overflow-hidden rounded-2xl">
@@ -252,31 +252,19 @@ export default function Profile() {
         ) : (
           <Card className="border-0 shadow-xl bg-gradient-to-br from-green-50 via-white to-emerald-50/30 dark:from-green-950/30 dark:via-slate-800 dark:to-emerald-950/30 mb-6">
             <CardContent className="p-5">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-gradient-to-br from-green-500/15 to-emerald-500/10 rounded-2xl border border-green-200/50 dark:border-green-800/50 shadow-sm">
-                    <Shield className="w-6 h-6 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg mb-1 flex items-center gap-2">
-                      Профиль активен
-                      <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      ✅ Ваш медицинский профиль готов к использованию и анализу
-                    </p>
-                  </div>
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-gradient-to-br from-green-500/15 to-emerald-500/10 rounded-2xl border border-green-200/50 dark:border-green-800/50 shadow-sm">
+                  <Shield className="w-6 h-6 text-green-600" />
                 </div>
-                <Button 
-                  variant="outline"
-                  onClick={() => navigate("/health-profile")}
-                  className="rounded-xl border-2 border-green-200 text-green-700 hover:bg-green-50"
-                  size="sm"
-                  data-testid="button-view-profile"
-                >
-                  <Edit className="w-4 h-4 mr-1" />
-                  Изменить
-                </Button>
+                <div>
+                  <h3 className="font-bold text-lg mb-1 flex items-center gap-2">
+                    Профиль активен
+                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    ✅ Ваш медицинский профиль готов к использованию и анализу
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>

@@ -276,7 +276,7 @@
   }
   
   .eva-page-content {
-    @apply container py-4 pb-20;
+    @apply container py-4 pb-24;
   }
   
   .eva-page-header {
