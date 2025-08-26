@@ -288,7 +288,7 @@ export default function Profile() {
                   data-testid="button-edit-profile"
                   variant="outline"
                   size="sm"
-                  onClick={() => navigate("/health-profile")}
+                  onClick={() => navigate("/health-profile?edit=true")}
                   className="rounded-xl border-2 hover:shadow-md transition-all duration-200"
                 >
                   <Edit className="w-4 h-4 mr-1" />
