@@ -121,7 +121,7 @@ export default function Dashboard() {
           </Link>
           
           {/* Blood Analysis */}
-          <Link href="/blood-analyses">
+          <Link href="/blood-analysis">
             <button
               data-testid="button-blood-upload"
               className="p-4 flex flex-col items-center justify-center gap-3 text-center text-white h-[160px] hover:scale-[1.02] transition-all duration-300 relative overflow-hidden w-full rounded-2xl shadow-xl hover:shadow-2xl"
