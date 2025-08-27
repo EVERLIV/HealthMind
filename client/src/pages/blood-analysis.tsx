@@ -97,13 +97,25 @@ export default function BloodAnalysisPage() {
         window.location.href = '/biomarkers';
       }, 3000);
     },
-    onError: () => {
+    onError: (error: any) => {
       updateProcessingState('idle', 0, 'Ошибка обработки');
-      toast({
-        title: "Ошибка",
-        description: "Не удалось обработать изображение. Попробуйте еще раз.",
-        variant: "destructive",
-      });
+      
+      // Check if error suggests text input fallback
+      if (error?.response?.data?.fallback === "text_input_required") {
+        toast({
+          title: "Переключитесь на текстовый режим",
+          description: "Для анализа изображений требуется дополнительная настройка. Попробуйте ввести данные вручную в текстовом режиме.",
+          variant: "destructive",
+        });
+        // Auto-switch to text mode
+        setAnalysisMode('text');
+      } else {
+        toast({
+          title: "Ошибка",
+          description: "Не удалось обработать изображение. Попробуйте еще раз или используйте текстовый режим.",
+          variant: "destructive",
+        });
+      }
     },
   });
 

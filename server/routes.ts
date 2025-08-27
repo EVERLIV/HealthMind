@@ -236,59 +236,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const openaiApiKey = process.env.OPENAI_API_KEY;
-      if (!openaiApiKey) {
-        return res.status(500).json({ error: "OpenAI API key not configured" });
-      }
+      const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
+      
+      // Use OpenAI for OCR if available, otherwise use DeepSeek with text input suggestion
+      if (openaiApiKey) {
+        const openaiService = new OpenAIVisionService(openaiApiKey);
+        const analysisResults = await openaiService.analyzeBloodTestImage(imageBase64, mimeType);
+        
+        // Process analysis results (existing code below)
+        // Update blood analysis with results
+        const updatedAnalysis = await storage.updateBloodAnalysis(req.params.id, {
+          status: "analyzed",
+          analyzedAt: new Date(),
+          results: analysisResults,
+        });
 
-      const openaiService = new OpenAIVisionService(openaiApiKey);
-      const analysisResults = await openaiService.analyzeBloodTestImage(imageBase64, mimeType);
+        // Create biomarker results from analysis
+        if (analysisResults.markers && analysisResults.markers.length > 0) {
+          for (const marker of analysisResults.markers) {
+            // Find existing biomarker or create a new one
+            const existingBiomarkers = await storage.getAllBiomarkers();
+            let biomarker = existingBiomarkers.find(b => 
+              b.name.toLowerCase() === marker.name.toLowerCase()
+            );
+            
+            if (!biomarker) {
+              // Create new biomarker if it doesn't exist
+              const newBiomarker = {
+                name: marker.name,
+                description: marker.education || "Biomarker information",
+                normalRange: {
+                  min: 0,
+                  max: 0,
+                  unit: "" 
+                },
+                category: "general" as const,
+                importance: "medium" as const,
+                recommendations: marker.recommendation ? [marker.recommendation] : [],
+              };
+              biomarker = await storage.createBiomarker(newBiomarker);
+            }
 
-      // Update blood analysis with results
-      const updatedAnalysis = await storage.updateBloodAnalysis(req.params.id, {
-        status: "analyzed",
-        analyzedAt: new Date(),
-        results: analysisResults,
-      });
-
-      // Create biomarker results from DeepSeek analysis
-      if (analysisResults.markers && analysisResults.markers.length > 0) {
-        for (const marker of analysisResults.markers) {
-          // Find existing biomarker or create a new one
-          const existingBiomarkers = await storage.getAllBiomarkers();
-          let biomarker = existingBiomarkers.find(b => 
-            b.name.toLowerCase() === marker.name.toLowerCase()
-          );
-          
-          if (!biomarker) {
-            // Create new biomarker if it doesn't exist
-            const newBiomarker = {
-              name: marker.name,
-              description: marker.education || "Biomarker information",
-              normalRange: {
-                min: 0,
-                max: 0,
-                unit: "" 
-              },
-              category: "general" as const,
-              importance: "medium" as const,
-              recommendations: marker.recommendation ? [marker.recommendation] : [],
-            };
-            biomarker = await storage.createBiomarker(newBiomarker);
+            // Create biomarker result
+            const numericValue = parseFloat(marker.value.replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
+            await storage.createBiomarkerResult({
+              analysisId: req.params.id,
+              biomarkerId: biomarker.id,
+              value: numericValue.toString(),
+              unit: marker.value.match(/[а-яА-Яa-zA-Z/]+/)?.[0] || "",
+              status: marker.status,
+            });
           }
-
-          // Create biomarker result
-          const numericValue = parseFloat(marker.value.replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
-          await storage.createBiomarkerResult({
-            analysisId: req.params.id,
-            biomarkerId: biomarker.id,
-            value: numericValue.toString(),
-            unit: marker.value.match(/[а-яА-Яa-zA-Z/]+/)?.[0] || "",
-            status: marker.status,
-          });
         }
-      }
 
-      res.json({ analysis: updatedAnalysis, results: analysisResults });
+        return res.json({ analysis: updatedAnalysis, results: analysisResults });
+      } else if (deepseekApiKey) {
+        // Fallback: suggest manual text input since we don't have OpenAI for OCR
+        return res.status(400).json({ 
+          error: "Для анализа изображений требуется ключ OpenAI API. Попробуйте ввести данные анализа вручную в текстовом режиме.",
+          fallback: "text_input_required"
+        });
+      } else {
+        return res.status(500).json({ 
+          error: "API ключи не настроены. Обратитесь к администратору.",
+          fallback: "configuration_error"
+        });
+      }
     } catch (error) {
       console.error("Error analyzing image with OpenAI Vision:", error);
       res.status(500).json({ error: "Analysis failed" });
