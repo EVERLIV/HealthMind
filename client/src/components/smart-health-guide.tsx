@@ -276,9 +276,9 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
         )}
       </div>
 
-      {/* Категории одинакового размера */}
+      {/* Компактные категории */}
       <div className="mb-6">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-2">
           {smartCategories.slice(0, showAllCategories ? undefined : 6).map((cat, index) => {
             const isSelected = selectedCategory === cat;
             const gradients = [
@@ -290,17 +290,16 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
               'from-indigo-400 to-blue-600'
             ];
             const gradient = gradients[index % gradients.length];
-            const articleCount = cat === "all" ? articlesArray.length : articlesArray.filter(a => a.category === cat).length;
             
             return (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 className={`
-                  relative h-28 overflow-hidden rounded-2xl transition-all duration-300 transform
+                  relative h-16 overflow-hidden rounded-xl transition-all duration-300 transform
                   ${isSelected 
-                    ? 'scale-105 shadow-2xl ring-2 ring-white ring-opacity-60' 
-                    : 'hover:scale-105 hover:shadow-xl shadow-lg'}
+                    ? 'scale-105 shadow-xl ring-2 ring-white ring-opacity-60' 
+                    : 'hover:scale-105 hover:shadow-lg shadow-md'}
                 `}
               >
                 {/* Фоновый градиент */}
@@ -309,56 +308,40 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
                   ${isSelected ? 'opacity-100' : 'opacity-95'}
                 `} />
                 
-                {/* Декоративные элементы */}
-                <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-                <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/10 rounded-full blur-xl" />
+                {/* Декоративный элемент */}
+                <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-xl" />
                 
                 {/* Контент категории */}
-                <div className="relative h-full px-4 py-3 flex flex-col justify-between">
-                  {/* Верхняя часть */}
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-10 h-10 bg-white/25 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
-                        {cat === "all" ? (
-                          <BookOpen className="w-5 h-5 text-white" />
-                        ) : (
-                          categoryIcons[cat as keyof typeof categoryIcons]
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Метка для ваших целей */}
-                    {userGoals.includes(cat) && (
-                      <div className="w-6 h-6 bg-white/40 backdrop-blur-sm rounded-full flex items-center justify-center animate-pulse">
-                        <Sparkles className="w-3.5 h-3.5 text-white" />
+                <div className="relative h-full px-3 py-2 flex items-center gap-2">
+                  {/* Иконка */}
+                  <div className="w-8 h-8 bg-white/25 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
+                    {cat === "all" ? (
+                      <BookOpen className="w-4 h-4 text-white" />
+                    ) : (
+                      <div className="text-white">
+                        {categoryIcons[cat as keyof typeof categoryIcons]}
                       </div>
                     )}
                   </div>
                   
-                  {/* Название категории */}
-                  <div className="flex-1 flex flex-col justify-center">
-                    <p className="text-white font-bold text-sm leading-tight line-clamp-2">
-                      {cat === "all" ? "Все статьи" : categoryNames[cat as keyof typeof categoryNames]}
+                  {/* Название */}
+                  <div className="flex-1 text-left min-w-0">
+                    <p className="text-white font-semibold text-xs leading-tight truncate">
+                      {cat === "all" ? "Все" : categoryNames[cat as keyof typeof categoryNames]}
                     </p>
                   </div>
                   
-                  {/* Нижняя часть с количеством */}
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <p className="text-white font-bold text-2xl leading-none">
-                        {articleCount}
-                      </p>
-                      <p className="text-white/70 text-[10px] mt-0.5">
-                        {articleCount === 1 ? 'статья' : articleCount < 5 ? 'статьи' : 'статей'}
-                      </p>
+                  {/* Метка для целей */}
+                  {userGoals.includes(cat) && (
+                    <div className="w-4 h-4 bg-white/40 backdrop-blur-sm rounded-full flex items-center justify-center animate-pulse flex-shrink-0">
+                      <Sparkles className="w-2.5 h-2.5 text-white" />
                     </div>
-                    {isSelected && (
-                      <div className="flex gap-1">
-                        <div className="w-1.5 h-6 bg-white/50 rounded-full" />
-                        <div className="w-1.5 h-4 bg-white/30 rounded-full" />
-                      </div>
-                    )}
-                  </div>
+                  )}
+                  
+                  {/* Индикатор выбора */}
+                  {isSelected && (
+                    <div className="w-1 h-6 bg-white/50 rounded-full flex-shrink-0" />
+                  )}
                 </div>
               </button>
             );
