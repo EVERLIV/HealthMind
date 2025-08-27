@@ -1,10 +1,8 @@
 import { useState, useMemo } from "react";
+import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { IconContainer, iconSizes } from "@/components/ui/icon-container";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
 import {
   BookOpen,
   Heart,
@@ -23,12 +21,7 @@ import {
   Zap,
   Eye,
   Activity,
-  Wind,
-  X,
-  Share2,
-  CheckCircle,
-  AlertCircle,
-  ChevronLeft
+  Wind
 } from "lucide-react";
 
 interface Article {
@@ -221,7 +214,6 @@ const articlesDatabase: Article[] = [
 
 export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }: SmartHealthGuideProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [showAllCategories, setShowAllCategories] = useState(false);
   
   // Умный подбор статей на основе целей пользователя и состояния биомаркеров
@@ -331,12 +323,11 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
       {/* Список статей с картинками */}
       <div className="space-y-4">
         {smartArticles.slice(0, 4).map((article) => (
-          <Card 
-            key={article.id}
-            onClick={() => setSelectedArticle(article)}
-            className="border-0 shadow-lg bg-white dark:bg-slate-800 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
-          >
-            <div className="relative">
+          <Link key={article.id} href={`/article/${article.id}`}>
+            <Card 
+              className="border-0 shadow-lg bg-white dark:bg-slate-800 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+            >
+              <div className="relative">
               {/* Картинка превью */}
               {article.imageUrl && (
                 <div 
@@ -409,6 +400,7 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
               </CardContent>
             </div>
           </Card>
+          </Link>
         ))}
       </div>
 
@@ -421,145 +413,6 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
           </button>
         </div>
       )}
-      
-      {/* Модальное окно детального просмотра статьи */}
-      <Dialog open={!!selectedArticle} onOpenChange={() => setSelectedArticle(null)}>
-        <DialogContent className="max-w-md mx-auto h-[90vh] p-0 overflow-hidden">
-          {selectedArticle && (
-            <div className="flex flex-col h-full">
-              {/* Шапка с картинкой */}
-              <div className="relative flex-shrink-0">
-                {selectedArticle.imageUrl && (
-                  <div 
-                    className="h-48 bg-cover bg-center"
-                    style={{ backgroundImage: `url(${selectedArticle.imageUrl})` }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                  </div>
-                )}
-                
-                {/* Кнопки управления */}
-                <div className="absolute top-4 left-4 right-4 flex justify-between">
-                  <button 
-                    onClick={() => setSelectedArticle(null)}
-                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  
-                  <div className="flex gap-2">
-                    <button className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg">
-                      <Bookmark className="w-5 h-5" />
-                    </button>
-                    <button className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg">
-                      <Share2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-                
-                {/* Заголовок на картинке */}
-                <div className="absolute bottom-4 left-4 right-4">
-                  <h2 className="text-white font-bold text-lg mb-2" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
-                    {selectedArticle.title}
-                  </h2>
-                  <div className="flex items-center gap-3">
-                    <Badge className="bg-white/20 backdrop-blur-sm text-white border-0">
-                      {categoryNames[selectedArticle.category as keyof typeof categoryNames]}
-                    </Badge>
-                    <span className="text-white/80 text-xs flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {selectedArticle.readTime}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Контент статьи с прокруткой */}
-              <ScrollArea className="flex-1">
-                <div className="p-6 space-y-6">
-                  {/* Описание */}
-                  <div>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {selectedArticle.description}
-                    </p>
-                  </div>
-                  
-                  {/* Основной контент */}
-                  {selectedArticle.content && (
-                    <div className="prose prose-sm dark:prose-invert max-w-none">
-                      {selectedArticle.content.split('\n').map((paragraph, index) => (
-                        <p key={index} className="text-sm leading-relaxed mb-4">
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {/* Советы */}
-                  {selectedArticle.tips && selectedArticle.tips.length > 0 && (
-                    <div className="bg-green-50 dark:bg-green-950/20 rounded-xl p-4">
-                      <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-green-600" />
-                        Полезные советы
-                      </h3>
-                      <ul className="space-y-2">
-                        {selectedArticle.tips.map((tip, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 bg-green-600 rounded-full mt-1.5 flex-shrink-0" />
-                            <span className="text-xs leading-relaxed">{tip}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  
-                  {/* Предупреждения */}
-                  {selectedArticle.warnings && selectedArticle.warnings.length > 0 && (
-                    <div className="bg-orange-50 dark:bg-orange-950/20 rounded-xl p-4">
-                      <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4 text-orange-600" />
-                        Важно знать
-                      </h3>
-                      <ul className="space-y-2">
-                        {selectedArticle.warnings.map((warning, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 bg-orange-600 rounded-full mt-1.5 flex-shrink-0" />
-                            <span className="text-xs leading-relaxed">{warning}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  
-                  {/* Автор и дата */}
-                  {(selectedArticle.author || selectedArticle.publishDate) && (
-                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        {selectedArticle.author && (
-                          <span>Автор: {selectedArticle.author}</span>
-                        )}
-                        {selectedArticle.publishDate && (
-                          <span>{new Date(selectedArticle.publishDate).toLocaleDateString('ru-RU')}</span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
-              
-              {/* Кнопка действия внизу */}
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800">
-                <Button 
-                  className="w-full bg-medical-blue hover:bg-medical-blue/90 text-white"
-                  onClick={() => setSelectedArticle(null)}
-                >
-                  Понятно, спасибо!
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

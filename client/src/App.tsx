@@ -13,6 +13,7 @@ import ChatPage from "@/pages/chat";
 import BloodAnalysisPage from "@/pages/blood-analysis";
 import BloodAnalysesListPage from "@/pages/blood-analyses-list";
 import BloodAnalysisDetailPage from "@/pages/blood-analysis-detail";
+import ArticleDetail from "@/pages/article-detail";
 
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/chat" component={ChatPage} />
       <Route path="/blood-analyses" component={BloodAnalysesListPage} />
       <Route path="/blood-analyses/:id" component={BloodAnalysisDetailPage} />
+      <Route path="/article/:id" component={ArticleDetail} />
       <Route component={NotFound} />
     </Switch>
   );
