@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { IconContainer, iconSizes } from "@/components/ui/icon-container";
 import {
   Dialog,
   DialogContent,
@@ -199,9 +200,9 @@ export default function Biomarkers() {
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
-                <div className="p-1.5 bg-white/20 backdrop-blur-sm rounded-lg border border-white/30">
-                  <Stethoscope className="w-4 h-4" />
-                </div>
+                <IconContainer size="xs" className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+                  <Stethoscope className={iconSizes.xs} />
+                </IconContainer>
                 <div>
                   <h1 className="text-lg font-bold">Биомаркеры</h1>
                   <p className="text-white/90 text-xs">Умная аналитика здоровья</p>
@@ -313,9 +314,9 @@ export default function Biomarkers() {
           {filteredBiomarkers.length === 0 ? (
             <Card className="border-0 shadow-lg bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm">
               <CardContent className="p-8 text-center">
-                <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Search className="w-6 h-6 text-muted-foreground" />
-                </div>
+                <IconContainer size="lg" variant="neutral" className="mx-auto mb-3">
+                  <Search className={iconSizes.lg} />
+                </IconContainer>
                 <h3 className="font-bold text-lg mb-2">Биомаркеры не найдены</h3>
                 <p className="text-muted-foreground text-sm mb-4">
                   Попробуйте изменить параметры поиска
@@ -339,9 +340,9 @@ export default function Biomarkers() {
                     <div className="space-y-3">
                       {/* Header Row - Mobile Optimized */}
                       <div className="flex items-start gap-3">
-                        <div className={`p-2 ${categoryData.bg} rounded-lg border ${categoryData.border} flex-shrink-0`}>
-                          <IconComponent className={`w-4 h-4 ${categoryData.text}`} />
-                        </div>
+                        <IconContainer size="sm" className={`${categoryData.bg} ${categoryData.text} ${categoryData.border} flex-shrink-0`}>
+                          <IconComponent className={iconSizes.sm} />
+                        </IconContainer>
                         <div className="flex-1 min-w-0">
                           <h4 className="font-bold text-sm leading-tight mb-1">{biomarker.name}</h4>
                           <p className="text-xs text-muted-foreground line-clamp-2">
@@ -480,20 +481,20 @@ export default function Biomarkers() {
                     /* Details View */
                     <>
                       <div className="text-center">
-                        <h3 className="font-bold text-lg">{selectedBiomarker.name}</h3>
+                        <h3 className="font-bold text-lg">{selectedBiomarker?.name}</h3>
                         <p className="text-sm text-muted-foreground capitalize">
-                          {selectedBiomarker.category}
+                          {selectedBiomarker?.category}
                         </p>
                       </div>
 
                       <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                         <h4 className="font-semibold text-sm mb-2">Описание</h4>
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                          {selectedBiomarker.description}
+                          {selectedBiomarker?.description}
                         </p>
                       </div>
 
-                      {selectedBiomarker.normalRange && (
+                      {selectedBiomarker?.normalRange && (
                         <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
                           <h4 className="font-semibold text-sm mb-2">Нормальные значения</h4>
                           <div className="text-lg font-bold font-mono text-green-600">
@@ -505,7 +506,7 @@ export default function Biomarkers() {
                         </div>
                       )}
 
-                      {selectedBiomarker.recommendations && selectedBiomarker.recommendations.length > 0 && (
+                      {selectedBiomarker?.recommendations && selectedBiomarker.recommendations.length > 0 && (
                         <div>
                           <h4 className="font-semibold text-sm mb-2">Рекомендации</h4>
                           <div className="space-y-2">
@@ -535,7 +536,7 @@ export default function Biomarkers() {
                     /* History View */
                     <>
                       <div className="text-center">
-                        <h3 className="font-bold text-lg">{selectedBiomarker.name}</h3>
+                        <h3 className="font-bold text-lg">{selectedBiomarker?.name}</h3>
                         <p className="text-sm text-muted-foreground">История результатов</p>
                       </div>
 
