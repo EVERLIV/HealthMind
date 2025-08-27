@@ -11,6 +11,11 @@ interface IconContainerProps {
 /**
  * Единый компонент для стилизации иконок по всему проекту
  * Обеспечивает консистентность форм, размеров и цветов
+ * 
+ * Встроенная защита от переполнения:
+ * - flex-shrink-0: иконка не сжимается
+ * - overflow-hidden: контент не выходит за границы
+ * - max-scale ограничение для hover эффектов
  */
 export function IconContainer({ 
   children, 
@@ -38,7 +43,12 @@ export function IconContainer({
 
   return (
     <div className={cn(
-      "rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm",
+      // Базовые стили
+      "rounded-2xl flex items-center justify-center shadow-sm",
+      // Защита от переполнения
+      "flex-shrink-0 overflow-hidden",
+      // Ограничение hover эффектов для безопасности
+      "hover:scale-[1.05] max-w-full max-h-full",
       sizeClasses[size],
       variantClasses[variant],
       className
