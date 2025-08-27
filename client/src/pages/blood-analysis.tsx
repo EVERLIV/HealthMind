@@ -58,8 +58,61 @@ interface BiomarkerField {
   name: string;
   value: string;
   unit: string;
-  reference?: string;
+  status: 'normal' | 'high' | 'low' | 'unknown';
+  category: string;
   isEditing?: boolean;
+}
+
+// Функция для определения статуса показателя
+function determineBiomarkerStatus(name: string, value: string, unit: string): 'normal' | 'high' | 'low' | 'unknown' {
+  const numValue = parseFloat(value.replace(',', '.'));
+  if (isNaN(numValue)) return 'unknown';
+
+  // Базовые нормы для основных показателей
+  const norms: Record<string, { min: number; max: number }> = {
+    'гемоглобин': { min: 110, max: 190 },
+    'эритроциты': { min: 4.0, max: 5.5 },
+    'лейкоциты': { min: 4.0, max: 11.0 },
+    'тромбоциты': { min: 150, max: 450 },
+    'глюкоза': { min: 3.9, max: 6.1 },
+    'холестерин': { min: 3.0, max: 5.2 },
+    'креатинин': { min: 53, max: 115 },
+    'гематокрит': { min: 37, max: 54 }
+  };
+
+  const normalizedName = name.toLowerCase().trim();
+  for (const [key, range] of Object.entries(norms)) {
+    if (normalizedName.includes(key)) {
+      if (numValue < range.min) return 'low';
+      if (numValue > range.max) return 'high';
+      return 'normal';
+    }
+  }
+
+  return 'unknown';
+}
+
+// Функция для определения категории показателя
+function categorizeBiomarker(name: string): string {
+  const normalizedName = name.toLowerCase();
+  
+  if (['гемоглобин', 'эритроциты', 'гематокрит'].some(term => normalizedName.includes(term))) {
+    return 'Кровь и кислород';
+  }
+  if (['лейкоциты', 'нейтрофилы', 'лимфоциты', 'моноциты', 'эозинофилы', 'базофилы'].some(term => normalizedName.includes(term))) {
+    return 'Иммунная система';
+  }
+  if (['тромбоциты'].some(term => normalizedName.includes(term))) {
+    return 'Свертываемость';
+  }
+  if (['глюкоза', 'холестерин', 'триглицериды'].some(term => normalizedName.includes(term))) {
+    return 'Биохимия';
+  }
+  if (['креатинин', 'мочевина'].some(term => normalizedName.includes(term))) {
+    return 'Почки';
+  }
+  
+  return 'Другие показатели';
 }
 
 // Функция парсинга распознанного текста в структурированные поля
@@ -72,13 +125,18 @@ function parseExtractedText(text: string): BiomarkerField[] {
     const match = line.match(/^([^:]+):\s*([0-9.,]+)\s*([^(]*?)(?:\s*\(референс:\s*([^)]+)\))?/i);
     
     if (match) {
-      const [, name, value, unit, reference] = match;
+      const [, name, value, unit] = match;
+      const cleanName = name.trim();
+      const cleanValue = value.trim();
+      const cleanUnit = unit.trim();
+      
       biomarkers.push({
         id: `biomarker-${index}`,
-        name: name.trim(),
-        value: value.trim(),
-        unit: unit.trim(),
-        reference: reference?.trim(),
+        name: cleanName,
+        value: cleanValue,
+        unit: cleanUnit,
+        status: determineBiomarkerStatus(cleanName, cleanValue, cleanUnit),
+        category: categorizeBiomarker(cleanName),
         isEditing: false
       });
     }
@@ -274,7 +332,8 @@ export default function BloodAnalysisPage() {
       name: '',
       value: '',
       unit: '',
-      reference: '',
+      status: 'unknown',
+      category: 'Другие показатели',
       isEditing: true
     };
     setBiomarkers(prev => [...prev, newBiomarker]);
@@ -301,8 +360,7 @@ export default function BloodAnalysisPage() {
     try {
       // Конвертируем биомаркеры обратно в текстовый формат для анализа
       const textForAnalysis = validBiomarkers.map(b => {
-        const referencePart = b.reference ? ` (референс: ${b.reference})` : '';
-        return `${b.name}: ${b.value} ${b.unit}${referencePart}`;
+        return `${b.name}: ${b.value} ${b.unit}`;
       }).join('\n');
 
       updateProcessingState('analyzing', 75, 'Анализируем данные...', 'DeepSeek AI обрабатывает биомаркеры');
@@ -827,141 +885,171 @@ export default function BloodAnalysisPage() {
             </Card>
           )}
 
-          {/* Biomarker Editor Modal */}
+          {/* Modern Adaptive Biomarker Modal */}
           {showBiomarkerEditor && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 p-4 overflow-y-auto">
-              <div className="max-w-4xl mx-auto mt-8 mb-8">
-                <Card className="shadow-2xl border-0">
-                  <CardHeader className="bg-gradient-to-r from-trust-green to-medical-blue text-white">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                          <Activity className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold">Биомаркеры анализа</h3>
-                          <p className="text-white/90 text-sm">
-                            Проверьте {biomarkers.length} показателей перед анализом с ИИ
-                          </p>
-                        </div>
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+              <div className="w-full max-w-4xl max-h-full sm:max-h-[90vh] bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-8 duration-300">
+                {/* Header */}
+                <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500 text-white p-4 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <Activity className="w-5 h-5 sm:w-6 sm:h-6" />
                       </div>
-                      <Button
-                        onClick={() => {
-                          setShowBiomarkerEditor(false);
-                          setBiomarkers([]);
-                          setCurrentAnalysisId(null);
-                        }}
-                        variant="ghost"
-                        size="sm"
-                        className="text-white hover:bg-white/20"
-                      >
-                        <X className="w-5 h-5" />
-                      </Button>
+                      <div>
+                        <h2 className="text-lg sm:text-xl font-bold">Результаты анализа</h2>
+                        <p className="text-white/90 text-sm">
+                          {biomarkers.length} показателей • {biomarkers.filter(b => b.status === 'normal').length} в норме
+                        </p>
+                      </div>
                     </div>
-                  </CardHeader>
-                  
-                  <CardContent className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
-                    {/* Biomarker Fields */}
-                    <div className="space-y-3">
-                      {biomarkers.map((biomarker) => (
-                        <Card key={biomarker.id} className="border-2 border-gray-100 hover:border-medical-blue/30 transition-colors">
-                          <CardContent className="p-4">
-                            <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-                              {/* Name Field */}
-                              <div className="md:col-span-4">
-                                <label className="text-xs font-medium text-gray-600 mb-1 block">
-                                  Показатель
-                                </label>
-                                <Input
-                                  value={biomarker.name}
-                                  onChange={(e) => updateBiomarker(biomarker.id, { name: e.target.value })}
-                                  placeholder="Гемоглобин"
-                                  className="text-sm"
-                                  data-testid={`input-biomarker-name-${biomarker.id}`}
-                                />
-                              </div>
-                              
-                              {/* Value Field */}
-                              <div className="md:col-span-2">
-                                <label className="text-xs font-medium text-gray-600 mb-1 block">
-                                  Значение
-                                </label>
-                                <Input
-                                  value={biomarker.value}
-                                  onChange={(e) => updateBiomarker(biomarker.id, { value: e.target.value })}
-                                  placeholder="150"
-                                  className="text-sm"
-                                  data-testid={`input-biomarker-value-${biomarker.id}`}
-                                />
-                              </div>
-                              
-                              {/* Unit Field */}
-                              <div className="md:col-span-2">
-                                <label className="text-xs font-medium text-gray-600 mb-1 block">
-                                  Единица
-                                </label>
-                                <Input
-                                  value={biomarker.unit}
-                                  onChange={(e) => updateBiomarker(biomarker.id, { unit: e.target.value })}
-                                  placeholder="г/л"
-                                  className="text-sm"
-                                  data-testid={`input-biomarker-unit-${biomarker.id}`}
-                                />
-                              </div>
-                              
-                              {/* Reference Field */}
-                              <div className="md:col-span-3">
-                                <label className="text-xs font-medium text-gray-600 mb-1 block">
-                                  Норма
-                                </label>
-                                <Input
-                                  value={biomarker.reference || ''}
-                                  onChange={(e) => updateBiomarker(biomarker.id, { reference: e.target.value })}
-                                  placeholder="120-160"
-                                  className="text-sm"
-                                  data-testid={`input-biomarker-reference-${biomarker.id}`}
-                                />
-                              </div>
-                              
-                              {/* Delete Button */}
-                              <div className="md:col-span-1">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeBiomarker(biomarker.id)}
-                                  className="text-red-500 hover:text-red-700 hover:bg-red-50 w-full"
-                                  data-testid={`button-delete-biomarker-${biomarker.id}`}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
+                    <Button
+                      onClick={() => {
+                        setShowBiomarkerEditor(false);
+                        setBiomarkers([]);
+                        setCurrentAnalysisId(null);
+                      }}
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-white/20 min-h-[44px] min-w-[44px] rounded-xl"
+                    >
+                      <X className="w-5 h-5" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto max-h-[calc(100vh-200px)] sm:max-h-[50vh]">
+                  {/* Categories */}
+                  {Object.entries(
+                    biomarkers.reduce((acc, biomarker) => {
+                      if (!acc[biomarker.category]) acc[biomarker.category] = [];
+                      acc[biomarker.category].push(biomarker);
+                      return acc;
+                    }, {} as Record<string, BiomarkerField[]>)
+                  ).map(([category, categoryBiomarkers]) => (
+                    <div key={category} className="p-4 border-b border-gray-100">
+                      <h3 className="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">
+                        {category}
+                      </h3>
+                      <div className="space-y-3">
+                        {categoryBiomarkers.map((biomarker) => {
+                          const statusColors = {
+                            normal: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+                            high: 'bg-red-50 border-red-200 text-red-800',
+                            low: 'bg-orange-50 border-orange-200 text-orange-800',
+                            unknown: 'bg-gray-50 border-gray-200 text-gray-800'
+                          };
+                          
+                          const statusIcons = {
+                            normal: '✓',
+                            high: '↑',
+                            low: '↓',
+                            unknown: '?'
+                          };
+
+                          const statusLabels = {
+                            normal: 'Норма',
+                            high: 'Выше нормы',
+                            low: 'Ниже нормы',
+                            unknown: 'Неизвестно'
+                          };
+
+                          return (
+                            <div
+                              key={biomarker.id}
+                              className={`p-4 rounded-2xl border-2 transition-all ${statusColors[biomarker.status]} hover:shadow-md`}
+                            >
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center space-x-2 mb-1">
+                                    <Input
+                                      value={biomarker.name}
+                                      onChange={(e) => {
+                                        const newName = e.target.value;
+                                        const newStatus = determineBiomarkerStatus(newName, biomarker.value, biomarker.unit);
+                                        const newCategory = categorizeBiomarker(newName);
+                                        updateBiomarker(biomarker.id, { 
+                                          name: newName, 
+                                          status: newStatus,
+                                          category: newCategory 
+                                        });
+                                      }}
+                                      placeholder="Название показателя"
+                                      className="font-medium text-gray-900 bg-transparent border-0 p-0 text-base h-auto focus:ring-0"
+                                      data-testid={`input-biomarker-name-${biomarker.id}`}
+                                    />
+                                    <span className="text-xl font-bold">
+                                      {statusIcons[biomarker.status]}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Input
+                                      value={biomarker.value}
+                                      onChange={(e) => {
+                                        const newValue = e.target.value;
+                                        const newStatus = determineBiomarkerStatus(biomarker.name, newValue, biomarker.unit);
+                                        updateBiomarker(biomarker.id, { value: newValue, status: newStatus });
+                                      }}
+                                      placeholder="0"
+                                      className="w-20 text-xl font-bold bg-transparent border-0 p-0 h-auto focus:ring-0"
+                                      data-testid={`input-biomarker-value-${biomarker.id}`}
+                                    />
+                                    <Input
+                                      value={biomarker.unit}
+                                      onChange={(e) => updateBiomarker(biomarker.id, { unit: e.target.value })}
+                                      placeholder="ед."
+                                      className="w-16 text-sm bg-transparent border-0 p-0 h-auto focus:ring-0 text-gray-600"
+                                      data-testid={`input-biomarker-unit-${biomarker.id}`}
+                                    />
+                                  </div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-white/50">
+                                    {statusLabels[biomarker.status]}
+                                  </span>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => removeBiomarker(biomarker.id)}
+                                    className="text-red-500 hover:text-red-700 hover:bg-red-100 min-h-[44px] min-w-[44px] rounded-xl"
+                                    data-testid={`button-delete-biomarker-${biomarker.id}`}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
                               </div>
                             </div>
-                          </CardContent>
-                        </Card>
-                      ))}
+                          );
+                        })}
+                      </div>
                     </div>
-                    
-                    {/* Add New Biomarker Button */}
+                  ))}
+
+                  {/* Add New Biomarker */}
+                  <div className="p-4">
                     <Button
                       variant="outline"
                       onClick={addNewBiomarker}
-                      className="w-full border-2 border-dashed border-gray-300 hover:border-medical-blue text-gray-600 hover:text-medical-blue"
+                      className="w-full min-h-[52px] border-2 border-dashed border-gray-300 hover:border-blue-400 text-gray-600 hover:text-blue-600 rounded-2xl"
                       data-testid="button-add-biomarker"
                     >
-                      <Plus className="w-4 h-4 mr-2" />
+                      <Plus className="w-5 h-5 mr-2" />
                       Добавить показатель
                     </Button>
-                  </CardContent>
-                  
-                  {/* Actions */}
-                  <div className="p-6 bg-gray-50 flex gap-3">
+                  </div>
+                </div>
+
+                {/* Footer Actions */}
+                <div className="bg-gray-50 p-4 border-t border-gray-100">
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <Button
+                      variant="outline"
                       onClick={() => {
                         setShowBiomarkerEditor(false);
                         setShowTextReview(true);
                       }}
-                      variant="outline"
-                      className="flex-1"
+                      className="min-h-[52px] flex-1 rounded-2xl border-2"
                     >
                       <Edit3 className="w-4 h-4 mr-2" />
                       Редактировать текст
@@ -969,15 +1057,29 @@ export default function BloodAnalysisPage() {
                     <Button
                       onClick={handleConfirmBiomarkers}
                       disabled={biomarkers.filter(b => b.name.trim() && b.value.trim()).length === 0}
-                      className="flex-1 bg-gradient-to-r from-trust-green to-medical-blue hover:from-trust-green/90 hover:to-medical-blue/90"
+                      className="min-h-[52px] flex-1 bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white rounded-2xl shadow-lg"
                       data-testid="button-confirm-biomarkers"
                     >
-                      <CheckCircle className="w-4 h-4 mr-2" />
+                      <CheckCircle className="w-5 h-5 mr-2" />
                       Анализировать с ИИ
                       <ChevronRight className="w-4 h-4 ml-2" />
                     </Button>
                   </div>
-                </Card>
+                  <div className="flex justify-center mt-3">
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        // Export functionality
+                        const exportData = biomarkers.map(b => `${b.name}: ${b.value} ${b.unit} (${b.status})`).join('\n');
+                        navigator.clipboard.writeText(exportData);
+                        toast({ title: "Скопировано", description: "Результаты скопированы в буфер обмена" });
+                      }}
+                      className="text-sm text-gray-500 hover:text-gray-700"
+                    >
+                      📋 Экспорт результатов
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
