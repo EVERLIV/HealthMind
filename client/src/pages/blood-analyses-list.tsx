@@ -104,16 +104,16 @@ export default function BloodAnalysesListPage() {
             <div className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
               <div className="grid grid-cols-2 gap-3">
                 <Link href="/blood-analysis">
-                  <Card className="group h-20 bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200/50 hover:border-emerald-300 transition-all duration-300 cursor-pointer">
-                    <div className="h-full p-3 flex items-center gap-3">
-                      <IconContainer size="sm" variant="success" className="bg-emerald-500 text-white border-emerald-600 group-hover:scale-110 transition-transform">
+                  <Card className="group h-20 bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200/50 hover:border-emerald-300 transition-all duration-300 cursor-pointer overflow-hidden">
+                    <div className="h-full p-3 flex items-center gap-2 max-w-full">
+                      <IconContainer size="sm" variant="success" className="bg-emerald-500 text-white border-emerald-600 flex-shrink-0">
                         <Camera className={iconSizes.sm} />
                       </IconContainer>
-                      <div className="flex-1">
-                        <div className="font-semibold text-gray-900 text-sm">Новый анализ</div>
-                        <div className="text-xs text-gray-600">Сфотографировать</div>
+                      <div className="flex-1 min-w-0 pr-1">
+                        <div className="font-semibold text-gray-900 text-sm truncate">Новый анализ</div>
+                        <div className="text-xs text-gray-600 truncate">Сфотографировать</div>
                       </div>
-                      <IconContainer size="xs" variant="success" className="bg-emerald-200 text-emerald-600 border-emerald-300">
+                      <IconContainer size="xs" variant="success" className="bg-emerald-200 text-emerald-600 border-emerald-300 flex-shrink-0">
                         <Plus className={iconSizes.xs} />
                       </IconContainer>
                     </div>
@@ -121,16 +121,16 @@ export default function BloodAnalysesListPage() {
                 </Link>
                 
                 <Link href="/biomarkers">
-                  <Card className="group h-20 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200/50 hover:border-blue-300 transition-all duration-300 cursor-pointer">
-                    <div className="h-full p-3 flex items-center gap-3">
-                      <IconContainer size="sm" variant="info" className="bg-blue-500 text-white border-blue-600 group-hover:scale-110 transition-transform">
+                  <Card className="group h-20 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200/50 hover:border-blue-300 transition-all duration-300 cursor-pointer overflow-hidden">
+                    <div className="h-full p-3 flex items-center gap-2 max-w-full">
+                      <IconContainer size="sm" variant="info" className="bg-blue-500 text-white border-blue-600 flex-shrink-0">
                         <TrendingUp className={iconSizes.sm} />
                       </IconContainer>
-                      <div className="flex-1">
-                        <div className="font-semibold text-gray-900 text-sm">Биомаркеры</div>
-                        <div className="text-xs text-gray-600">Посмотреть</div>
+                      <div className="flex-1 min-w-0 pr-1">
+                        <div className="font-semibold text-gray-900 text-sm truncate">Биомаркеры</div>
+                        <div className="text-xs text-gray-600 truncate">Посмотреть</div>
                       </div>
-                      <IconContainer size="xs" variant="info" className="bg-blue-200 text-blue-600 border-blue-300">
+                      <IconContainer size="xs" variant="info" className="bg-blue-200 text-blue-600 border-blue-300 flex-shrink-0">
                         <Sparkles className={iconSizes.xs} />
                       </IconContainer>
                     </div>

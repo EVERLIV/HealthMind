@@ -598,3 +598,51 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Правила безопасности для предотвращения переполнения иконок и контента */
+@layer utilities {
+  /* Безопасные карточки - предотвращают выезжание контента */
+  .safe-card {
+    @apply overflow-hidden;
+  }
+  
+  /* Безопасные flex контейнеры с иконками */
+  .safe-flex-container {
+    @apply flex items-center max-w-full;
+  }
+  
+  /* Защищенное содержимое карточек */
+  .safe-card-content {
+    @apply flex items-center gap-2 max-w-full overflow-hidden;
+  }
+  
+  /* Безопасный текстовый контент - всегда может сжиматься */
+  .safe-text-content {
+    @apply flex-1 min-w-0;
+  }
+  
+  /* Безопасные иконки - никогда не сжимаются */
+  .safe-icon {
+    @apply flex-shrink-0 overflow-hidden;
+  }
+  
+  /* Ограничение hover эффектов для мобильных устройств */
+  .safe-hover-scale {
+    @apply hover:scale-[1.02] transition-transform duration-200;
+  }
+  
+  /* Безопасные отступы в компактных карточках */
+  .compact-spacing {
+    @apply gap-2 p-3;
+  }
+  
+  /* Обрезка текста с многоточием */
+  .safe-truncate {
+    @apply truncate min-w-0;
+  }
+  
+  /* Компактная компоновка для мобильных */
+  .mobile-compact {
+    @apply gap-2 text-sm;
+  }
+}
