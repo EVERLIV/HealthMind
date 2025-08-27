@@ -59,22 +59,22 @@ const iconMap = {
   vitamins: Sparkles,
 };
 
-// Enhanced category colors for mobile
-const categoryColors = {
-  blood: { bg: "bg-red-50 dark:bg-red-950/20", text: "text-red-700 dark:text-red-400", border: "border-red-200" },
-  cardiovascular: { bg: "bg-blue-50 dark:bg-blue-950/20", text: "text-blue-700 dark:text-blue-400", border: "border-blue-200" },
-  metabolic: { bg: "bg-orange-50 dark:bg-orange-950/20", text: "text-orange-700 dark:text-orange-400", border: "border-orange-200" },
-  kidney: { bg: "bg-green-50 dark:bg-green-950/20", text: "text-green-700 dark:text-green-400", border: "border-green-200" },
-  liver: { bg: "bg-purple-50 dark:bg-purple-950/20", text: "text-purple-700 dark:text-purple-400", border: "border-purple-200" },
-  immune: { bg: "bg-cyan-50 dark:bg-cyan-950/20", text: "text-cyan-700 dark:text-cyan-400", border: "border-cyan-200" },
-  brain: { bg: "bg-indigo-50 dark:bg-indigo-950/20", text: "text-indigo-700 dark:text-indigo-400", border: "border-indigo-200" },
-};
+// Enhanced category colors - unified with IconContainer variants
+const categoryVariants = {
+  blood: "soft-danger",
+  cardiovascular: "soft-info", 
+  metabolic: "soft-warning",
+  kidney: "soft-success",
+  liver: "soft-primary",
+  immune: "info",
+  brain: "primary",
+} as const;
 
-const importanceColors = {
-  high: { bg: "bg-red-100 dark:bg-red-900/30", text: "text-red-700 dark:text-red-400", dot: "bg-red-500" },
-  medium: { bg: "bg-yellow-100 dark:bg-yellow-900/30", text: "text-yellow-700 dark:text-yellow-400", dot: "bg-yellow-500" },
-  low: { bg: "bg-gray-100 dark:bg-gray-900/30", text: "text-gray-700 dark:text-gray-400", dot: "bg-gray-500" },
-};
+const importanceVariants = {
+  high: { variant: "soft-danger", dot: "bg-red-500" },
+  medium: { variant: "soft-warning", dot: "bg-amber-500" }, 
+  low: { variant: "soft-neutral", dot: "bg-gray-500" },
+} as const;
 
 const MiniChart = ({ values, color = "bg-medical-blue" }: { values: number[]; color?: string }) => (
   <div className="flex items-end gap-0.5 h-6 w-12">
@@ -314,7 +314,7 @@ export default function Biomarkers() {
           {filteredBiomarkers.length === 0 ? (
             <Card className="border-0 shadow-lg bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm">
               <CardContent className="p-8 text-center">
-                <IconContainer size="lg" variant="neutral" className="mx-auto mb-3">
+                <IconContainer size="lg" variant="soft-neutral" className="mx-auto mb-3">
                   <Search className={iconSizes.lg} />
                 </IconContainer>
                 <h3 className="font-bold text-lg mb-2">Биомаркеры не найдены</h3>
@@ -325,9 +325,9 @@ export default function Biomarkers() {
             </Card>
           ) : (
             filteredBiomarkers.map((biomarker: any) => {
-              const categoryData = categoryColors[biomarker.category as keyof typeof categoryColors] || categoryColors.blood;
+              const categoryVariant = categoryVariants[biomarker.category as keyof typeof categoryVariants] || "soft-danger";
               const IconComponent = iconMap[biomarker.category as keyof typeof iconMap] || Activity;
-              const importanceStyle = importanceColors[biomarker.importance as keyof typeof importanceColors];
+              const importanceStyle = importanceVariants[biomarker.importance as keyof typeof importanceVariants] || importanceVariants.low;
               const trend = generateTrend(); // In real app, this would come from API
 
               return (
@@ -340,7 +340,7 @@ export default function Biomarkers() {
                     <div className="space-y-3">
                       {/* Header Row - Mobile Optimized */}
                       <div className="flex items-start gap-3">
-                        <IconContainer size="sm" className={`${categoryData.bg} ${categoryData.text} ${categoryData.border} flex-shrink-0`}>
+                        <IconContainer size="sm" variant={categoryVariant} className="flex-shrink-0">
                           <IconComponent className={iconSizes.sm} />
                         </IconContainer>
                         <div className="flex-1 min-w-0">
@@ -349,7 +349,12 @@ export default function Biomarkers() {
                             {biomarker.description}
                           </p>
                         </div>
-                        <Badge className={`${importanceStyle.bg} ${importanceStyle.text} border-0 text-xs px-2 py-0.5 flex-shrink-0`}>
+                        <Badge className="text-xs px-2 py-0.5 flex-shrink-0 border-0" style={{ 
+                          backgroundColor: importanceStyle.variant === 'soft-danger' ? 'rgb(254 242 242)' : 
+                                          importanceStyle.variant === 'soft-warning' ? 'rgb(255 251 235)' : 'rgb(249 250 251)',
+                          color: importanceStyle.variant === 'soft-danger' ? 'rgb(185 28 28)' : 
+                                importanceStyle.variant === 'soft-warning' ? 'rgb(180 83 9)' : 'rgb(55 65 81)'
+                        }}>
                           <div className={`w-1.5 h-1.5 rounded-full ${importanceStyle.dot} mr-1`}></div>
                           {biomarker.importance === 'high' ? 'Крит' : 
                            biomarker.importance === 'medium' ? 'Важн' : 'Обыч'}
