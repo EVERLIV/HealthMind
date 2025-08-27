@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { IconContainer, iconSizes } from "@/components/ui/icon-container";
+import { articlesArray } from "@/data/articles";
 import {
   BookOpen,
   Heart,
@@ -24,24 +25,6 @@ import {
   Wind
 } from "lucide-react";
 
-interface Article {
-  id: string;
-  title: string;
-  description: string;
-  readTime: string;
-  category: string;
-  goals: string[];
-  relevanceScore: number;
-  icon: React.ReactNode;
-  imageUrl?: string;
-  content?: string;
-  tips?: string[];
-  warnings?: string[];
-  author?: string;
-  publishDate?: string;
-  new?: boolean;
-  trending?: boolean;
-}
 
 interface SmartHealthGuideProps {
   userGoals?: string[];
@@ -87,8 +70,9 @@ const categoryColors = {
   "recovery": "soft-primary"
 } as const;
 
-// База статей - в реальном приложении берется из API
-const articlesDatabase: Article[] = [
+// Статьи импортируются из общей базы данных
+/*
+const articlesDatabase = [
   {
     id: "1",
     title: "5 способов снизить холестерин без лекарств",
@@ -211,6 +195,7 @@ const articlesDatabase: Article[] = [
     tips: ["20 сек работа / 10 сек отдых", "Разминка обязательна", "3-4 раза в неделю"]
   }
 ];
+*/
 
 export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }: SmartHealthGuideProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -218,7 +203,7 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
   
   // Умный подбор статей на основе целей пользователя и состояния биомаркеров
   const smartArticles = useMemo(() => {
-    let articles = [...articlesDatabase];
+    let articles = [...articlesArray];
     
     // Сортировка по релевантности для пользователя
     articles.sort((a, b) => {

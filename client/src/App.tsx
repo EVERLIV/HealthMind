@@ -19,6 +19,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route path="/blood-analysis" component={BloodAnalysisPage} />
       <Route path="/biomarkers" component={Biomarkers} />
       <Route path="/profile" component={Profile} />
