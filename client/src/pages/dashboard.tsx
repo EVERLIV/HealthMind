@@ -111,7 +111,7 @@ export default function Dashboard() {
               }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30"></div>
-              <IconContainer size="lg" className="bg-gradient-to-br from-white/25 to-white/15 text-white border-white/20 backdrop-blur-md shadow-lg">
+              <IconContainer size="lg" variant="soft-primary" className="backdrop-blur-md shadow-lg">
                 <MessageCircle className={`${iconSizes.lg} drop-shadow-lg`} />
               </IconContainer>
               <div className="relative z-10 text-center">
@@ -134,7 +134,7 @@ export default function Dashboard() {
               }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30"></div>
-              <IconContainer size="lg" className="bg-gradient-to-br from-white/25 to-white/15 text-white border-white/20 backdrop-blur-md shadow-lg">
+              <IconContainer size="lg" variant="danger" className="backdrop-blur-md shadow-lg">
                 <Camera className={`${iconSizes.lg} drop-shadow-lg`} />
               </IconContainer>
               <div className="relative z-10 text-center">
@@ -157,7 +157,7 @@ export default function Dashboard() {
               }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 via-purple-700/60 to-purple-500/40"></div>
-              <IconContainer size="lg" className="bg-gradient-to-br from-white/25 to-white/15 text-white border-white/20 backdrop-blur-md shadow-lg">
+              <IconContainer size="lg" variant="info" className="backdrop-blur-md shadow-lg">
                 <BarChart3 className={`${iconSizes.lg} drop-shadow-lg`} />
               </IconContainer>
               <div className="relative z-10 text-center">
@@ -183,7 +183,7 @@ export default function Dashboard() {
               {hasProfile && (
                 <div className="absolute top-2 right-2 w-3 h-3 bg-white rounded-full shadow-lg animate-pulse"></div>
               )}
-              <IconContainer size="lg" className="bg-gradient-to-br from-white/25 to-white/15 text-white border-white/20 backdrop-blur-md shadow-lg">
+              <IconContainer size="lg" variant="success" className="backdrop-blur-md shadow-lg">
                 <Shield className={`${iconSizes.lg} drop-shadow-lg`} />
               </IconContainer>
               <div className="relative z-10 text-center">
@@ -230,7 +230,7 @@ export default function Dashboard() {
                 </div>
                 
                 <div className="text-center">
-                  <IconContainer size="md" className="bg-purple-100 text-purple-600 border-purple-200 mx-auto mb-2">
+                  <IconContainer size="md" variant="soft-warning" className="mx-auto mb-2">
                     <Zap className={iconSizes.md} />
                   </IconContainer>
                   <div className="text-sm font-semibold text-purple-600">Отлично</div>

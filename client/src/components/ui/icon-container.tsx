@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 interface IconContainerProps {
   children: ReactNode;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
-  variant?: "primary" | "secondary" | "success" | "warning" | "danger" | "info" | "neutral";
+  variant?: "primary" | "secondary" | "success" | "warning" | "danger" | "info" | "neutral" | "soft-primary" | "soft-success" | "soft-info" | "soft-warning" | "soft-danger" | "soft-neutral";
   className?: string;
 }
 
@@ -32,13 +32,22 @@ export function IconContainer({
   };
 
   const variantClasses = {
-    primary: "bg-medical-blue/15 text-medical-blue border border-medical-blue/20",
-    secondary: "bg-trust-green/15 text-trust-green border border-trust-green/20", 
-    success: "bg-emerald-100 text-emerald-600 border border-emerald-200",
-    warning: "bg-amber-100 text-amber-600 border border-amber-200",
-    danger: "bg-red-100 text-red-600 border border-red-200",
-    info: "bg-blue-100 text-blue-600 border border-blue-200",
-    neutral: "bg-gray-100 text-gray-600 border border-gray-200",
+    // Контрастные варианты (белый текст на цветном фоне)
+    primary: "bg-medical-blue text-white border border-medical-blue/20 shadow-sm",
+    secondary: "bg-trust-green text-white border border-trust-green/20 shadow-sm", 
+    success: "bg-emerald-500 text-white border border-emerald-600/20 shadow-sm",
+    warning: "bg-amber-500 text-white border border-amber-600/20 shadow-sm",
+    danger: "bg-red-500 text-white border border-red-600/20 shadow-sm",
+    info: "bg-blue-500 text-white border border-blue-600/20 shadow-sm",
+    neutral: "bg-gray-500 text-white border border-gray-600/20 shadow-sm",
+    
+    // Мягкие варианты (цветной текст на светлом фоне)
+    "soft-primary": "bg-medical-blue/10 text-medical-blue border border-medical-blue/20",
+    "soft-success": "bg-emerald-50 text-emerald-700 border border-emerald-200",
+    "soft-info": "bg-blue-50 text-blue-700 border border-blue-200",
+    "soft-warning": "bg-amber-50 text-amber-700 border border-amber-200",
+    "soft-danger": "bg-red-50 text-red-700 border border-red-200",
+    "soft-neutral": "bg-gray-50 text-gray-700 border border-gray-200",
   };
 
   return (
