@@ -51,14 +51,14 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
       <MobileNav />
       
-      <main className="px-3 py-4 pb-24">
+      <main className="p-4 pb-24">
         {/* Modern Medical Header */}
-        <div className="mb-6">
+        <div className="mb-4">
           <div className="bg-gradient-to-r from-medical-blue via-blue-500 to-trust-green relative overflow-hidden rounded-2xl">
             <div className="absolute inset-0 opacity-10">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] bg-[length:20px_20px]"></div>
             </div>
-            <div className="relative p-5 text-white">
+            <div className="relative p-4 text-white">
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-xl font-bold mb-1">
@@ -74,7 +74,7 @@ export default function Dashboard() {
               </div>
               
               {!hasProfile && (
-                <div className="mt-4 p-3 bg-white/15 rounded-xl backdrop-blur-sm border border-white/20">
+                <div className="mt-3 p-3 bg-white/15 rounded-xl backdrop-blur-sm border border-white/20">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-white text-sm font-semibold">Создайте профиль здоровья</p>
@@ -96,7 +96,7 @@ export default function Dashboard() {
         </div>
 
         {/* Main Action Cards - 2x2 Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-4">
           {/* AI Doctor */}
           <Link href="/chat">
             <button

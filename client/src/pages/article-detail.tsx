@@ -261,7 +261,7 @@ export default function ArticleDetail() {
             style={{ backgroundImage: `url(${article.imageUrl})` }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-            <div className="absolute bottom-4 left-4 right-4">
+            <div className="absolute bottom-3 left-3 right-3">
               <div className="flex items-center gap-3 mb-2">
                 <Badge className="bg-white/20 backdrop-blur-sm text-white border-0">
                   {categoryNames[article.category as keyof typeof categoryNames]}
