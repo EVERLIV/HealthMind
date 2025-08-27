@@ -262,129 +262,186 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
         </Badge>
       </div>
 
-      {/* Категории в сетке для мобильных */}
-      <div className="mb-4">
-        <div className="grid grid-cols-3 gap-2">
-          {smartCategories.slice(0, showAllCategories ? undefined : 6).map(cat => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`
-                px-3 py-2.5 rounded-xl text-xs font-medium transition-all flex flex-col items-center gap-1
-                ${selectedCategory === cat 
-                  ? 'bg-medical-blue text-white shadow-lg' 
-                  : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'}
-              `}
-            >
-              {cat === "all" ? (
-                <>
-                  <BookOpen className="w-4 h-4" />
-                  <span>Все</span>
-                </>
-              ) : (
-                <>
-                  {categoryIcons[cat as keyof typeof categoryIcons]}
-                  <span className="text-[10px] leading-tight text-center">
-                    {categoryNames[cat as keyof typeof categoryNames]}
-                  </span>
-                  {userGoals.includes(cat) && (
-                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full absolute top-1 right-1" />
+      {/* Категории в креативном дизайне */}
+      <div className="mb-6">
+        <div className="grid grid-cols-2 gap-3">
+          {smartCategories.slice(0, showAllCategories ? undefined : 6).map((cat, index) => {
+            const isSelected = selectedCategory === cat;
+            const gradients = [
+              'from-rose-400 to-pink-600',
+              'from-violet-400 to-purple-600', 
+              'from-sky-400 to-blue-600',
+              'from-emerald-400 to-green-600',
+              'from-amber-400 to-orange-600',
+              'from-indigo-400 to-blue-600'
+            ];
+            const gradient = gradients[index % gradients.length];
+            
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`
+                  relative overflow-hidden rounded-2xl transition-all duration-300 transform
+                  ${isSelected 
+                    ? 'scale-105 shadow-2xl' 
+                    : 'hover:scale-105 hover:shadow-xl shadow-lg'}
+                `}
+              >
+                {/* Фоновый градиент */}
+                <div className={`
+                  absolute inset-0 bg-gradient-to-br ${isSelected ? 'from-medical-blue to-trust-green' : gradient} 
+                  ${isSelected ? 'opacity-100' : 'opacity-90'}
+                `} />
+                
+                {/* Декоративные круги */}
+                <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-xl" />
+                <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-white/10 rounded-full blur-lg" />
+                
+                {/* Контент категории */}
+                <div className="relative px-4 py-4 flex items-center gap-3">
+                  {cat === "all" ? (
+                    <>
+                      <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                        <BookOpen className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <p className="text-white font-bold text-sm">Все статьи</p>
+                        <p className="text-white/80 text-xs mt-0.5">{articlesArray.length} материалов</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                        {categoryIcons[cat as keyof typeof categoryIcons]}
+                      </div>
+                      <div className="flex-1 text-left">
+                        <p className="text-white font-bold text-sm">
+                          {categoryNames[cat as keyof typeof categoryNames]}
+                        </p>
+                        <p className="text-white/80 text-xs mt-0.5">
+                          {articlesArray.filter(a => a.category === cat).length} статей
+                        </p>
+                      </div>
+                    </>
                   )}
-                </>
-              )}
-            </button>
-          ))}
+                  
+                  {/* Метка для ваших целей */}
+                  {userGoals.includes(cat) && (
+                    <div className="absolute top-2 right-2">
+                      <div className="w-6 h-6 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center">
+                        <Sparkles className="w-3.5 h-3.5 text-white" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
+        
         {smartCategories.length > 6 && (
           <button 
             onClick={() => setShowAllCategories(!showAllCategories)}
-            className="w-full mt-2 py-2 text-xs text-medical-blue font-medium"
+            className="w-full mt-3 py-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-xl text-gray-700 dark:text-gray-300 font-medium text-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2"
           >
-            {showAllCategories ? 'Свернуть' : `Еще ${smartCategories.length - 6} категорий`}
+            <Eye className="w-4 h-4" />
+            {showAllCategories ? 'Свернуть' : `Показать еще ${smartCategories.length - 6} категорий`}
           </button>
         )}
       </div>
 
-      {/* Список статей с картинками */}
-      <div className="space-y-4">
+      {/* Качественные карточки статей с фото */}
+      <div className="space-y-5">
         {smartArticles.slice(0, 4).map((article) => (
           <Link key={article.id} href={`/article/${article.id}`}>
             <Card 
-              className="border-0 shadow-lg bg-white dark:bg-slate-800 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+              className="border-0 shadow-xl bg-white dark:bg-slate-800 hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden group"
             >
               <div className="relative">
-              {/* Картинка превью */}
-              {article.imageUrl && (
-                <div 
-                  className="h-32 bg-cover bg-center relative"
-                  style={{
-                    backgroundImage: `url(${article.imageUrl})`,
-                  }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  
-                  {/* Бейджи на картинке */}
-                  <div className="absolute top-2 left-2 flex gap-2">
-                    {article.trending && (
-                      <Badge className="bg-orange-500 text-white border-0 text-xs px-2 py-0.5">
-                        <TrendingUp className="w-3 h-3 mr-1" />
-                        В тренде
-                      </Badge>
-                    )}
-                    {article.new && (
-                      <Badge className="bg-green-500 text-white border-0 text-xs px-2 py-0.5">
-                        Новое
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  {/* Время чтения на картинке */}
-                  <div className="absolute bottom-2 right-2">
-                    <Badge className="bg-black/50 text-white backdrop-blur-sm border-0 text-xs">
-                      <Clock className="w-3 h-3 mr-1" />
-                      {article.readTime}
-                    </Badge>
-                  </div>
-                </div>
-              )}
-              
-              {/* Контент статьи */}
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <IconContainer 
-                    size="sm" 
-                    variant={categoryColors[article.category as keyof typeof categoryColors]}
-                    className="flex-shrink-0"
-                  >
-                    {article.icon}
-                  </IconContainer>
-                  
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-sm mb-1 line-clamp-2">
-                      {article.title}
-                    </h3>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-                      {article.description}
-                    </p>
+                {/* Качественное фото превью */}
+                {article.imageUrl && (
+                  <div className="relative overflow-hidden">
+                    <div 
+                      className="h-52 bg-cover bg-center relative group-hover:scale-105 transition-transform duration-500"
+                      style={{
+                        backgroundImage: `url(${article.imageUrl})`,
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    </div>
                     
-                    {/* Мета информация */}
-                    <div className="flex items-center justify-between">
-                      <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                        {categoryNames[article.category as keyof typeof categoryNames]}
-                      </Badge>
+                    {/* Оверлей с информацией */}
+                    <div className="absolute inset-0">
+                      {/* Бейджи сверху */}
+                      <div className="absolute top-4 left-4 flex gap-2">
+                        {article.trending && (
+                          <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 text-xs px-3 py-1 shadow-lg backdrop-blur-sm">
+                            <TrendingUp className="w-3.5 h-3.5 mr-1.5" />
+                            Тренд
+                          </Badge>
+                        )}
+                        {article.new && (
+                          <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 text-xs px-3 py-1 shadow-lg backdrop-blur-sm">
+                            <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                            Новое
+                          </Badge>
+                        )}
+                      </div>
                       
-                      {userGoals.some(g => article.goals.includes(g)) && (
-                        <Badge className="bg-green-50 text-green-700 border-green-200 text-xs px-2 py-0.5">
-                          <Target className="w-3 h-3 mr-1" />
-                          Для вас
-                        </Badge>
-                      )}
+                      {/* Информация внизу картинки */}
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <div className="flex items-center gap-3 text-white">
+                          <Badge className="bg-white/20 backdrop-blur-md text-white border-0 text-xs px-3 py-1">
+                            {categoryNames[article.category as keyof typeof categoryNames]}
+                          </Badge>
+                          <span className="text-xs flex items-center gap-1 text-white/90">
+                            <Clock className="w-3.5 h-3.5" />
+                            {article.readTime}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </div>
-          </Card>
+                )}
+                
+                {/* Контент статьи */}
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="font-bold text-lg mb-2.5 line-clamp-2 group-hover:text-medical-blue transition-colors">
+                        {article.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                        {article.description}
+                      </p>
+                    </div>
+                    
+                    {/* Нижняя часть карточки */}
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+                      <div className="flex items-center gap-3">
+                        {userGoals.some(g => article.goals.includes(g)) && (
+                          <Badge className="bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border-green-200 text-xs px-3 py-1">
+                            <Target className="w-3.5 h-3.5 mr-1.5" />
+                            Рекомендуем
+                          </Badge>
+                        )}
+                        {article.author && (
+                          <span className="text-xs text-muted-foreground">
+                            {article.author}
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center gap-1.5 text-xs text-medical-blue font-medium">
+                        <span>Читать</span>
+                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </div>
+            </Card>
           </Link>
         ))}
       </div>
