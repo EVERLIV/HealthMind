@@ -248,6 +248,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const openaiService = new OpenAIVisionService(openaiApiKey);
       const extractedText = await openaiService.extractTextFromImage(imageBase64, mimeType);
       
+      console.log('Extracted text length:', extractedText?.length);
+      console.log('Extracted text preview:', extractedText?.substring(0, 200));
+      
       res.json({ extractedText });
     } catch (error) {
       console.error("Error extracting text with OpenAI Vision:", error);
