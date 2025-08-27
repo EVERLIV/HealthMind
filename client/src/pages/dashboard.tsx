@@ -9,6 +9,7 @@ import AnalysisResultsModal from "@/components/modals/analysis-results-modal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { IconContainer, iconSizes } from "@/components/ui/icon-container";
 import { 
   Heart, 
   Camera, 
@@ -68,9 +69,9 @@ export default function Dashboard() {
                     Добро пожаловать в HealthAI 🏥
                   </p>
                 </div>
-                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30 shadow-lg">
-                  <Stethoscope className="w-6 h-6" />
-                </div>
+                <IconContainer size="lg" className="bg-white/20 text-white border-white/30 backdrop-blur-sm shadow-lg">
+                  <Stethoscope className={iconSizes.lg} />
+                </IconContainer>
               </div>
               
               {!hasProfile && (
@@ -110,9 +111,9 @@ export default function Dashboard() {
               }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30"></div>
-              <div className="relative z-10 w-12 h-12 bg-gradient-to-br from-white/25 to-white/15 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg border border-white/20">
-                <MessageCircle className="w-6 h-6 text-white drop-shadow-lg" />
-              </div>
+              <IconContainer size="lg" className="bg-gradient-to-br from-white/25 to-white/15 text-white border-white/20 backdrop-blur-md shadow-lg">
+                <MessageCircle className={`${iconSizes.lg} drop-shadow-lg`} />
+              </IconContainer>
               <div className="relative z-10 text-center">
                 <div className="font-bold text-lg leading-tight text-white mb-0.5" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>ИИ Доктор</div>
                 <div className="text-xs font-medium text-white/90" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>24/7 Консультации</div>
@@ -133,9 +134,9 @@ export default function Dashboard() {
               }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30"></div>
-              <div className="relative z-10 w-12 h-12 bg-gradient-to-br from-white/25 to-white/15 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg border border-white/20">
-                <Camera className="w-6 h-6 text-white drop-shadow-lg" />
-              </div>
+              <IconContainer size="lg" className="bg-gradient-to-br from-white/25 to-white/15 text-white border-white/20 backdrop-blur-md shadow-lg">
+                <Camera className={`${iconSizes.lg} drop-shadow-lg`} />
+              </IconContainer>
               <div className="relative z-10 text-center">
                 <div className="font-bold text-lg leading-tight text-white mb-0.5" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>Анализ крови</div>
                 <div className="text-xs font-medium text-white/90" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>Загрузить фото</div>
@@ -156,9 +157,9 @@ export default function Dashboard() {
               }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 via-purple-700/60 to-purple-500/40"></div>
-              <div className="relative z-10 w-12 h-12 bg-gradient-to-br from-white/25 to-white/15 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg border border-white/20">
-                <BarChart3 className="w-6 h-6 text-white drop-shadow-lg" />
-              </div>
+              <IconContainer size="lg" className="bg-gradient-to-br from-white/25 to-white/15 text-white border-white/20 backdrop-blur-md shadow-lg">
+                <BarChart3 className={`${iconSizes.lg} drop-shadow-lg`} />
+              </IconContainer>
               <div className="relative z-10 text-center">
                 <div className="font-bold text-lg leading-tight text-white mb-0.5" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>Биомаркеры</div>
                 <div className="text-xs font-medium text-white/90" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>Мои показатели</div>
@@ -182,9 +183,9 @@ export default function Dashboard() {
               {hasProfile && (
                 <div className="absolute top-2 right-2 w-3 h-3 bg-white rounded-full shadow-lg animate-pulse"></div>
               )}
-              <div className="relative z-10 w-12 h-12 bg-gradient-to-br from-white/25 to-white/15 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg border border-white/20">
-                <Shield className="w-6 h-6 text-white drop-shadow-lg" />
-              </div>
+              <IconContainer size="lg" className="bg-gradient-to-br from-white/25 to-white/15 text-white border-white/20 backdrop-blur-md shadow-lg">
+                <Shield className={`${iconSizes.lg} drop-shadow-lg`} />
+              </IconContainer>
               <div className="relative z-10 text-center">
                 <div className="font-bold text-lg leading-tight text-white mb-0.5" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>Мой профиль</div>
                 <div className="text-xs font-medium text-white/90" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>
@@ -201,9 +202,9 @@ export default function Dashboard() {
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-lg flex items-center gap-2">
-                  <div className="p-2 bg-gradient-to-br from-medical-blue/15 to-trust-green/10 rounded-xl border border-medical-blue/20 shadow-sm">
-                    <Activity className="w-5 h-5 text-medical-blue" />
-                  </div>
+                  <IconContainer size="md" variant="primary">
+                    <Activity className={iconSizes.md} />
+                  </IconContainer>
                   Последние результаты
                 </h3>
                 <Badge className="bg-gradient-to-r from-medical-blue/10 to-trust-green/10 text-medical-blue border-medical-blue/20 text-xs">
@@ -213,25 +214,25 @@ export default function Dashboard() {
               
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center">
-                  <div className="p-3 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl mb-2">
-                    <TrendingUp className="w-5 h-5 text-green-600 mx-auto" />
-                  </div>
+                  <IconContainer size="md" variant="success" className="mx-auto mb-2">
+                    <TrendingUp className={iconSizes.md} />
+                  </IconContainer>
                   <div className="text-sm font-semibold text-green-600">Хорошо</div>
                   <div className="text-xs text-muted-foreground">Общее</div>
                 </div>
                 
                 <div className="text-center">
-                  <div className="p-3 bg-gradient-to-br from-blue-50 to-medical-blue/5 rounded-xl mb-2">
-                    <Heart className="w-5 h-5 text-medical-blue mx-auto" />
-                  </div>
+                  <IconContainer size="md" variant="primary" className="mx-auto mb-2">
+                    <Heart className={iconSizes.md} />
+                  </IconContainer>
                   <div className="text-sm font-semibold text-medical-blue">Норма</div>
                   <div className="text-xs text-muted-foreground">Сердце</div>
                 </div>
                 
                 <div className="text-center">
-                  <div className="p-3 bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl mb-2">
-                    <Zap className="w-5 h-5 text-purple-600 mx-auto" />
-                  </div>
+                  <IconContainer size="md" className="bg-purple-100 text-purple-600 border-purple-200 mx-auto mb-2">
+                    <Zap className={iconSizes.md} />
+                  </IconContainer>
                   <div className="text-sm font-semibold text-purple-600">Отлично</div>
                   <div className="text-xs text-muted-foreground">Энергия</div>
                 </div>
@@ -258,9 +259,9 @@ export default function Dashboard() {
           <Card className="border-0 shadow-xl bg-gradient-to-br from-orange-50 via-white to-yellow-50/30 dark:from-orange-950/20 dark:via-slate-800 dark:to-yellow-900/20">
             <CardContent className="p-5">
               <div className="flex items-start gap-4">
-                <div className="p-3 bg-gradient-to-br from-orange-500/15 to-yellow-500/10 rounded-xl border border-orange-200/50 dark:border-orange-800/50 shadow-sm">
-                  <Sparkles className="w-5 h-5 text-orange-600" />
-                </div>
+                <IconContainer size="md" variant="warning">
+                  <Sparkles className={iconSizes.md} />
+                </IconContainer>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
                     Рекомендация дня

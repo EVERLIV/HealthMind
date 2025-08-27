@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowLeft, Camera, Upload, FileText, Activity, Clock, CheckCircle, Brain, FileImage, Stethoscope, Database, Sparkles, ChevronRight, X, AlertCircle, Shield, Heart, ChevronLeft, Edit3, Save, Trash2, Plus } from "lucide-react";
+import { IconContainer, iconSizes } from "@/components/ui/icon-container";
 import { ObjectUploader } from "@/components/ObjectUploader";
 import type { UploadResult } from "@uppy/core";
 import { apiRequest } from "@/lib/queryClient";
@@ -521,9 +522,9 @@ export default function BloodAnalysisPage() {
         
         <main className="eva-page-content min-h-screen flex flex-col items-center justify-center">
           <div className="text-center space-y-6 max-w-sm">
-            <div className="w-24 h-24 bg-gradient-to-br from-trust-green/20 to-medical-blue/20 rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle className="w-12 h-12 text-trust-green" />
-            </div>
+            <IconContainer size="xl" className="bg-gradient-to-br from-trust-green/20 to-medical-blue/20 text-trust-green border-trust-green/20 mx-auto">
+              <CheckCircle className={iconSizes.xl} />
+            </IconContainer>
             <div>
               <h2 className="text-2xl font-bold mb-2">Анализ завершен!</h2>
               <p className="text-muted-foreground mb-4">
