@@ -248,21 +248,35 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
 
   return (
     <div className="mb-6">
-      {/* Заголовок секции */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-bold text-lg flex items-center gap-2">
-          <IconContainer size="sm" variant="soft-primary">
-            <BookOpen className={iconSizes.sm} />
-          </IconContainer>
-          Справочник здоровья
-        </h2>
-        <Badge className="bg-gradient-to-r from-medical-blue/10 to-trust-green/10 text-medical-blue border-medical-blue/20 text-xs">
-          <Sparkles className="w-3 h-3 mr-1" />
-          Персональная подборка
-        </Badge>
+      {/* Улучшенный заголовок секции */}
+      <div className="bg-gradient-to-r from-medical-blue/5 to-trust-green/5 rounded-2xl p-5 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-medical-blue to-trust-green rounded-xl flex items-center justify-center shadow-xl">
+              <BookOpen className="w-6 h-6 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-medical-blue to-trust-green bg-clip-text text-transparent">
+              Справочник здоровья
+            </h2>
+          </div>
+          {userGoals.length > 0 && (
+            <Badge className="bg-gradient-to-r from-medical-blue to-trust-green text-white border-0 px-4 py-1.5 shadow-xl">
+              <Sparkles className="w-4 h-4 mr-2 animate-pulse" />
+              Для вас
+            </Badge>
+          )}
+        </div>
+        {userGoals.length > 0 && (
+          <div className="flex items-center gap-2">
+            <div className="w-2.5 h-2.5 bg-trust-green rounded-full animate-pulse" />
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {smartArticles.filter(a => userGoals.some(g => a.goals.includes(g))).length} персональных рекомендаций
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* Категории в креативном дизайне */}
+      {/* Категории одинакового размера */}
       <div className="mb-6">
         <div className="grid grid-cols-2 gap-3">
           {smartCategories.slice(0, showAllCategories ? undefined : 6).map((cat, index) => {
@@ -276,64 +290,75 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
               'from-indigo-400 to-blue-600'
             ];
             const gradient = gradients[index % gradients.length];
+            const articleCount = cat === "all" ? articlesArray.length : articlesArray.filter(a => a.category === cat).length;
             
             return (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 className={`
-                  relative overflow-hidden rounded-2xl transition-all duration-300 transform
+                  relative h-28 overflow-hidden rounded-2xl transition-all duration-300 transform
                   ${isSelected 
-                    ? 'scale-105 shadow-2xl' 
+                    ? 'scale-105 shadow-2xl ring-2 ring-white ring-opacity-60' 
                     : 'hover:scale-105 hover:shadow-xl shadow-lg'}
                 `}
               >
                 {/* Фоновый градиент */}
                 <div className={`
                   absolute inset-0 bg-gradient-to-br ${isSelected ? 'from-medical-blue to-trust-green' : gradient} 
-                  ${isSelected ? 'opacity-100' : 'opacity-90'}
+                  ${isSelected ? 'opacity-100' : 'opacity-95'}
                 `} />
                 
-                {/* Декоративные круги */}
-                <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-xl" />
-                <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-white/10 rounded-full blur-lg" />
+                {/* Декоративные элементы */}
+                <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
+                <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/10 rounded-full blur-xl" />
                 
                 {/* Контент категории */}
-                <div className="relative px-4 py-4 flex items-center gap-3">
-                  {cat === "all" ? (
-                    <>
-                      <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                        <BookOpen className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="flex-1 text-left">
-                        <p className="text-white font-bold text-sm">Все статьи</p>
-                        <p className="text-white/80 text-xs mt-0.5">{articlesArray.length} материалов</p>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                        {categoryIcons[cat as keyof typeof categoryIcons]}
-                      </div>
-                      <div className="flex-1 text-left">
-                        <p className="text-white font-bold text-sm">
-                          {categoryNames[cat as keyof typeof categoryNames]}
-                        </p>
-                        <p className="text-white/80 text-xs mt-0.5">
-                          {articlesArray.filter(a => a.category === cat).length} статей
-                        </p>
-                      </div>
-                    </>
-                  )}
-                  
-                  {/* Метка для ваших целей */}
-                  {userGoals.includes(cat) && (
-                    <div className="absolute top-2 right-2">
-                      <div className="w-6 h-6 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center">
-                        <Sparkles className="w-3.5 h-3.5 text-white" />
+                <div className="relative h-full px-4 py-3 flex flex-col justify-between">
+                  {/* Верхняя часть */}
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 bg-white/25 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
+                        {cat === "all" ? (
+                          <BookOpen className="w-5 h-5 text-white" />
+                        ) : (
+                          categoryIcons[cat as keyof typeof categoryIcons]
+                        )}
                       </div>
                     </div>
-                  )}
+                    
+                    {/* Метка для ваших целей */}
+                    {userGoals.includes(cat) && (
+                      <div className="w-6 h-6 bg-white/40 backdrop-blur-sm rounded-full flex items-center justify-center animate-pulse">
+                        <Sparkles className="w-3.5 h-3.5 text-white" />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Название категории */}
+                  <div className="flex-1 flex flex-col justify-center">
+                    <p className="text-white font-bold text-sm leading-tight line-clamp-2">
+                      {cat === "all" ? "Все статьи" : categoryNames[cat as keyof typeof categoryNames]}
+                    </p>
+                  </div>
+                  
+                  {/* Нижняя часть с количеством */}
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <p className="text-white font-bold text-2xl leading-none">
+                        {articleCount}
+                      </p>
+                      <p className="text-white/70 text-[10px] mt-0.5">
+                        {articleCount === 1 ? 'статья' : articleCount < 5 ? 'статьи' : 'статей'}
+                      </p>
+                    </div>
+                    {isSelected && (
+                      <div className="flex gap-1">
+                        <div className="w-1.5 h-6 bg-white/50 rounded-full" />
+                        <div className="w-1.5 h-4 bg-white/30 rounded-full" />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </button>
             );
