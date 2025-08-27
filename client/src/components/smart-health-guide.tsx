@@ -248,28 +248,28 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
 
   return (
     <div className="mb-6">
-      {/* Улучшенный заголовок секции */}
-      <div className="bg-gradient-to-r from-medical-blue/5 to-trust-green/5 rounded-2xl p-5 mb-6">
-        <div className="flex items-center justify-between mb-3">
+      {/* Заголовок секции с правильным контрастом */}
+      <div className="bg-gradient-to-r from-medical-blue/5 to-trust-green/5 rounded-2xl p-4 mb-4">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-medical-blue to-trust-green rounded-xl flex items-center justify-center shadow-xl">
-              <BookOpen className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 bg-medical-blue rounded-xl flex items-center justify-center shadow-lg">
+              <BookOpen className="w-5 h-5 text-white" />
             </div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-medical-blue to-trust-green bg-clip-text text-transparent">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               Справочник здоровья
             </h2>
           </div>
           {userGoals.length > 0 && (
-            <Badge className="bg-gradient-to-r from-medical-blue to-trust-green text-white border-0 px-4 py-1.5 shadow-xl">
-              <Sparkles className="w-4 h-4 mr-2 animate-pulse" />
+            <Badge className="bg-gradient-to-r from-medical-blue to-trust-green text-white border-0 px-3 py-1 shadow-lg">
+              <Sparkles className="w-3 h-3 mr-1.5 animate-pulse" />
               Для вас
             </Badge>
           )}
         </div>
         {userGoals.length > 0 && (
-          <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 bg-trust-green rounded-full animate-pulse" />
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <div className="flex items-center gap-2 pl-13">
+            <div className="w-2 h-2 bg-trust-green rounded-full animate-pulse" />
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
               {smartArticles.filter(a => userGoals.some(g => a.goals.includes(g))).length} персональных рекомендаций
             </p>
           </div>
@@ -277,8 +277,8 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
       </div>
 
       {/* Компактные категории */}
-      <div className="mb-6">
-        <div className="grid grid-cols-3 gap-2">
+      <div className="mb-4">
+        <div className="grid grid-cols-3 gap-3">
           {smartCategories.slice(0, showAllCategories ? undefined : 6).map((cat, index) => {
             const isSelected = selectedCategory === cat;
             const gradients = [
@@ -360,7 +360,7 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
       </div>
 
       {/* Качественные карточки статей с фото */}
-      <div className="space-y-5">
+      <div className="space-y-4">
         {smartArticles.slice(0, 4).map((article) => (
           <Link key={article.id} href={`/article/${article.id}`}>
             <Card 
@@ -398,7 +398,7 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
                       </div>
                       
                       {/* Информация внизу картинки */}
-                      <div className="absolute bottom-4 left-4 right-4">
+                      <div className="absolute bottom-3 left-3 right-3">
                         <div className="flex items-center gap-3 text-white">
                           <Badge className="bg-white/20 backdrop-blur-md text-white border-0 text-xs px-3 py-1">
                             {categoryNames[article.category as keyof typeof categoryNames]}
@@ -414,10 +414,10 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
                 )}
                 
                 {/* Контент статьи */}
-                <CardContent className="p-6">
-                  <div className="space-y-4">
+                <CardContent className="p-4">
+                  <div className="space-y-3">
                     <div>
-                      <h3 className="font-bold text-lg mb-2.5 line-clamp-2 group-hover:text-medical-blue transition-colors">
+                      <h3 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-medical-blue transition-colors">
                         {article.title}
                       </h3>
                       <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
