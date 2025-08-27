@@ -51,7 +51,7 @@ interface HealthRecommendations {
 }
 
 export class DeepSeekService {
-  private client: OpenAI;
+  protected client: OpenAI;
 
   constructor(apiKey: string) {
     this.client = new OpenAI({
@@ -386,19 +386,135 @@ export class DeepSeekAnalysisService extends DeepSeekService {
   }
   
   async analyzeBloodTestText(text: string): Promise<any> {
-    // Legacy method for backward compatibility
-    const profile = null;
-    const bloodMarkers: any[] = [];
-    const recommendations = await this.generateHealthRecommendations(profile, bloodMarkers);
-    return {
-      markers: [],
-      supplements: [],
-      generalRecommendation: recommendations.summary,
-      riskFactors: [],
-      followUpTests: recommendations.nextSteps,
-      urgencyLevel: "low",
-      nextCheckup: "Через 3 месяца"
-    };
+    try {
+      console.log('Анализируем текст с DeepSeek:', text.substring(0, 200));
+      
+      // Parse text into structured biomarkers using AI
+      const parsePrompt = `Ты — эксперт по анализу крови. Разбери следующий текст анализа крови и извлеки все биомаркеры в структурированном формате JSON.
+
+ВАЖНО: Определи статус каждого показателя на основе нормальных значений:
+- normal: значение в пределах нормы
+- high: значение выше нормы  
+- low: значение ниже нормы
+
+Верни ТОЛЬКО валидный JSON массив биомаркеров в формате:
+[
+  {
+    "name": "Название показателя",
+    "value": "123.4",
+    "unit": "г/л",
+    "status": "normal|high|low",
+    "education": "Краткое объяснение что это такое",
+    "recommendation": "Рекомендация при отклонении"
+  }
+]
+
+Текст анализа:
+${text}`;
+
+      const parseResponse = await this.client.chat.completions.create({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: parsePrompt }
+        ],
+        temperature: 0.1,
+        max_tokens: 4000
+      });
+
+      const parseResult = parseResponse.choices[0]?.message?.content;
+      console.log('Ответ от DeepSeek (первые 500 символов):', parseResult?.substring(0, 500));
+
+      let markers: BloodMarker[] = [];
+      try {
+        // Try to parse JSON from the response
+        const jsonMatch = parseResult?.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          markers = JSON.parse(jsonMatch[0]);
+          console.log('Парсинг успешен, получены маркеры:', markers.length);
+        }
+      } catch (parseError) {
+        console.error('Ошибка парсинга JSON:', parseError);
+        // Fallback: parse manually
+        markers = this.parseTextManually(text);
+      }
+
+      // Generate recommendations based on parsed markers
+      const profile = null;
+      const recommendations = await this.generateHealthRecommendations(profile, markers);
+      
+      return {
+        markers: markers,
+        generalRecommendation: recommendations.summary,
+        riskFactors: recommendations.priorityAreas || [],
+        followUpTests: recommendations.nextSteps,
+        urgencyLevel: "low",
+        nextCheckup: "Через 3 месяца",
+        ...recommendations
+      };
+    } catch (error) {
+      console.error('Ошибка анализа текста:', error);
+      // Fallback to manual parsing
+      const markers = this.parseTextManually(text);
+      const profile = null;
+      const recommendations = await this.generateHealthRecommendations(profile, markers);
+      
+      return {
+        markers: markers,
+        generalRecommendation: recommendations.summary,
+        riskFactors: recommendations.priorityAreas || [],
+        followUpTests: recommendations.nextSteps,
+        urgencyLevel: "low",
+        nextCheckup: "Через 3 месяца",
+        ...recommendations
+      };
+    }
+  }
+
+  private parseTextManually(text: string): BloodMarker[] {
+    const lines = text.split('\n').filter(line => line.trim());
+    const markers: BloodMarker[] = [];
+    
+    lines.forEach(line => {
+      // Pattern: "Name: value unit (reference: min-max)"
+      const match = line.match(/^([^:]+):\s*([0-9.,]+)\s*([^(]*?)(?:\s*\(референс:\s*([^)]+)\))?/i);
+      
+      if (match) {
+        const [, name, value, unit, reference] = match;
+        const cleanName = name.trim();
+        const cleanValue = value.trim();
+        const cleanUnit = unit.trim();
+        
+        // Determine status based on common normal ranges
+        let status: 'normal' | 'high' | 'low' = 'normal';
+        const numValue = parseFloat(cleanValue.replace(',', '.'));
+        
+        // Basic normal range checks
+        if (cleanName.toLowerCase().includes('гемоглобин')) {
+          if (numValue < 110) status = 'low';
+          else if (numValue > 190) status = 'high';
+        } else if (cleanName.toLowerCase().includes('эритроциты')) {
+          if (numValue < 4.0) status = 'low';
+          else if (numValue > 5.5) status = 'high';
+        } else if (cleanName.toLowerCase().includes('лейкоциты')) {
+          if (numValue < 4.0) status = 'low';
+          else if (numValue > 11.0) status = 'high';
+        } else if (cleanName.toLowerCase().includes('тромбоциты')) {
+          if (numValue < 150) status = 'low';
+          else if (numValue > 450) status = 'high';
+        }
+        
+        markers.push({
+          name: cleanName,
+          value: cleanValue,
+          unit: cleanUnit,
+          status: status,
+          education: `${cleanName} - важный показатель здоровья`,
+          recommendation: status !== 'normal' ? `Обратитесь к врачу для консультации по показателю ${cleanName}` : ''
+        });
+      }
+    });
+    
+    return markers;
   }
 }
 
