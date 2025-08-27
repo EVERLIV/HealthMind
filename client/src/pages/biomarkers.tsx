@@ -486,36 +486,36 @@ export default function Biomarkers() {
                     /* Details View */
                     <>
                       <div className="text-center">
-                        <h3 className="font-bold text-lg">{selectedBiomarker?.name}</h3>
+                        <h3 className="font-bold text-lg">{(selectedBiomarker as any)?.name}</h3>
                         <p className="text-sm text-muted-foreground capitalize">
-                          {selectedBiomarker?.category}
+                          {(selectedBiomarker as any)?.category}
                         </p>
                       </div>
 
                       <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                         <h4 className="font-semibold text-sm mb-2">Описание</h4>
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                          {selectedBiomarker?.description}
+                          {(selectedBiomarker as any)?.description}
                         </p>
                       </div>
 
-                      {selectedBiomarker?.normalRange && (
+                      {(selectedBiomarker as any)?.normalRange && (
                         <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
                           <h4 className="font-semibold text-sm mb-2">Нормальные значения</h4>
                           <div className="text-lg font-bold font-mono text-green-600">
-                            {selectedBiomarker.normalRange.min} - {selectedBiomarker.normalRange.max}
+                            {(selectedBiomarker as any).normalRange.min} - {(selectedBiomarker as any).normalRange.max}
                             <span className="text-sm font-normal text-muted-foreground ml-2">
-                              {selectedBiomarker.normalRange.unit}
+                              {(selectedBiomarker as any).normalRange.unit}
                             </span>
                           </div>
                         </div>
                       )}
 
-                      {selectedBiomarker?.recommendations && selectedBiomarker.recommendations.length > 0 && (
+                      {(selectedBiomarker as any)?.recommendations && (selectedBiomarker as any).recommendations.length > 0 && (
                         <div>
                           <h4 className="font-semibold text-sm mb-2">Рекомендации</h4>
                           <div className="space-y-2">
-                            {selectedBiomarker.recommendations.map((rec: string, index: number) => (
+                            {(selectedBiomarker as any).recommendations.map((rec: string, index: number) => (
                               <div key={index} className="flex items-start gap-2 p-2 bg-green-50 dark:bg-green-950/20 rounded-lg">
                                 <CheckCircle className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
                                 <span className="text-xs leading-relaxed">{rec}</span>
@@ -541,7 +541,7 @@ export default function Biomarkers() {
                     /* History View */
                     <>
                       <div className="text-center">
-                        <h3 className="font-bold text-lg">{selectedBiomarker?.name}</h3>
+                        <h3 className="font-bold text-lg">{(selectedBiomarker as any)?.name}</h3>
                         <p className="text-sm text-muted-foreground">История результатов</p>
                       </div>
 
