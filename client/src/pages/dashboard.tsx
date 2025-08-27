@@ -3,8 +3,7 @@ import { useLocation, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import MobileNav from "@/components/layout/mobile-nav";
 import BottomNav from "@/components/layout/bottom-nav";
-import BloodAnalysisCard from "@/components/cards/blood-analysis-card";
-import AsklepiosScoreCard from "@/components/cards/asklepios-score-card";
+import SmartHealthGuide from "@/components/smart-health-guide";
 import AnalysisResultsModal from "@/components/modals/analysis-results-modal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -196,63 +195,6 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        {/* Latest Results Summary */}
-        {hasProfile && (
-          <Card className="border-0 shadow-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm mb-6">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-lg flex items-center gap-2">
-                  <IconContainer size="md" variant="primary">
-                    <Activity className={iconSizes.md} />
-                  </IconContainer>
-                  Последние результаты
-                </h3>
-                <Badge className="bg-gradient-to-r from-medical-blue/10 to-trust-green/10 text-medical-blue border-medical-blue/20 text-xs">
-                  Обновлено
-                </Badge>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center">
-                  <IconContainer size="md" variant="success" className="mx-auto mb-2">
-                    <TrendingUp className={iconSizes.md} />
-                  </IconContainer>
-                  <div className="text-sm font-semibold text-green-600">Хорошо</div>
-                  <div className="text-xs text-muted-foreground">Общее</div>
-                </div>
-                
-                <div className="text-center">
-                  <IconContainer size="md" variant="primary" className="mx-auto mb-2">
-                    <Heart className={iconSizes.md} />
-                  </IconContainer>
-                  <div className="text-sm font-semibold text-medical-blue">Норма</div>
-                  <div className="text-xs text-muted-foreground">Сердце</div>
-                </div>
-                
-                <div className="text-center">
-                  <IconContainer size="md" variant="soft-warning" className="mx-auto mb-2">
-                    <Zap className={iconSizes.md} />
-                  </IconContainer>
-                  <div className="text-sm font-semibold text-purple-600">Отлично</div>
-                  <div className="text-xs text-muted-foreground">Энергия</div>
-                </div>
-              </div>
-              
-              <div className="mt-4 pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
-                <Link href="/biomarkers">
-                  <Button 
-                    variant="outline" 
-                    className="w-full rounded-xl border-2 hover:shadow-md transition-all duration-200"
-                  >
-                    <BarChart3 className="w-4 h-4 mr-2" />
-                    Подробная статистика
-                    <ChevronRight className="w-4 h-4 ml-auto" />
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Health Insights */}
         <div className="mb-6">
@@ -282,15 +224,11 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Latest Blood Analysis Card - Streamlined */}
-        {latestAnalysis && (
-          <div className="mb-6">
-            <BloodAnalysisCard 
-              analysis={latestAnalysis} 
-              onViewResults={() => setIsAnalysisOpen(true)}
-            />
-          </div>
-        )}
+        {/* Умный справочник здоровья */}
+        <SmartHealthGuide 
+          userGoals={hasProfile ? ["heart-health", "weight-loss", "energy"] : []}
+          userBiomarkers={latestAnalysis?.biomarkerResults || []}
+        />
 
       </main>
 
