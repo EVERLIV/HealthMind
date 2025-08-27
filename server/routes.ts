@@ -228,15 +228,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Received MIME type:', mimeType);
       console.log('Image data length:', imageBase64?.length);
 
-      // Validate that we received an image
+      // Check API keys first before validating image
+      const openaiApiKey = process.env.OPENAI_API_KEY;
+      const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
+      
+      if (!openaiApiKey && !deepseekApiKey) {
+        return res.status(500).json({ 
+          error: "API ключи не настроены. Обратитесь к администратору.",
+          fallback: "configuration_error"
+        });
+      }
+      
+      if (!openaiApiKey) {
+        // Fallback: suggest manual text input since we don't have OpenAI for OCR
+        return res.status(400).json({ 
+          error: "Для анализа изображений требуется ключ OpenAI API. Попробуйте ввести данные анализа вручную в текстовом режиме.",
+          fallback: "text_input_required"
+        });
+      }
+
+      // Validate that we received an image (only if we have OpenAI API)
       if (!mimeType?.startsWith('image/') || !imageBase64 || imageBase64.length < 1000) {
         return res.status(400).json({ 
           error: "Invalid image data. Please upload a valid image file (PNG, JPG, GIF, WEBP)" 
         });
       }
-
-      const openaiApiKey = process.env.OPENAI_API_KEY;
-      const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
       
       // Use OpenAI for OCR if available, otherwise use DeepSeek with text input suggestion
       if (openaiApiKey) {
