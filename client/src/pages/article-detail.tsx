@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { IconContainer, iconSizes } from "@/components/ui/icon-container";
 import BottomNav from "@/components/layout/bottom-nav";
+import { articlesDatabase } from "@/data/articles";
 import {
   ChevronLeft,
   Clock,
@@ -27,28 +28,6 @@ import {
   MessageCircle,
   ThumbsUp
 } from "lucide-react";
-
-interface Article {
-  id: string;
-  title: string;
-  description: string;
-  readTime: string;
-  category: string;
-  goals: string[];
-  relevanceScore: number;
-  icon: React.ReactNode;
-  imageUrl?: string;
-  content?: string;
-  tips?: string[];
-  warnings?: string[];
-  author?: string;
-  publishDate?: string;
-  sections?: {
-    title: string;
-    content: string;
-  }[];
-  relatedArticles?: string[];
-}
 
 const categoryNames = {
   "weight-loss": "Снижение веса",
@@ -89,8 +68,8 @@ const categoryColors = {
   "recovery": "soft-primary"
 } as const;
 
-// Расширенная база статей с детальным контентом
-const articlesDatabase: Record<string, Article> = {
+// Статьи импортируются из общей базы данных
+/* const articlesDatabase: Record<string, Article> = {
   "1": {
     id: "1",
     title: "5 способов снизить холестерин без лекарств",
@@ -202,6 +181,7 @@ const articlesDatabase: Record<string, Article> = {
     publishDate: "2024-01-20"
   }
 };
+*/
 
 export default function ArticleDetail() {
   const params = useParams();
