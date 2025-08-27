@@ -363,6 +363,8 @@ export default function BloodAnalysisPage() {
         return `${b.name}: ${b.value} ${b.unit}`;
       }).join('\n');
 
+      // Закрываем модальное окно и показываем прогресс анализа
+      setShowBiomarkerEditor(false);
       updateProcessingState('analyzing', 75, 'Анализируем данные...', 'DeepSeek AI обрабатывает биомаркеры');
       
       await analyzeTextMutation.mutateAsync({
@@ -370,11 +372,17 @@ export default function BloodAnalysisPage() {
         text: textForAnalysis,
       });
       
-      setShowBiomarkerEditor(false);
+      // Очищаем состояние после успешного анализа (это будет выполнено в onSuccess)
       setBiomarkers([]);
       setCurrentAnalysisId(null);
     } catch (error) {
       console.error('Ошибка анализа:', error);
+      updateProcessingState('idle', 0, 'Ошибка анализа');
+      toast({
+        title: "Ошибка",
+        description: "Не удалось обработать данные. Попробуйте еще раз.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -567,7 +575,7 @@ export default function BloodAnalysisPage() {
     <div className="eva-page">
       <main className="eva-page-content pt-6">
         {/* Processing indicator - shown during processing */}
-        {processingState.stage !== 'idle' && processingState.stage !== 'complete' && (
+        {['uploading', 'recognizing', 'analyzing', 'saving'].includes(processingState.stage) && (
           <ProcessingStages />
         )}
 
@@ -1041,31 +1049,18 @@ export default function BloodAnalysisPage() {
                 </div>
 
                 {/* Footer Actions */}
-                <div className="bg-gray-50 p-4 border-t border-gray-100">
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setShowBiomarkerEditor(false);
-                        setShowTextReview(true);
-                      }}
-                      className="min-h-[52px] flex-1 rounded-2xl border-2"
-                    >
-                      <Edit3 className="w-4 h-4 mr-2" />
-                      Редактировать текст
-                    </Button>
+                <div className="bg-gray-50 p-4 pb-8 sm:pb-4 border-t border-gray-100">
+                  <div className="flex flex-col gap-3">
                     <Button
                       onClick={handleConfirmBiomarkers}
                       disabled={biomarkers.filter(b => b.name.trim() && b.value.trim()).length === 0}
-                      className="min-h-[52px] flex-1 bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white rounded-2xl shadow-lg"
+                      className="min-h-[52px] w-full bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white rounded-2xl shadow-lg"
                       data-testid="button-confirm-biomarkers"
                     >
                       <CheckCircle className="w-5 h-5 mr-2" />
-                      Анализировать с ИИ
+                      Получить рекомендации ИИ
                       <ChevronRight className="w-4 h-4 ml-2" />
                     </Button>
-                  </div>
-                  <div className="flex justify-center mt-3">
                     <Button
                       variant="ghost"
                       onClick={() => {
@@ -1074,7 +1069,7 @@ export default function BloodAnalysisPage() {
                         navigator.clipboard.writeText(exportData);
                         toast({ title: "Скопировано", description: "Результаты скопированы в буфер обмена" });
                       }}
-                      className="text-sm text-gray-500 hover:text-gray-700"
+                      className="text-sm text-gray-500 hover:text-gray-700 min-h-[44px]"
                     >
                       📋 Экспорт результатов
                     </Button>
