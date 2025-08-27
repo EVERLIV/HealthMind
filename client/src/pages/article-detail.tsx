@@ -398,35 +398,52 @@ export default function ArticleDetail() {
           
           {/* Похожие статьи */}
           {article.relatedArticles && article.relatedArticles.length > 0 && (
-            <div className="mt-8">
-              <h3 className="font-bold text-lg mb-4">Читайте также</h3>
-              <div className="space-y-3">
+            <div className="mt-12">
+              <h3 className="font-bold text-xl mb-6">Читайте также</h3>
+              <div className="grid grid-cols-1 gap-4">
                 {article.relatedArticles.map(relatedId => {
                   const related = articlesDatabase[relatedId];
                   if (!related) return null;
                   
                   return (
                     <Link key={relatedId} href={`/article/${relatedId}`}>
-                      <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer">
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-3">
-                            <IconContainer 
-                              size="sm" 
-                              variant={categoryColors[related.category as keyof typeof categoryColors]}
+                      <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group">
+                        <div className="flex h-32">
+                          {/* Изображение статьи */}
+                          {related.imageUrl && (
+                            <div 
+                              className="w-32 h-32 bg-cover bg-center flex-shrink-0"
+                              style={{ backgroundImage: `url(${related.imageUrl})` }}
                             >
-                              {categoryIcons[related.category as keyof typeof categoryIcons]}
-                            </IconContainer>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-semibold text-sm mb-1">{related.title}</h4>
-                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <span>{categoryNames[related.category as keyof typeof categoryNames]}</span>
-                                <span>•</span>
-                                <span>{related.readTime}</span>
-                              </div>
+                              <div className="w-full h-full bg-gradient-to-r from-black/30 to-transparent group-hover:from-black/40 transition-all duration-300" />
                             </div>
-                            <ChevronLeft className="w-4 h-4 text-gray-400 rotate-180" />
-                          </div>
-                        </CardContent>
+                          )}
+                          
+                          {/* Контент карточки */}
+                          <CardContent className="flex-1 p-5 flex flex-col justify-between">
+                            <div>
+                              <h4 className="font-bold text-base mb-2 line-clamp-2 group-hover:text-medical-blue transition-colors">
+                                {related.title}
+                              </h4>
+                              <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                                {related.description}
+                              </p>
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <Badge variant="secondary" className="text-xs">
+                                  {categoryNames[related.category as keyof typeof categoryNames]}
+                                </Badge>
+                                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <Clock className="w-3 h-3" />
+                                  {related.readTime}
+                                </span>
+                              </div>
+                              <ChevronLeft className="w-5 h-5 text-gray-400 rotate-180 group-hover:translate-x-1 transition-transform" />
+                            </div>
+                          </CardContent>
+                        </div>
                       </Card>
                     </Link>
                   );
