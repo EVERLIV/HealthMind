@@ -82,15 +82,19 @@ export default function BloodAnalysisPage() {
 
   const extractTextMutation = useMutation({
     mutationFn: async ({ analysisId, imageBase64, mimeType }: { analysisId: string; imageBase64: string; mimeType?: string }) => {
+      console.log('Sending extract text request...');
       const response = await apiRequest("POST", `/api/blood-analyses/${analysisId}/extract-text`, {
         imageBase64,
         mimeType,
       });
-      return response.json();
+      const result = await response.json();
+      console.log('Extract text result:', result);
+      return result;
     },
     onSuccess: (result) => {
+      console.log('Extract text success, extracted text:', result.extractedText);
       updateProcessingState('idle', 0, '');
-      setExtractedText(result.extractedText);
+      setExtractedText(result.extractedText || '');
       setShowTextReview(true);
       toast({
         title: "Текст распознан",
@@ -98,6 +102,7 @@ export default function BloodAnalysisPage() {
       });
     },
     onError: (error: any) => {
+      console.error('Extract text error:', error);
       updateProcessingState('idle', 0, 'Ошибка распознавания');
       toast({
         title: "Ошибка",
@@ -608,62 +613,113 @@ export default function BloodAnalysisPage() {
           )}
 
 
-          {/* Text Review Modal */}
+          {/* Text Review Interface */}
           {showTextReview && (
-            <Card className="mt-6 border-2 border-trust-green">
-              <CardHeader className="bg-gradient-to-r from-trust-green/10 to-medical-blue/10">
-                <h3 className="text-lg font-semibold text-medical-dark flex items-center">
-                  <CheckCircle className="w-5 h-5 mr-2 text-trust-green" />
-                  Распознанный текст
-                </h3>
-                <p className="text-sm text-gray-600 mt-1">
-                  Проверьте распознанные данные и при необходимости отредактируйте их перед анализом
-                </p>
-              </CardHeader>
-              <CardContent className="p-4 space-y-4">
-                <Textarea
-                  data-testid="textarea-extracted-text"
-                  value={extractedText}
-                  onChange={(e) => setExtractedText(e.target.value)}
-                  className="min-h-[300px] text-sm font-mono"
-                  placeholder="Распознанный текст появится здесь..."
-                />
-                
-                <div className="flex gap-2">
+            <Card className="mt-6 border-2 border-trust-green shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-trust-green to-medical-blue text-white">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <FileText className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold">Распознанный текст</h3>
+                      <p className="text-white/90 text-sm">
+                        Распознано {extractedText.length} символов
+                      </p>
+                    </div>
+                  </div>
                   <Button
-                    data-testid="button-confirm-analysis"
-                    onClick={handleConfirmExtractedText}
-                    className="flex-1 bg-trust-green hover:bg-trust-green/90"
-                  >
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    Подтвердить и анализировать
-                  </Button>
-                  <Button
-                    data-testid="button-cancel-review"
                     onClick={() => {
                       setShowTextReview(false);
                       setExtractedText('');
                       setCurrentAnalysisId(null);
                     }}
-                    variant="outline"
-                    className="flex-1"
+                    variant="ghost"
+                    size="sm"
+                    className="text-white hover:bg-white/20"
                   >
-                    <X className="w-4 h-4 mr-2" />
-                    Отмена
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              
+              <CardContent className="p-4 space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-700">
+                    Проверьте и отредактируйте данные:
+                  </label>
+                  <Textarea
+                    data-testid="textarea-extracted-text"
+                    value={extractedText}
+                    onChange={(e) => setExtractedText(e.target.value)}
+                    className="min-h-[300px] text-sm font-mono"
+                    placeholder="Распознанный текст появится здесь..."
+                  />
+                </div>
+                
+                {/* Stats */}
+                {extractedText && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <div className="grid grid-cols-3 gap-2 text-xs text-center">
+                      <div>
+                        <div className="font-semibold text-blue-900">Строк</div>
+                        <div className="text-blue-600 font-bold">
+                          {extractedText.split('\n').filter(line => line.trim()).length}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-semibold text-blue-900">Показателей</div>
+                        <div className="text-blue-600 font-bold">
+                          {extractedText.split('\n').filter(line => 
+                            line.includes(':') && line.match(/\d+[.,]?\d*/)
+                          ).length}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-semibold text-blue-900">Единиц</div>
+                        <div className="text-blue-600 font-bold">
+                          {(extractedText.match(/(г\/л|мг\/дл|ммоль\/л|мкмоль\/л|%|х10|x10)/gi) || []).length}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    data-testid="button-confirm-analysis"
+                    onClick={handleConfirmExtractedText}
+                    disabled={!extractedText.trim() || extractedText.length < 10}
+                    className="flex-1 bg-trust-green hover:bg-trust-green/90"
+                  >
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Анализировать с ИИ
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setShowTextReview(false);
+                      setExtractedText('');
+                      setCurrentAnalysisId(null);
+                      setAnalysisMode('text');
+                    }}
+                    variant="outline"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    Ручной ввод
                   </Button>
                 </div>
                 
+                {/* Tips */}
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                  <div className="flex items-start space-x-2">
-                    <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5" />
-                    <div className="text-sm text-amber-700">
-                      <p className="font-semibold mb-1">Совет:</p>
-                      <ul className="space-y-1">
-                        <li>• Убедитесь, что все показатели правильно распознаны</li>
-                        <li>• Проверьте числовые значения и единицы измерения</li>
-                        <li>• Можете добавить пропущенные показатели вручную</li>
-                      </ul>
-                    </div>
+                  <div className="text-sm text-amber-800">
+                    <p className="font-semibold mb-1">💡 Советы:</p>
+                    <ul className="space-y-1 text-xs">
+                      <li>• Проверьте числовые значения</li>
+                      <li>• Убедитесь в правильности единиц измерения</li>
+                      <li>• Добавьте пропущенные показатели</li>
+                    </ul>
                   </div>
                 </div>
               </CardContent>
