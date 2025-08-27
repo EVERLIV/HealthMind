@@ -218,110 +218,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/blood-analyses/:id/analyze-image", async (req, res) => {
+  // Extract text from image using OpenAI Vision (OCR step)
+  app.post("/api/blood-analyses/:id/extract-text", async (req, res) => {
     try {
       const { imageBase64, mimeType } = req.body;
       if (!imageBase64) {
         return res.status(400).json({ error: "Image data is required" });
       }
 
-      console.log('Received MIME type:', mimeType);
+      console.log('Extracting text from image, MIME type:', mimeType);
       console.log('Image data length:', imageBase64?.length);
 
-      // Check API keys first before validating image
       const openaiApiKey = process.env.OPENAI_API_KEY;
-      const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
-      
-      if (!openaiApiKey && !deepseekApiKey) {
+      if (!openaiApiKey) {
         return res.status(500).json({ 
-          error: "API ключи не настроены. Обратитесь к администратору.",
+          error: "OpenAI API key not configured",
           fallback: "configuration_error"
         });
       }
-      
-      if (!openaiApiKey) {
-        // Fallback: suggest manual text input since we don't have OpenAI for OCR
-        return res.status(400).json({ 
-          error: "Для анализа изображений требуется ключ OpenAI API. Попробуйте ввести данные анализа вручную в текстовом режиме.",
-          fallback: "text_input_required"
-        });
-      }
 
-      // Validate that we received an image (only if we have OpenAI API)
+      // Validate that we received an image
       if (!mimeType?.startsWith('image/') || !imageBase64 || imageBase64.length < 1000) {
         return res.status(400).json({ 
           error: "Invalid image data. Please upload a valid image file (PNG, JPG, GIF, WEBP)" 
         });
       }
+
+      // Use OpenAI Vision to extract text from the image
+      const openaiService = new OpenAIVisionService(openaiApiKey);
+      const extractedText = await openaiService.extractTextFromImage(imageBase64, mimeType);
       
-      // Use OpenAI for OCR if available, otherwise use DeepSeek with text input suggestion
-      if (openaiApiKey) {
-        const openaiService = new OpenAIVisionService(openaiApiKey);
-        const analysisResults = await openaiService.analyzeBloodTestImage(imageBase64, mimeType);
-        
-        // Process analysis results (existing code below)
-        // Update blood analysis with results
-        const updatedAnalysis = await storage.updateBloodAnalysis(req.params.id, {
-          status: "analyzed",
-          analyzedAt: new Date(),
-          results: analysisResults,
-        });
-
-        // Create biomarker results from analysis
-        if (analysisResults.markers && analysisResults.markers.length > 0) {
-          for (const marker of analysisResults.markers) {
-            // Find existing biomarker or create a new one
-            const existingBiomarkers = await storage.getAllBiomarkers();
-            let biomarker = existingBiomarkers.find(b => 
-              b.name.toLowerCase() === marker.name.toLowerCase()
-            );
-            
-            if (!biomarker) {
-              // Create new biomarker if it doesn't exist
-              const newBiomarker = {
-                name: marker.name,
-                description: marker.education || "Biomarker information",
-                normalRange: {
-                  min: 0,
-                  max: 0,
-                  unit: "" 
-                },
-                category: "general" as const,
-                importance: "medium" as const,
-                recommendations: marker.recommendation ? [marker.recommendation] : [],
-              };
-              biomarker = await storage.createBiomarker(newBiomarker);
-            }
-
-            // Create biomarker result
-            const numericValue = parseFloat(marker.value.replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
-            await storage.createBiomarkerResult({
-              analysisId: req.params.id,
-              biomarkerId: biomarker.id,
-              value: numericValue.toString(),
-              unit: marker.value.match(/[а-яА-Яa-zA-Z/]+/)?.[0] || "",
-              status: marker.status,
-            });
-          }
-        }
-
-        return res.json({ analysis: updatedAnalysis, results: analysisResults });
-      } else if (deepseekApiKey) {
-        // Fallback: suggest manual text input since we don't have OpenAI for OCR
-        return res.status(400).json({ 
-          error: "Для анализа изображений требуется ключ OpenAI API. Попробуйте ввести данные анализа вручную в текстовом режиме.",
-          fallback: "text_input_required"
-        });
-      } else {
-        return res.status(500).json({ 
-          error: "API ключи не настроены. Обратитесь к администратору.",
-          fallback: "configuration_error"
-        });
-      }
+      res.json({ extractedText });
     } catch (error) {
-      console.error("Error analyzing image with OpenAI Vision:", error);
-      res.status(500).json({ error: "Analysis failed" });
+      console.error("Error extracting text with OpenAI Vision:", error);
+      res.status(500).json({ error: "Text extraction failed" });
     }
+  });
+
+  // This endpoint is no longer used for image analysis, keeping for compatibility
+  app.post("/api/blood-analyses/:id/analyze-image", async (req, res) => {
+    return res.status(400).json({ 
+      error: "Please use the two-step process: extract text first, then analyze",
+      fallback: "deprecated_endpoint"
+    });
   });
 
   // Recommendations route

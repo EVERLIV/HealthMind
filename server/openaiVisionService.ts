@@ -24,6 +24,71 @@ export default class OpenAIVisionService {
     });
   }
 
+  async extractTextFromImage(imageBase64: string, mimeType: string = 'image/jpeg'): Promise<string> {
+    try {
+      // Validate and normalize MIME type
+      const validMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      let validatedMimeType = mimeType?.toLowerCase();
+      
+      if (!validatedMimeType || !validMimeTypes.includes(validatedMimeType)) {
+        console.log('Invalid MIME type:', mimeType, 'defaulting to image/jpeg');
+        validatedMimeType = 'image/jpeg';
+      }
+
+      const response = await this.client.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: `Вы - эксперт по распознаванию медицинских документов. Ваша задача - точно извлечь весь текст из изображения анализа крови.
+            
+            ВАЖНО:
+            - Извлеките ВСЕ текстовые данные: названия показателей, значения, единицы измерения, референсные диапазоны
+            - Сохраните структуру: каждый показатель на новой строке
+            - Включите даже рукописные заметки врача
+            - Формат вывода: простой текст, БЕЗ JSON`
+          },
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: `Извлеките ВЕСЬ текст из этого изображения анализа крови. Формат вывода:
+                
+Название показателя: значение единицы_измерения (референс: мин-макс)
+
+Например:
+Гемоглобин: 135 г/л (референс: 130-160)
+Эритроциты: 4.5 x10^12/л (референс: 4.0-5.5)
+
+Извлеките ВСЕ показатели, включая рукописные пометки.`
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:${validatedMimeType};base64,${imageBase64}`,
+                  detail: "high"
+                }
+              }
+            ]
+          }
+        ],
+        max_tokens: 2000,
+        temperature: 0.1,
+      });
+
+      const content = response.choices[0].message.content;
+      if (!content) {
+        throw new Error("Не удалось извлечь текст из изображения");
+      }
+
+      return content;
+    } catch (error) {
+      console.error("Ошибка извлечения текста с OpenAI Vision:", error);
+      throw new Error("Не удалось извлечь текст из изображения");
+    }
+  }
+
   async analyzeBloodTestImage(imageBase64: string, mimeType: string = 'image/jpeg'): Promise<AnalysisResult> {
     try {
       // Validate and normalize MIME type

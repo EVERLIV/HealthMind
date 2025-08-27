@@ -3,8 +3,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Camera, Upload, FileText, Activity, Clock, CheckCircle, Brain, FileImage, Stethoscope, Database, Sparkles, ChevronRight } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { ArrowLeft, Camera, Upload, FileText, Activity, Clock, CheckCircle, Brain, FileImage, Stethoscope, Database, Sparkles, ChevronRight, X, AlertCircle, Shield, Heart, ChevronLeft } from "lucide-react";
 import { ObjectUploader } from "@/components/ObjectUploader";
 import type { UploadResult } from "@uppy/core";
 import { apiRequest } from "@/lib/queryClient";
@@ -55,6 +55,9 @@ interface ProcessingState {
 export default function BloodAnalysisPage() {
   const [analysisMode, setAnalysisMode] = useState<'photo' | 'text'>('photo');
   const [textInput, setTextInput] = useState('');
+  const [extractedText, setExtractedText] = useState('');
+  const [showTextReview, setShowTextReview] = useState(false);
+  const [currentAnalysisId, setCurrentAnalysisId] = useState<string | null>(null);
   const [processingState, setProcessingState] = useState<ProcessingState>({
     stage: 'idle',
     progress: 0,
@@ -77,45 +80,31 @@ export default function BloodAnalysisPage() {
     },
   });
 
-  const analyzeImageMutation = useMutation({
+  const extractTextMutation = useMutation({
     mutationFn: async ({ analysisId, imageBase64, mimeType }: { analysisId: string; imageBase64: string; mimeType?: string }) => {
-      const response = await apiRequest("POST", `/api/blood-analyses/${analysisId}/analyze-image`, {
+      const response = await apiRequest("POST", `/api/blood-analyses/${analysisId}/extract-text`, {
         imageBase64,
         mimeType,
       });
       return response.json();
     },
     onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/blood-analyses"] });
-      updateProcessingState('complete', 100, 'Анализ завершен!', 'Биомаркеры сохранены в ваш профиль');
+      updateProcessingState('idle', 0, '');
+      setExtractedText(result.extractedText);
+      setShowTextReview(true);
       toast({
-        title: "Анализ завершен",
-        description: "Биомаркеры распознаны и сохранены в систему",
+        title: "Текст распознан",
+        description: "Проверьте и отредактируйте распознанные данные перед анализом",
       });
-      // Redirect to biomarkers page after showing success state
-      setTimeout(() => {
-        window.location.href = '/biomarkers';
-      }, 3000);
     },
     onError: (error: any) => {
-      updateProcessingState('idle', 0, 'Ошибка обработки');
-      
-      // Check if error suggests text input fallback
-      if (error?.response?.data?.fallback === "text_input_required") {
-        toast({
-          title: "Переключитесь на текстовый режим",
-          description: "Для анализа изображений требуется дополнительная настройка. Попробуйте ввести данные вручную в текстовом режиме.",
-          variant: "destructive",
-        });
-        // Auto-switch to text mode
-        setAnalysisMode('text');
-      } else {
-        toast({
-          title: "Ошибка",
-          description: "Не удалось обработать изображение. Попробуйте еще раз или используйте текстовый режим.",
-          variant: "destructive",
-        });
-      }
+      updateProcessingState('idle', 0, 'Ошибка распознавания');
+      toast({
+        title: "Ошибка",
+        description: "Не удалось распознать текст. Попробуйте еще раз или введите данные вручную.",
+        variant: "destructive",
+      });
+      setAnalysisMode('text');
     },
   });
 
@@ -202,14 +191,11 @@ export default function BloodAnalysisPage() {
               return;
             }
             
-            updateProcessingState('recognizing', 65, 'Распознаем текст...', 'OpenAI Vision анализирует изображение');
+            updateProcessingState('recognizing', 65, 'Распознаем текст...', 'OpenAI Vision извлекает данные из изображения');
             
-            // Start the AI analysis
-            updateProcessingState('analyzing', 75, 'Обрабатываем с ИИ...', 'Извлекаем биомаркеры и создаем рекомендации');
-            
-            updateProcessingState('saving', 90, 'Сохраняем биомаркеры...', 'Добавляем в "Мои биомаркеры" и "Мои анализы"');
-            
-            await analyzeImageMutation.mutateAsync({
+            // Extract text from image
+            setCurrentAnalysisId(analysis.id);
+            await extractTextMutation.mutateAsync({
               analysisId: analysis.id,
               imageBase64,
               mimeType: actualMimeType,
@@ -225,6 +211,33 @@ export default function BloodAnalysisPage() {
         console.error("Error processing upload:", error);
         updateProcessingState('idle', 0, 'Ошибка загрузки');
       }
+    }
+  };
+
+  const handleConfirmExtractedText = async () => {
+    if (!extractedText.trim() || !currentAnalysisId) {
+      toast({
+        title: "Ошибка",
+        description: "Нет данных для анализа",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      updateProcessingState('analyzing', 75, 'Анализируем данные...', 'DeepSeek AI обрабатывает биомаркеры');
+      
+      await analyzeTextMutation.mutateAsync({
+        analysisId: currentAnalysisId,
+        text: extractedText,
+      });
+      
+      setShowTextReview(false);
+      setExtractedText('');
+      setCurrentAnalysisId(null);
+    } catch (error) {
+      console.error("Error analyzing text:", error);
+      updateProcessingState('idle', 0, 'Ошибка анализа');
     }
   };
 
@@ -595,8 +608,70 @@ export default function BloodAnalysisPage() {
           )}
 
 
+          {/* Text Review Modal */}
+          {showTextReview && (
+            <Card className="mt-6 border-2 border-trust-green">
+              <CardHeader className="bg-gradient-to-r from-trust-green/10 to-medical-blue/10">
+                <h3 className="text-lg font-semibold text-medical-dark flex items-center">
+                  <CheckCircle className="w-5 h-5 mr-2 text-trust-green" />
+                  Распознанный текст
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  Проверьте распознанные данные и при необходимости отредактируйте их перед анализом
+                </p>
+              </CardHeader>
+              <CardContent className="p-4 space-y-4">
+                <Textarea
+                  data-testid="textarea-extracted-text"
+                  value={extractedText}
+                  onChange={(e) => setExtractedText(e.target.value)}
+                  className="min-h-[300px] text-sm font-mono"
+                  placeholder="Распознанный текст появится здесь..."
+                />
+                
+                <div className="flex gap-2">
+                  <Button
+                    data-testid="button-confirm-analysis"
+                    onClick={handleConfirmExtractedText}
+                    className="flex-1 bg-trust-green hover:bg-trust-green/90"
+                  >
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Подтвердить и анализировать
+                  </Button>
+                  <Button
+                    data-testid="button-cancel-review"
+                    onClick={() => {
+                      setShowTextReview(false);
+                      setExtractedText('');
+                      setCurrentAnalysisId(null);
+                    }}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Отмена
+                  </Button>
+                </div>
+                
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                  <div className="flex items-start space-x-2">
+                    <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5" />
+                    <div className="text-sm text-amber-700">
+                      <p className="font-semibold mb-1">Совет:</p>
+                      <ul className="space-y-1">
+                        <li>• Убедитесь, что все показатели правильно распознаны</li>
+                        <li>• Проверьте числовые значения и единицы измерения</li>
+                        <li>• Можете добавить пропущенные показатели вручную</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Info Cards - only shown when idle */}
-          {processingState.stage === 'idle' && (
+          {processingState.stage === 'idle' && !showTextReview && (
             <div className="mt-8 space-y-4">
               <Card className="bg-gradient-to-r from-gray-50 to-blue-50 border-gray-200">
                 <CardContent className="p-4">
