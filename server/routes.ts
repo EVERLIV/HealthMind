@@ -175,40 +175,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create biomarker results from DeepSeek analysis
       if (analysisResults.markers && analysisResults.markers.length > 0) {
+        console.log('Сохраняем биомаркеры:', analysisResults.markers.length);
+        
         for (const marker of analysisResults.markers) {
-          // Find existing biomarker or create a new one
-          const existingBiomarkers = await storage.getAllBiomarkers();
-          let biomarker = existingBiomarkers.find(b => 
-            b.name.toLowerCase() === marker.name.toLowerCase()
-          );
-          
-          if (!biomarker) {
-            // Create new biomarker if it doesn't exist
-            const newBiomarker = {
-              name: marker.name,
-              description: marker.education || "Biomarker information",
-              normalRange: {
-                min: 0,
-                max: 0,
-                unit: "" 
-              },
-              category: "general" as const,
-              importance: "medium" as const,
-              recommendations: marker.recommendation ? [marker.recommendation] : [],
-            };
-            biomarker = await storage.createBiomarker(newBiomarker);
-          }
+          try {
+            // Find existing biomarker or create a new one
+            const existingBiomarkers = await storage.getAllBiomarkers();
+            let biomarker = existingBiomarkers.find(b => 
+              b.name.toLowerCase() === marker.name.toLowerCase()
+            );
+            
+            if (!biomarker) {
+              // Determine category based on marker name
+              let category: 'cardiovascular' | 'metabolic' | 'immune' | 'liver' | 'kidney' | 'general' = 'general';
+              const markerName = marker.name.toLowerCase();
+              
+              if (['гемоглобин', 'эритроциты', 'гематокрит'].some(term => markerName.includes(term))) {
+                category = 'cardiovascular';
+              } else if (['лейкоциты', 'нейтрофилы', 'лимфоциты', 'моноциты'].some(term => markerName.includes(term))) {
+                category = 'immune';
+              } else if (['глюкоза', 'холестерин', 'триглицериды'].some(term => markerName.includes(term))) {
+                category = 'metabolic';
+              } else if (['креатинин', 'мочевина'].some(term => markerName.includes(term))) {
+                category = 'kidney';
+              }
+              
+              // Create new biomarker if it doesn't exist
+              const newBiomarker = {
+                name: marker.name,
+                description: marker.education || `${marker.name} - важный показатель здоровья`,
+                normalRange: {
+                  min: 0,
+                  max: 0,
+                  unit: marker.unit || "" 
+                },
+                category: category,
+                importance: "medium" as const,
+                recommendations: marker.recommendation ? [marker.recommendation] : [],
+              };
+              biomarker = await storage.createBiomarker(newBiomarker);
+              console.log('Создан новый биомаркер:', biomarker.name);
+            }
 
-          // Create biomarker result
-          const numericValue = parseFloat(marker.value.replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
-          await storage.createBiomarkerResult({
-            analysisId: req.params.id,
-            biomarkerId: biomarker.id,
-            value: numericValue.toString(),
-            unit: marker.value.match(/[а-яА-Яa-zA-Z/]+/)?.[0] || "",
-            status: marker.status,
-          });
+            // Create biomarker result with proper value parsing
+            const numericValue = parseFloat(marker.value.replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
+            
+            const biomarkerResult = await storage.createBiomarkerResult({
+              analysisId: req.params.id,
+              biomarkerId: biomarker.id,
+              value: numericValue.toString(),
+              unit: marker.unit || marker.value.match(/[а-яА-Яa-zA-Z/]+/)?.[0] || "",
+              status: marker.status || 'normal',
+            });
+            
+            console.log('Создан результат биомаркера:', biomarker.name, '=', numericValue, marker.unit);
+          } catch (markerError) {
+            console.error('Ошибка сохранения биомаркера:', marker.name, markerError);
+          }
         }
+        
+        console.log('Все биомаркеры обработаны');
       }
 
       res.json({ analysis: updatedAnalysis, results: analysisResults });
