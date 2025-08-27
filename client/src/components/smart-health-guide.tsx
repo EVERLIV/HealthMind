@@ -360,7 +360,7 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
       </div>
 
       {/* Качественные карточки статей с фото */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         {smartArticles.slice(0, 4).map((article) => (
           <Link key={article.id} href={`/article/${article.id}`}>
             <Card 
@@ -414,8 +414,8 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
                 )}
                 
                 {/* Контент статьи */}
-                <CardContent className="p-4">
-                  <div className="space-y-3">
+                <CardContent className="p-5">
+                  <div className="space-y-4">
                     <div>
                       <h3 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-medical-blue transition-colors">
                         {article.title}

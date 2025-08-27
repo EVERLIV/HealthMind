@@ -64,3 +64,13 @@ Preferred communication style: Simple, everyday language.
 - **Type Safety**: End-to-end TypeScript with shared types between client and server
 - **Responsive Design**: Mobile-first approach with adaptive layouts and touch-friendly interfaces
 - **Error Handling**: Comprehensive error boundaries and user-friendly error messaging
+
+### Design System and Spacing Standards
+- **Container Spacing**: Standard 16px padding (p-4) for main containers
+- **Section Margins**: 16px margins between sections (mb-4)
+- **Card Content**: 20px padding (p-5) for card content
+- **Element Gaps**: 12px gaps between elements (gap-3)
+- **Article Cards**: 24px spacing between cards (space-y-6)
+- **Icon Consistency**: All icons use explicit color contrast instead of gradients
+- **Color Contrast**: White icons on colored backgrounds, never white-on-white
+- **Icon Sizes**: Standard 24px (w-6 h-6) for icons, 40px (w-10 h-10) for containers
