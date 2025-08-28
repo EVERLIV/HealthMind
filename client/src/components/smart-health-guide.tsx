@@ -296,7 +296,7 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 className={`
-                  relative h-16 overflow-hidden rounded-xl transition-all duration-300 transform
+                  relative h-20 overflow-hidden rounded-xl transition-all duration-300 transform
                   ${isSelected 
                     ? 'scale-105 shadow-xl ring-2 ring-white ring-opacity-60' 
                     : 'hover:scale-105 hover:shadow-lg shadow-md'}
@@ -312,21 +312,21 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
                 <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-xl" />
                 
                 {/* Контент категории */}
-                <div className="relative h-full px-3 py-2 flex items-center gap-2">
+                <div className="relative h-full px-2 py-2 flex flex-col justify-center gap-1">
                   {/* Иконка */}
-                  <div className="w-8 h-8 bg-white/25 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
+                  <div className="w-6 h-6 bg-white/25 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-md mx-auto flex-shrink-0">
                     {cat === "all" ? (
-                      <BookOpen className="w-4 h-4 text-white" />
+                      <BookOpen className="w-3 h-3 text-white" />
                     ) : (
-                      <div className="text-white">
+                      <div className="text-white text-xs">
                         {categoryIcons[cat as keyof typeof categoryIcons]}
                       </div>
                     )}
                   </div>
                   
                   {/* Название */}
-                  <div className="flex-1 text-left min-w-0">
-                    <p className="text-white font-semibold text-xs leading-tight truncate">
+                  <div className="text-center">
+                    <p className="text-white font-semibold text-[10px] leading-tight">
                       {cat === "all" ? "Все" : categoryNames[cat as keyof typeof categoryNames]}
                     </p>
                   </div>
