@@ -3,6 +3,12 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+
+// Set environment for Express
+if (process.env.NODE_ENV === 'production') {
+  app.set('env', 'production');
+}
+
 app.use(express.json({ limit: '50mb' })); // Увеличиваем лимит для изображений
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
@@ -50,9 +56,14 @@ app.use((req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
+  const isDev = process.env.NODE_ENV === "development";
+  log(`Environment: NODE_ENV=${process.env.NODE_ENV}, app.env=${app.get('env')}, isDev=${isDev}`);
+  
+  if (isDev) {
+    log("Starting Vite development server");
     await setupVite(app, server);
   } else {
+    log("Starting production static file server");
     serveStatic(app);
   }
 
