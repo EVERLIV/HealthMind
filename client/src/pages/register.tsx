@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Mail, Lock, User, AtSign } from 'lucide-react';
+import { Heart, Mail, Lock, User, AtSign, Sparkles } from 'lucide-react';
+import logoUrl from '@assets/logo_1756383212372.png';
 
 export default function RegisterPage() {
   const [, setLocation] = useLocation();
@@ -55,8 +56,13 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <Heart className="w-8 h-8 text-white" />
+            <div className="relative">
+              <div className="w-20 h-20 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 rounded-3xl flex items-center justify-center shadow-2xl transform rotate-3 p-3">
+                <img src={logoUrl} alt="EVERLIV HEALTH" className="w-full h-full object-contain" />
+              </div>
+              <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                <Sparkles className="w-3 h-3 text-white" />
+              </div>
             </div>
           </div>
           <CardTitle className="text-2xl font-bold">Регистрация</CardTitle>
