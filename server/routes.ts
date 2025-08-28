@@ -12,6 +12,192 @@ import {
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Auth routes
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email и пароль обязательны" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(401).json({ error: "Неверный email или пароль" });
+      }
+
+      const bcrypt = await import('bcrypt');
+      const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+      if (!isValidPassword) {
+        return res.status(401).json({ error: "Неверный email или пароль" });
+      }
+
+      const jwt = await import('jsonwebtoken');
+      const token = jwt.default.sign(
+        { userId: user.id },
+        process.env.JWT_SECRET || 'dev-secret',
+        { expiresIn: '30d' }
+      );
+
+      const userResponse = {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        name: user.name,
+        role: user.role,
+        subscriptionType: user.subscriptionType
+      };
+
+      res.json({ user: userResponse, token });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ error: "Внутренняя ошибка сервера" });
+    }
+  });
+
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { email, username, password, name } = req.body;
+      
+      if (!email || !username || !password || !name) {
+        return res.status(400).json({ error: "Все поля обязательны" });
+      }
+
+      // Check if user exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ error: "Пользователь с таким email уже существует" });
+      }
+
+      const bcrypt = await import('bcrypt');
+      const passwordHash = await bcrypt.hash(password, 12);
+
+      const newUser = await storage.createUser({
+        email,
+        username,
+        name,
+        passwordHash,
+        role: 'user',
+        subscriptionType: 'free'
+      });
+
+      const jwt = await import('jsonwebtoken');
+      const token = jwt.default.sign(
+        { userId: newUser.id },
+        process.env.JWT_SECRET || 'dev-secret',
+        { expiresIn: '30d' }
+      );
+
+      const userResponse = {
+        id: newUser.id,
+        email: newUser.email,
+        username: newUser.username,
+        name: newUser.name,
+        role: newUser.role,
+        subscriptionType: newUser.subscriptionType
+      };
+
+      res.json({ user: userResponse, token });
+    } catch (error) {
+      console.error("Registration error:", error);
+      res.status(500).json({ error: "Внутренняя ошибка сервера" });
+    }
+  });
+
+  app.get("/api/auth/me", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      const user = await storage.getUser(req.user.id);
+      if (!user) {
+        return res.status(404).json({ error: "Пользователь не найден" });
+      }
+
+      const userResponse = {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        name: user.name,
+        role: user.role,
+        subscriptionType: user.subscriptionType
+      };
+
+      res.json(userResponse);
+    } catch (error) {
+      console.error("Get current user error:", error);
+      res.status(500).json({ error: "Внутренняя ошибка сервера" });
+    }
+  });
+
+  app.post("/api/auth/logout", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      // In a real app, you might want to blacklist the token
+      res.json({ message: "Logged out successfully" });
+    } catch (error) {
+      console.error("Logout error:", error);
+      res.status(500).json({ error: "Внутренняя ошибка сервера" });
+    }
+  });
+
+  app.patch("/api/auth/profile", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      const { email, username, name } = req.body;
+      
+      const updatedUser = await storage.updateUser(req.user.id, {
+        email,
+        username,
+        name
+      });
+
+      const userResponse = {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        username: updatedUser.username,
+        name: updatedUser.name,
+        role: updatedUser.role,
+        subscriptionType: updatedUser.subscriptionType
+      };
+
+      res.json(userResponse);
+    } catch (error) {
+      console.error("Update profile error:", error);
+      res.status(500).json({ error: "Внутренняя ошибка сервера" });
+    }
+  });
+
+  app.post("/api/auth/change-password", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      const { currentPassword, newPassword } = req.body;
+      
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: "Все поля обязательны" });
+      }
+
+      const user = await storage.getUser(req.user.id);
+      if (!user) {
+        return res.status(404).json({ error: "Пользователь не найден" });
+      }
+
+      const bcrypt = await import('bcrypt');
+      const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
+      if (!isValidPassword) {
+        return res.status(400).json({ error: "Неверный текущий пароль" });
+      }
+
+      const newPasswordHash = await bcrypt.hash(newPassword, 12);
+      await storage.updateUser(req.user.id, { passwordHash: newPasswordHash });
+
+      res.json({ message: "Пароль успешно изменен" });
+    } catch (error) {
+      console.error("Change password error:", error);
+      res.status(500).json({ error: "Внутренняя ошибка сервера" });
+    }
+  });
+
   // Chat sessions
   app.get("/api/chat-sessions", authenticate, async (req: AuthenticatedRequest, res) => {
     try {

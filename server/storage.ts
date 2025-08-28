@@ -6,6 +6,7 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: string, user: Partial<InsertUser>): Promise<User>;
   
   // Health Profiles
   getHealthProfile(userId: string): Promise<HealthProfile | undefined>;
@@ -72,7 +73,17 @@ export class MemStorage implements IStorage {
       username: "anna_user",
       email: "anna@example.com",
       name: "Анна",
+      passwordHash: "$2b$12$Wq0sk.Th.nhoN5NDXbKBxOMLsaod9aWz5f4AyjmOEfTTTzCyV9/Ui", // password: "password123"
+      role: "user",
+      subscriptionType: "premium",
+      subscriptionExpiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+      isEmailVerified: 1,
+      emailVerificationToken: null,
+      resetPasswordToken: null,
+      resetPasswordExpires: null,
+      lastLoginAt: new Date(),
       createdAt: new Date(),
+      updatedAt: new Date(),
     };
     this.users.set(defaultUser.id, defaultUser);
 
@@ -181,9 +192,38 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const user: User = { ...insertUser, id, createdAt: new Date() };
+    const user: User = { 
+      ...insertUser, 
+      id, 
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      role: insertUser.role || 'user',
+      subscriptionType: insertUser.subscriptionType || 'free',
+      subscriptionExpiresAt: null,
+      isEmailVerified: 0,
+      emailVerificationToken: null,
+      resetPasswordToken: null,
+      resetPasswordExpires: null,
+      lastLoginAt: null,
+    };
     this.users.set(id, user);
     return user;
+  }
+
+  async updateUser(id: string, updates: Partial<InsertUser>): Promise<User> {
+    const user = this.users.get(id);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    
+    const updatedUser: User = {
+      ...user,
+      ...updates,
+      updatedAt: new Date(),
+    };
+    
+    this.users.set(id, updatedUser);
+    return updatedUser;
   }
 
   // Health Profiles
