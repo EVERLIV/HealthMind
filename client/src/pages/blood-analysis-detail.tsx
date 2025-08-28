@@ -227,13 +227,28 @@ export default function BloodAnalysisDetailPage() {
         {/* Компактная сводка и управление */}
         <div className="mt-4 space-y-3">
           {/* Быстрая навигация по категориям */}
-          <div className="flex items-center justify-between">
-            <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="space-y-3">
+            {/* Переключатель режима просмотра */}
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-medium text-gray-700">Категории</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
+                className="text-xs h-8 px-2"
+                data-testid="button-view-mode"
+              >
+                {viewMode === "grid" ? <Filter className="w-4 h-4" /> : <Grid3X3 className="w-4 h-4" />}
+              </Button>
+            </div>
+            
+            {/* Кнопки категорий с переносом */}
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant={activeTab === "all" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setActiveTab("all")}
-                className="whitespace-nowrap text-xs h-8 px-3"
+                className="text-xs h-8 px-3"
                 data-testid="tab-all"
               >
                 Все ({totalCount})
@@ -247,7 +262,7 @@ export default function BloodAnalysisDetailPage() {
                     variant={activeTab === category ? "default" : "outline"}
                     size="sm"
                     onClick={() => setActiveTab(category)}
-                    className="whitespace-nowrap text-xs h-8 px-3 flex items-center gap-1.5"
+                    className="text-xs h-8 px-3 flex items-center gap-1.5"
                     data-testid={`tab-${category}`}
                   >
                     <IconComponent className="w-3 h-3" />
@@ -256,15 +271,6 @@ export default function BloodAnalysisDetailPage() {
                 );
               })}
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-              className="text-xs h-8 px-2"
-              data-testid="button-view-mode"
-            >
-              {viewMode === "grid" ? <Filter className="w-4 h-4" /> : <Grid3X3 className="w-4 h-4" />}
-            </Button>
           </div>
 
           {/* Маркеры в компактной сетке */}
