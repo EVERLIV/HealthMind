@@ -185,15 +185,36 @@ export default function ChatPage() {
         queryKey: ["/api/chat-sessions", currentSessionId, "messages"] 
       });
 
+      // Clear message input after image upload
+      setMessage("");
+      
       toast({
-        title: "Изображение проанализировано",
-        description: "ИИ проанализировал ваше изображение",
+        title: "✅ Изображение обработано",
+        description: "Анализ изображения завершен - смотрите результат в чате",
       });
     } catch (error) {
       console.error("Error analyzing image:", error);
+      
+      // Send fallback message even if API fails
+      try {
+        await apiRequest(`/api/chat-sessions/${currentSessionId}/messages`, {
+          method: "POST",
+          body: JSON.stringify({
+            role: "assistant",
+            content: `🔧 **Проблема с анализом изображения "${fileName}"**\n\nНе удалось обработать изображение автоматически.\n\n**💬 Опишите что на фото:**\n• Кожная проблема, симптомы?\n• Результаты анализов?\n• Медицинские документы?\n\n🎯 Я помогу на основе вашего описания!`,
+          }),
+        });
+        
+        queryClient.invalidateQueries({ 
+          queryKey: ["/api/chat-sessions", currentSessionId, "messages"] 
+        });
+      } catch (fallbackError) {
+        console.error("Failed to send fallback message:", fallbackError);
+      }
+      
       toast({
-        title: "Ошибка анализа",
-        description: "Не удалось проанализировать изображение",
+        title: "⚠️ Проблема с анализом",
+        description: "Опишите что на фото - я помогу текстом",
         variant: "destructive",
       });
     }
