@@ -9,6 +9,56 @@ interface ReviewSectionProps {
 }
 
 export default function ReviewSection({ data }: ReviewSectionProps) {
+  // Переводы для всех возможных значений
+  const translations = {
+    // Activity levels
+    sedentary: "Сидячий",
+    light: "Легкая активность", 
+    moderate: "Умеренная",
+    active: "Активный",
+    very_active: "Очень активный",
+    
+    // Exercise frequency
+    never: "Никогда",
+    "1-2_week": "1-2 раза/нед",
+    "3-4_week": "3-4 раза/нед",
+    "5+_week": "5+ раз/нед",
+    
+    // Fitness levels
+    beginner: "Начинающий",
+    intermediate: "Средний", 
+    advanced: "Продвинутый",
+    
+    // Mood changes
+    stable: "Стабильное",
+    mild: "Легкие колебания",
+    severe: "Сильные колебания",
+    
+    // Sleep quality
+    poor: "Плохое",
+    fair: "Удовлетворительное",
+    good: "Хорошее",
+    excellent: "Отличное",
+    
+    // Health goals
+    weight_loss: "Снижение веса",
+    muscle_gain: "Набор мышечной массы",
+    improve_fitness: "Улучшение физической формы",
+    reduce_stress: "Снижение стресса",
+    better_sleep: "Улучшение сна",
+    healthy_eating: "Здоровое питание",
+    quit_smoking: "Бросить курить",
+    manage_condition: "Контроль хронического заболевания",
+    increase_energy: "Повышение энергии",
+    mental_health: "Улучшение ментального здоровья",
+    preventive_care: "Профилактика заболеваний",
+    longevity: "Долголетие"
+  };
+
+  const getTranslation = (key: string): string => {
+    return translations[key as keyof typeof translations] || key;
+  };
+
   const sections = [
     {
       title: "Личная информация",
@@ -25,9 +75,9 @@ export default function ReviewSection({ data }: ReviewSectionProps) {
       title: "Физическое здоровье",
       icon: Activity,
       items: [
-        { label: "Активность", value: data.activityLevel || "Не указана" },
-        { label: "Тренировки", value: data.exerciseFrequency || "Не указаны" },
-        { label: "Фитнес", value: data.fitnessLevel || "Не указан" },
+        { label: "Активность", value: data.activityLevel ? getTranslation(data.activityLevel) : "Не указана" },
+        { label: "Тренировки", value: data.exerciseFrequency ? getTranslation(data.exerciseFrequency) : "Не указаны" },
+        { label: "Фитнес", value: data.fitnessLevel ? getTranslation(data.fitnessLevel) : "Не указан" },
       ]
     },
     {
@@ -36,7 +86,7 @@ export default function ReviewSection({ data }: ReviewSectionProps) {
       items: [
         { label: "Стресс", value: data.stressLevel ? `${data.stressLevel}/10` : "Не указан" },
         { label: "Тревожность", value: data.anxietyLevel ? `${data.anxietyLevel}/10` : "Не указана" },
-        { label: "Настроение", value: data.moodChanges || "Не указано" },
+        { label: "Настроение", value: data.moodChanges ? getTranslation(data.moodChanges) : "Не указано" },
       ]
     },
     {
@@ -44,7 +94,7 @@ export default function ReviewSection({ data }: ReviewSectionProps) {
       icon: Moon,
       items: [
         { label: "Часы сна", value: data.sleepHours ? `${data.sleepHours} часов` : "Не указано" },
-        { label: "Качество", value: data.sleepQuality || "Не указано" },
+        { label: "Качество", value: data.sleepQuality ? getTranslation(data.sleepQuality) : "Не указано" },
         { label: "Проблемы", value: data.sleepProblems?.length ? `${data.sleepProblems.length} проблем` : "Нет" },
       ]
     },
@@ -95,13 +145,13 @@ export default function ReviewSection({ data }: ReviewSectionProps) {
           <div className="flex flex-wrap gap-2">
             {data.healthGoals.map((goal) => (
               <Badge key={goal} variant="secondary">
-                {goal.replace(/_/g, " ")}
+                {getTranslation(goal)}
               </Badge>
             ))}
           </div>
           {data.primaryGoal && (
             <p className="text-sm text-muted-foreground mt-3">
-              <span className="font-medium">Главная цель:</span> {data.primaryGoal}
+              <span className="font-medium">Главная цель:</span> {getTranslation(data.primaryGoal)}
             </p>
           )}
         </Card>
