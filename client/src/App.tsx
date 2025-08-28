@@ -17,6 +17,7 @@ import BloodAnalysisDetailPage from "@/pages/blood-analysis-detail";
 import ArticleDetail from "@/pages/article-detail";
 import LoginPage from "@/pages/login";
 import RegisterPage from "@/pages/register";
+import UserSettingsPage from "@/pages/user-settings";
 
 // Protected route wrapper
 function ProtectedRoute({ component: Component }: { component: React.FC }) {
@@ -60,6 +61,7 @@ function Router() {
       <Route path="/blood-analyses" component={() => <ProtectedRoute component={BloodAnalysesListPage} />} />
       <Route path="/blood-analyses/:id" component={() => <ProtectedRoute component={BloodAnalysisDetailPage} />} />
       <Route path="/article/:id" component={() => <ProtectedRoute component={ArticleDetail} />} />
+      <Route path="/user-settings" component={() => <ProtectedRoute component={UserSettingsPage} />} />
       <Route component={NotFound} />
     </Switch>
   );

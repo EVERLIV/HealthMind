@@ -36,6 +36,11 @@ const updateProfileSchema = z.object({
   username: z.string().min(3).max(50).optional(),
 });
 
+const changeEmailSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+
 export function registerAuthRoutes(app: Express) {
   // Register new user
   app.post("/api/auth/register", async (req, res) => {
@@ -280,6 +285,60 @@ export function registerAuthRoutes(app: Express) {
       }
       console.error("Change password error:", error);
       res.status(500).json({ error: "Failed to change password" });
+    }
+  });
+
+  // Change email
+  app.post("/api/auth/change-email", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const data = changeEmailSchema.parse(req.body);
+
+      // Find user
+      const [user] = await db.select().from(users)
+        .where(eq(users.id, req.user.id))
+        .limit(1);
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Verify password
+      const isValid = await verifyPassword(data.password, user.passwordHash);
+      if (!isValid) {
+        return res.status(401).json({ error: "Password is incorrect" });
+      }
+
+      // Check if email is already taken
+      const existingUser = await db.select().from(users)
+        .where(eq(users.email, data.email))
+        .limit(1);
+
+      if (existingUser.length > 0 && existingUser[0].id !== req.user.id) {
+        return res.status(400).json({ error: "Email already in use" });
+      }
+
+      // Update email
+      await db.update(users)
+        .set({
+          email: data.email,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, req.user.id));
+
+      // Log activity
+      await logActivity(req.user.id, "email_changed");
+
+      res.json({ message: "Email changed successfully" });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid input", details: error.errors });
+      }
+      console.error("Change email error:", error);
+      res.status(500).json({ error: "Failed to change email" });
     }
   });
 
