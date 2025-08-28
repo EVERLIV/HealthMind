@@ -45,6 +45,7 @@ export default function AIConsultation() {
     response: ConsultationResponse;
     timestamp: Date;
   }>>([]);
+  const [expandedGoals, setExpandedGoals] = useState<Set<number>>(new Set());
   const { toast } = useToast();
 
   const { data: healthProfile } = useQuery({
@@ -270,6 +271,16 @@ export default function AIConsultation() {
 
   const goalRecommendations = getUserGoalRecommendations();
 
+  const toggleGoalExpansion = (index: number) => {
+    const newExpanded = new Set(expandedGoals);
+    if (newExpanded.has(index)) {
+      newExpanded.delete(index);
+    } else {
+      newExpanded.add(index);
+    }
+    setExpandedGoals(newExpanded);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 overflow-x-hidden">
       <MobileNav />
@@ -379,13 +390,13 @@ export default function AIConsultation() {
         {goalRecommendations.length > 0 && (
           <Card className="mb-6 p-5 border-0 shadow-lg bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm">
             <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-4 flex-wrap">
                 <Target className="w-5 h-5 text-medical-blue" />
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   Персональные рекомендации
                 </h3>
-                <Badge className="bg-trust-green/10 text-trust-green border-trust-green/20 text-xs">
-                  На основе ваших целей
+                <Badge className="bg-trust-green/10 text-trust-green border-trust-green/20 text-xs px-2 py-1 rounded-full whitespace-nowrap">
+                  ваши цели
                 </Badge>
               </div>
               
@@ -400,7 +411,7 @@ export default function AIConsultation() {
                     </div>
                     
                     <div className="space-y-2">
-                      {goal.recommendations.slice(0, 3).map((rec, recIndex) => (
+                      {(expandedGoals.has(index) ? goal.recommendations : goal.recommendations.slice(0, 3)).map((rec, recIndex) => (
                         <div key={recIndex} className="flex items-start gap-2">
                           <div className="w-1.5 h-1.5 bg-trust-green rounded-full mt-2 flex-shrink-0" />
                           <span className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -409,9 +420,17 @@ export default function AIConsultation() {
                         </div>
                       ))}
                       {goal.recommendations.length > 3 && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                          +{goal.recommendations.length - 3} дополнительных рекомендаций
-                        </p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleGoalExpansion(index)}
+                          className="text-xs text-trust-green hover:text-trust-green hover:bg-trust-green/10 p-1 h-auto mt-2"
+                        >
+                          {expandedGoals.has(index) 
+                            ? `Скрыть ${goal.recommendations.length - 3} рекомендаций`
+                            : `+${goal.recommendations.length - 3} дополнительных рекомендаций`
+                          }
+                        </Button>
                       )}
                     </div>
                   </div>
