@@ -373,7 +373,7 @@ export default function BloodAnalysisPage() {
 
       // Закрываем модальное окно и показываем прогресс анализа
       setShowBiomarkerEditor(false);
-      updateProcessingState('analyzing', 75, 'Анализируем данные...', 'DeepSeek AI обрабатывает биомаркеры');
+      updateProcessingState('analyzing', 75, 'Анализируем данные...', 'ИИ-консультант обрабатывает биомаркеры');
       
       await analyzeTextMutation.mutateAsync({
         analysisId: currentAnalysisId,
@@ -405,7 +405,7 @@ export default function BloodAnalysisPage() {
     }
 
     try {
-      updateProcessingState('analyzing', 75, 'Анализируем данные...', 'DeepSeek AI обрабатывает биомаркеры');
+      updateProcessingState('analyzing', 75, 'Анализируем данные...', 'ИИ-консультант обрабатывает биомаркеры');
       
       await analyzeTextMutation.mutateAsync({
         analysisId: currentAnalysisId,

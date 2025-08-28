@@ -113,7 +113,7 @@ export default function BloodAnalysisModal({ open, onOpenChange }: BloodAnalysis
         // Create blood analysis entry
         const analysis = await createAnalysisMutation.mutateAsync();
         
-        // Get uploaded image and convert to base64 for DeepSeek
+        // Get uploaded image and convert to base64 for AI analysis
         const uploadURL = result.successful[0].uploadURL as string;
         const response = await fetch(uploadURL);
         const blob = await response.blob();
@@ -124,7 +124,7 @@ export default function BloodAnalysisModal({ open, onOpenChange }: BloodAnalysis
             const base64 = reader.result as string;
             const imageBase64 = base64.split(',')[1]; // Remove data:image/jpeg;base64, prefix
             
-            // Analyze with DeepSeek AI
+            // Analyze with AI
             await analyzeImageMutation.mutateAsync({
               analysisId: analysis.id,
               imageBase64,
@@ -160,7 +160,7 @@ export default function BloodAnalysisModal({ open, onOpenChange }: BloodAnalysis
       // Create analysis first
       const analysisResponse = await createAnalysisMutation.mutateAsync();
       
-      // Analyze with DeepSeek
+      // Analyze with AI
       await analyzeTextMutation.mutateAsync({
         analysisId: analysisResponse.id,
         text: textInput,
@@ -186,7 +186,7 @@ export default function BloodAnalysisModal({ open, onOpenChange }: BloodAnalysis
           </h3>
           <p className="text-muted-foreground text-sm">
             {analysisMode === 'photo' 
-              ? "Загрузите фото результатов анализа для получения рекомендаций DeepSeek AI"
+              ? "Загрузите фото результатов анализа для получения рекомендаций ИИ"
               : "Введите данные анализа вручную для обработки с помощью ИИ"
             }
           </p>
@@ -270,7 +270,7 @@ export default function BloodAnalysisModal({ open, onOpenChange }: BloodAnalysis
         {(isUploading || isAnalyzing) && (
           <div className="text-center mt-4">
             <div className="animate-pulse text-sm text-trust-green">
-              {isAnalyzing ? "Анализируем с помощью DeepSeek AI..." : "Обрабатываем ваш анализ..."}
+              {isAnalyzing ? "Анализируем с помощью ИИ..." : "Обрабатываем ваш анализ..."}
             </div>
           </div>
         )}

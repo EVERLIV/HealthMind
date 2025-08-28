@@ -456,8 +456,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // DeepSeek Consultation endpoint
-  app.post("/api/deepseek-consultation", authenticate, async (req: AuthenticatedRequest, res) => {
+  // AI Consultation endpoint
+  app.post("/api/ai-consultation", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.user) return res.status(401).json({ error: "Unauthorized" });
 
