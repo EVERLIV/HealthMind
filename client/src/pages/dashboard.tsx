@@ -65,7 +65,7 @@ export default function Dashboard() {
                     Привет, <span data-testid="user-name" className="text-white/95">{hasProfile ? "Анна" : "Пользователь"}</span>
                   </h1>
                   <p className="text-white/90 text-sm font-medium">
-                    Добро пожаловать в HealthAI 🏥
+                    Добро пожаловать в EVERLIV HEALTH 🏥
                   </p>
                 </div>
                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm shadow-lg border border-white/30">
