@@ -4,6 +4,19 @@ import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
+// PRIORITY: Health check endpoints for deployment - MUST be first
+app.get("/", (_req, res) => {
+  res.status(200).send("OK");
+});
+
+app.get("/health", (_req, res) => {
+  res.status(200).send("OK");
+});
+
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 // Set environment for Express
 if (process.env.NODE_ENV === 'production') {
   app.set('env', 'production');
@@ -43,15 +56,6 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Priority health check endpoints BEFORE database initialization
-  app.get("/health", (_req, res) => {
-    res.status(200).send("OK");
-  });
-  
-  app.get("/api/health", (_req, res) => {
-    res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
-  });
-
   let server;
   try {
     server = await registerRoutes(app);
