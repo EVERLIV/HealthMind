@@ -278,7 +278,7 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
 
       {/* Компактные категории */}
       <div className="mb-4">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {smartCategories.slice(0, showAllCategories ? undefined : 6).map((cat, index) => {
             const isSelected = selectedCategory === cat;
             const gradients = [
@@ -296,10 +296,10 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 className={`
-                  relative h-20 overflow-hidden rounded-xl transition-all duration-300 transform
+                  relative w-full aspect-square overflow-hidden rounded-2xl transition-all duration-300 transform
                   ${isSelected 
-                    ? 'scale-105 shadow-xl ring-2 ring-white ring-opacity-60' 
-                    : 'hover:scale-105 hover:shadow-lg shadow-md'}
+                    ? 'scale-105 shadow-2xl ring-3 ring-white/60' 
+                    : 'hover:scale-105 hover:shadow-xl shadow-lg'}
                 `}
               >
                 {/* Фоновый градиент */}
@@ -308,25 +308,26 @@ export default function SmartHealthGuide({ userGoals = [], userBiomarkers = [] }
                   ${isSelected ? 'opacity-100' : 'opacity-95'}
                 `} />
                 
-                {/* Декоративный элемент */}
-                <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-xl" />
+                {/* Декоративные элементы */}
+                <div className="absolute -top-6 -right-6 w-12 h-12 bg-white/15 rounded-full blur-lg" />
+                <div className="absolute -bottom-4 -left-4 w-8 h-8 bg-white/10 rounded-full blur-md" />
                 
                 {/* Контент категории */}
-                <div className="relative h-full px-2 py-2 flex flex-col justify-center gap-1">
+                <div className="relative h-full p-3 flex flex-col justify-center items-center gap-2">
                   {/* Иконка */}
-                  <div className="w-6 h-6 bg-white/25 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-md mx-auto flex-shrink-0">
+                  <div className="w-10 h-10 bg-white/30 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg border border-white/20">
                     {cat === "all" ? (
-                      <BookOpen className="w-3 h-3 text-white" />
+                      <BookOpen className="w-5 h-5 text-white" />
                     ) : (
-                      <div className="text-white text-xs">
+                      <div className="text-white">
                         {categoryIcons[cat as keyof typeof categoryIcons]}
                       </div>
                     )}
                   </div>
                   
                   {/* Название */}
-                  <div className="text-center">
-                    <p className="text-white font-semibold text-[10px] leading-tight">
+                  <div className="text-center flex-1 flex items-center">
+                    <p className="text-white font-semibold text-xs leading-snug text-center px-1">
                       {cat === "all" ? "Все" : categoryNames[cat as keyof typeof categoryNames]}
                     </p>
                   </div>
