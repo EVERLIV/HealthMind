@@ -502,7 +502,7 @@ export default function Recommendations() {
             <h2 className="text-base font-bold">Детальные рекомендации</h2>
           </div>
           
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {[
               { key: "nutrition", label: "Питание", icon: Apple },
               { key: "physicalActivity", label: "Активность", icon: Activity },
@@ -514,15 +514,15 @@ export default function Recommendations() {
                 variant={selectedCategory === key ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedCategory(key)}
-                className={`h-8 px-3 flex items-center gap-1.5 text-xs ${
+                className={`h-9 px-4 flex items-center gap-2 text-sm font-medium ${
                   selectedCategory === key 
                     ? 'bg-gradient-to-r from-medical-blue to-trust-green text-white' 
                     : ''
                 }`}
                 data-testid={`category-${key}`}
               >
-                <Icon className="w-3 h-3" />
-                <span>{label}</span>
+                <Icon className="w-4 h-4 flex-shrink-0" />
+                <span className="whitespace-nowrap">{label}</span>
               </Button>
             ))}
           </div>
