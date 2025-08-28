@@ -60,16 +60,16 @@ export default function LoginPage() {
                 </div>
               </div>
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-3">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-2">
               EVERLIV HEALTH
             </h1>
-            <p className="text-lg text-gray-600">
-              Добро пожаловать в будущее здоровья
+            <p className="text-lg text-gray-600 font-medium">
+              Get Your Health in order
             </p>
           </div>
 
           {/* Login Form */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border-0 p-8">
+          <div className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium text-gray-700">
@@ -84,7 +84,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="pl-12 h-12 bg-gray-50/50 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl transition-all duration-200"
+                    className="pl-12 h-12 bg-white/70 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl transition-all duration-200 backdrop-blur-sm"
                     disabled={isSubmitting}
                     data-testid="input-email"
                   />
@@ -104,7 +104,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="pl-12 pr-12 h-12 bg-gray-50/50 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl transition-all duration-200"
+                    className="pl-12 pr-12 h-12 bg-white/70 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl transition-all duration-200 backdrop-blur-sm"
                     disabled={isSubmitting}
                     data-testid="input-password"
                   />
