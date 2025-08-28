@@ -14,6 +14,7 @@ export default function ChatPage() {
   const [message, setMessage] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [lastMessageTimestamp, setLastMessageTimestamp] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -30,6 +31,15 @@ export default function ChatPage() {
   const { data: messages } = useQuery({
     queryKey: ["/api/chat-sessions", currentSessionId, "messages"],
     enabled: !!currentSessionId,
+    onSuccess: (newMessages: any[]) => {
+      // Update timestamp when new messages arrive
+      if (newMessages && newMessages.length > 0) {
+        const latestMessage = newMessages[newMessages.length - 1];
+        if (latestMessage && latestMessage.createdAt !== lastMessageTimestamp) {
+          setLastMessageTimestamp(latestMessage.createdAt);
+        }
+      }
+    },
   });
 
   const createSessionMutation = useMutation({
@@ -453,11 +463,18 @@ export default function ChatPage() {
                         className="bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 transform transition-all duration-200 hover:shadow-md"
                         data-testid={`message-${msg.role}`}
                       >
-                        <TypingAnimation 
-                          text={msg.content} 
-                          speed={15} 
-                          className="text-gray-700"
-                        />
+{/* Only use typing animation for the most recent assistant message */}
+                        {msg.role === "assistant" && 
+                         msg.createdAt === lastMessageTimestamp && 
+                         index === ((messages as any[])?.length - 1) ? (
+                          <TypingAnimation 
+                            text={msg.content} 
+                            speed={15} 
+                            className="text-gray-700"
+                          />
+                        ) : (
+                          <p className="text-gray-700 whitespace-pre-line">{msg.content}</p>
+                        )}
                       </div>
                       <p className="text-xs text-gray-500 mt-2 opacity-70">
                         {new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
@@ -475,7 +492,7 @@ export default function ChatPage() {
                       <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                       <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
                       <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                      <span className="text-xs text-gray-500 ml-2">EVERLIV Помощник печатает...</span>
+                      <span className="text-xs text-gray-500 ml-2">EVERLIV Помощник думает...</span>
                     </div>
                   </div>
                 </div>
