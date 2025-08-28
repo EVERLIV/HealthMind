@@ -562,7 +562,7 @@
   }
 }
 
-/* Cloud Messages Animation */
+/* Landing Page Smooth Animations */
 @keyframes fadeInScale {
   from {
     opacity: 0;
@@ -577,7 +577,18 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
   }
   to {
     opacity: 1;
@@ -588,7 +599,7 @@
 @keyframes slideInLeft {
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-50px);
   }
   to {
     opacity: 1;
@@ -599,7 +610,7 @@
 @keyframes slideInRight {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(50px);
   }
   to {
     opacity: 1;
@@ -607,22 +618,99 @@
   }
 }
 
+@keyframes smoothFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.6);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes scrollBounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
 .animate-fadeInScale {
-  animation: fadeInScale 0.3s ease-out forwards;
+  animation: fadeInScale 0.8s ease-out forwards;
   animation-fill-mode: both;
 }
 
 .animate-slideInLeft {
-  animation: slideInLeft 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation: slideInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 
 .animate-slideInRight {
-  animation: slideInRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation: slideInRight 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 
 .animate-fadeIn {
-  animation: fadeInUp 0.4s ease-out both;
+  animation: fadeInUp 0.8s ease-out both;
 }
+
+.animate-fadeInUp {
+  animation: fadeInUp 1s ease-out both;
+}
+
+.animate-fadeInDown {
+  animation: fadeInDown 1s ease-out both;
+}
+
+.animate-smoothFloat {
+  animation: smoothFloat 3s ease-in-out infinite;
+}
+
+.animate-pulseGlow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.animate-scrollBounce {
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+/* Intersection Observer animations */
+.section-hidden {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.8s ease-out;
+}
+
+.section-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger animations for feature cards */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+
+/* Hero animation sequence */
+.hero-logo { animation-delay: 0.2s; }
+.hero-title { animation-delay: 0.4s; }
+.hero-subtitle { animation-delay: 0.6s; }
+.hero-buttons { animation-delay: 0.8s; }
+.hero-scroll { animation-delay: 1.2s; }
 
 /* EVA Mobile Optimizations */
 @media (max-width: 640px) {
