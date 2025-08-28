@@ -643,19 +643,9 @@ export default function Recommendations() {
         <DialogContent className="max-w-sm mx-auto max-h-[90vh] p-0">
           <ScrollArea className="max-h-[90vh]">
             <DialogHeader className="p-4 pb-2">
-              <DialogTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <TestTube className="w-4 h-4 text-medical-blue" />
-                  <span className="text-base">{selectedBiomarker}</span>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => setSelectedBiomarker(null)}
-                  className="h-6 w-6"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
+              <DialogTitle className="flex items-center gap-2">
+                <TestTube className="w-4 h-4 text-medical-blue" />
+                <span className="text-base">{selectedBiomarker}</span>
               </DialogTitle>
             </DialogHeader>
 
