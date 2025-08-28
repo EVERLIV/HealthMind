@@ -322,7 +322,7 @@ JSON структура:
 }
 
 // Legacy DeepSeekAnalysisService for blood test analysis
-export class DeepSeekAnalysisService extends DeepSeekService {
+class DeepSeekAnalysisService extends DeepSeekService {
   constructor(apiKey: string) {
     super(apiKey);
   }
@@ -486,4 +486,5 @@ ${text}`;
   }
 }
 
+export { DeepSeekAnalysisService };
 export default DeepSeekService;
