@@ -268,18 +268,6 @@ export default function LandingPage() {
             )}
           </div>
           
-          {/* Scroll Indicator */}
-          <div className="absolute bottom-16 sm:bottom-8 left-1/2 -translate-x-1/2 group cursor-pointer animate-fadeInUp hero-scroll">
-            <div className="relative">
-              <div className="w-7 h-12 border-2 border-white/50 rounded-full flex justify-center group-hover:border-white/70 transition-all duration-300 animate-scrollBounce">
-                <div className="w-1.5 h-4 bg-white/70 rounded-full mt-2 group-hover:bg-white animate-pulse group-hover:h-5 transition-all duration-300"></div>
-              </div>
-              <div className="absolute -inset-2 bg-white/10 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-            <div className="text-white/60 text-xs mt-3 text-center font-medium group-hover:text-white/80 transition-colors duration-300">
-              Прокрутите вниз
-            </div>
-          </div>
         </div>
       </section>
 
