@@ -78,7 +78,7 @@ export interface HealthProfileData {
 
 const steps = [
   { id: 1, title: "Личная информация", shortTitle: "Личное", icon: User, component: PersonalInfoSection, color: "from-medical-blue via-blue-500 to-blue-600", bgColor: "bg-gradient-to-br from-medical-blue/8 via-blue-50 to-blue-100/50", iconBg: "bg-medical-blue/15", iconColor: "text-medical-blue" },
-  { id: 2, title: "Физическое здоровье", shortTitle: "Физика", icon: Activity, component: PhysicalHealthSection, color: "from-trust-green via-green-500 to-emerald-600", bgColor: "bg-gradient-to-br from-trust-green/8 via-green-50 to-emerald-100/50", iconBg: "bg-trust-green/15", iconColor: "text-trust-green" },
+  { id: 2, title: "Физическое здоровье", shortTitle: "Физическая Активность", icon: Activity, component: PhysicalHealthSection, color: "from-trust-green via-green-500 to-emerald-600", bgColor: "bg-gradient-to-br from-trust-green/8 via-green-50 to-emerald-100/50", iconBg: "bg-trust-green/15", iconColor: "text-trust-green" },
   { id: 3, title: "Ментальное здоровье", shortTitle: "Психика", icon: Brain, component: MentalHealthSection, color: "from-wellness-purple via-purple-500 to-purple-600", bgColor: "bg-gradient-to-br from-purple-100/8 via-purple-50 to-purple-100/50", iconBg: "bg-purple-500/15", iconColor: "text-purple-600" },
   { id: 4, title: "Образ жизни", shortTitle: "Стиль", icon: Coffee, component: LifestyleSection, color: "from-energy-orange via-orange-500 to-orange-600", bgColor: "bg-gradient-to-br from-orange-100/8 via-orange-50 to-orange-100/50", iconBg: "bg-orange-500/15", iconColor: "text-orange-600" },
   { id: 5, title: "Сон и отдых", shortTitle: "Сон", icon: Moon, component: SleepSection, color: "from-indigo-500 via-indigo-500 to-purple-600", bgColor: "bg-gradient-to-br from-indigo-100/8 via-indigo-50 to-purple-100/50", iconBg: "bg-indigo-500/15", iconColor: "text-indigo-600" },
@@ -118,8 +118,11 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
         data.bmi = parseFloat((data.weight / (heightInMeters * heightInMeters)).toFixed(1));
       }
       
-      const response = await apiRequest("POST", "/api/health-profile/complete", data);
-      return response.json();
+      const response = await apiRequest("/api/health-profile/complete", {
+        method: "POST", 
+        body: JSON.stringify(data)
+      });
+      return response;
     },
     onSuccess: () => {
       toast({
@@ -186,7 +189,7 @@ export default function HealthProfileWizard({ onComplete, initialData = {} }: He
                 </div>
                 <div>
                   <h2 className="text-lg md:text-3xl font-bold tracking-tight">
-                    HealthAI
+                    EVERLIV HEALTH
                   </h2>
                   <p className="text-white/90 text-xs md:text-sm mt-0.5 font-medium">
                     <span className="hidden sm:inline">Персонализированный анализ здоровья</span>

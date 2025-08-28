@@ -388,6 +388,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/health-profile", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      const userId = req.user.id;
+      const profileData = req.body;
+      
+      // Check if profile exists
+      const existingProfile = await storage.getHealthProfile(userId);
+      
+      if (existingProfile) {
+        // Update existing profile
+        const updated = await storage.updateHealthProfile(userId, profileData);
+        res.json(updated);
+      } else {
+        // Create new profile
+        const profile = await storage.createHealthProfile({
+          userId,
+          ...profileData,
+        });
+        res.json(profile);
+      }
+    } catch (error) {
+      console.error("Error saving health profile:", error);
+      res.status(500).json({ error: "Failed to save health profile" });
+    }
+  });
+
   app.post("/api/health-profile/complete", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.user) return res.status(401).json({ error: "Unauthorized" });
