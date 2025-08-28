@@ -15,6 +15,7 @@ export default function ChatPage() {
   const [isRecording, setIsRecording] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [lastMessageTimestamp, setLastMessageTimestamp] = useState<string | null>(null);
+  const [isAiResponding, setIsAiResponding] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -31,16 +32,22 @@ export default function ChatPage() {
   const { data: messages } = useQuery({
     queryKey: ["/api/chat-sessions", currentSessionId, "messages"],
     enabled: !!currentSessionId,
-    onSuccess: (newMessages: any[]) => {
-      // Update timestamp when new messages arrive
-      if (newMessages && newMessages.length > 0) {
-        const latestMessage = newMessages[newMessages.length - 1];
-        if (latestMessage && latestMessage.createdAt !== lastMessageTimestamp) {
-          setLastMessageTimestamp(latestMessage.createdAt);
+  });
+
+  // Track when new messages arrive
+  useEffect(() => {
+    if (messages && Array.isArray(messages) && messages.length > 0) {
+      const latestMessage = messages[messages.length - 1];
+      if (latestMessage && latestMessage.createdAt !== lastMessageTimestamp) {
+        setLastMessageTimestamp(latestMessage.createdAt);
+        
+        // If latest message is from assistant, stop the "thinking" indicator
+        if (latestMessage.role === 'assistant') {
+          setIsAiResponding(false);
         }
       }
-    },
-  });
+    }
+  }, [messages, lastMessageTimestamp]);
 
   const createSessionMutation = useMutation({
     mutationFn: async () => {
@@ -105,10 +112,15 @@ export default function ChatPage() {
       return { previousMessages };
     },
     onSuccess: () => {
-      // Invalidate to get the actual response with AI message
-      queryClient.invalidateQueries({ 
-        queryKey: ["/api/chat-sessions", currentSessionId, "messages"] 
-      });
+      // Start the AI thinking indicator
+      setIsAiResponding(true);
+      
+      // Delay invalidation to allow optimistic update to show first
+      setTimeout(() => {
+        queryClient.invalidateQueries({ 
+          queryKey: ["/api/chat-sessions", currentSessionId, "messages"] 
+        });
+      }, 500);
     },
     onError: (err, variables, context: any) => {
       // If the mutation fails, use the context returned from onMutate to roll back
@@ -258,13 +270,18 @@ export default function ChatPage() {
         }),
       });
 
-      // Refresh messages to get server IDs
-      queryClient.invalidateQueries({ 
-        queryKey: ["/api/chat-sessions", currentSessionId, "messages"] 
-      });
+      // Stop the AI responding indicator and refresh messages
+      setIsAiResponding(false);
+      
+      setTimeout(() => {
+        queryClient.invalidateQueries({ 
+          queryKey: ["/api/chat-sessions", currentSessionId, "messages"] 
+        });
+      }, 100);
 
-      // Clear message input after image upload
+      // Clear message input and set AI responding state
       setMessage("");
+      setIsAiResponding(true);
       
       toast({
         title: "✅ Изображение обработано",
@@ -283,9 +300,11 @@ export default function ChatPage() {
           }),
         });
         
-        queryClient.invalidateQueries({ 
-          queryKey: ["/api/chat-sessions", currentSessionId, "messages"] 
-        });
+        setTimeout(() => {
+          queryClient.invalidateQueries({ 
+            queryKey: ["/api/chat-sessions", currentSessionId, "messages"] 
+          });
+        }, 100);
       } catch (fallbackError) {
         console.error("Failed to send fallback message:", fallbackError);
       }
@@ -463,10 +482,11 @@ export default function ChatPage() {
                         className="bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 transform transition-all duration-200 hover:shadow-md"
                         data-testid={`message-${msg.role}`}
                       >
-{/* Only use typing animation for the most recent assistant message */}
+{/* Only use typing animation for the most recent assistant message that just arrived */}
                         {msg.role === "assistant" && 
                          msg.createdAt === lastMessageTimestamp && 
-                         index === ((messages as any[])?.length - 1) ? (
+                         index === ((messages as any[])?.length - 1) && 
+                         !isAiResponding ? (
                           <TypingAnimation 
                             text={msg.content} 
                             speed={15} 
@@ -484,7 +504,7 @@ export default function ChatPage() {
                 </div>
               ))
             )}
-            {sendMessageMutation.isPending && (
+{(sendMessageMutation.isPending || isAiResponding) && (
               <div className="flex justify-start">
                 <div className="max-w-lg animate-fadeIn">
                   <div className="bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100">
