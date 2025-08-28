@@ -319,14 +319,9 @@ export default function ChatPage() {
                 <ArrowLeft className="w-5 h-5" />
               </Button>
             </Link>
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-lg">🤖</span>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-800">EVERLIV Помощник</h3>
-                <p className="text-xs text-green-600 font-medium">● Персональный ИИ-консультант</p>
-              </div>
+            <div>
+              <h3 className="font-semibold text-gray-800">EVERLIV Помощник</h3>
+              <p className="text-xs text-green-600 font-medium">● Персональный ИИ-консультант</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -350,12 +345,9 @@ export default function ChatPage() {
           <div className="space-y-4">
             {!messages || !Array.isArray(messages) || messages.length === 0 ? (
               <div className="flex justify-start">
-                <div className="flex space-x-3 max-w-lg">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-sm">🤖</span>
-                  </div>
+                <div className="max-w-lg animate-fadeIn">
                   <div 
-                    className="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border border-gray-100"
+                    className="bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 transform transition-all duration-200 hover:shadow-md"
                   >
                     <p className="text-gray-700">
                       Здравствуйте! Я EVERLIV Помощник — ваш персональный ИИ-консультант по здоровью. 
@@ -370,37 +362,34 @@ export default function ChatPage() {
               (messages as any[]).map((msg: any, index: number) => (
                 <div
                   key={msg.id}
-                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                  style={{ animationDelay: `${index * 0.05}s` }}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} animate-fadeIn`}
+                  style={{ 
+                    animation: `fadeInUp 0.4s ease-out ${index * 0.1}s both`,
+                  }}
                 >
                   {msg.role === "user" ? (
                     <div className="max-w-lg">
                       <div
-                        className="bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-md"
+                        className="bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-md transform transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"
                         data-testid={`message-${msg.role}`}
                       >
                         <p className="whitespace-pre-line">{msg.content}</p>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1 text-right">
+                      <p className="text-xs text-gray-500 mt-2 text-right opacity-70">
                         {new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
                   ) : (
-                    <div className="flex space-x-3 max-w-lg">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-sm">🤖</span>
+                    <div className="max-w-lg">
+                      <div 
+                        className="bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 transform transition-all duration-200 hover:shadow-md"
+                        data-testid={`message-${msg.role}`}
+                      >
+                        <p className="text-gray-700 whitespace-pre-line">{msg.content}</p>
                       </div>
-                      <div>
-                        <div 
-                          className="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border border-gray-100"
-                          data-testid={`message-${msg.role}`}
-                        >
-                          <p className="text-gray-700 whitespace-pre-line">{msg.content}</p>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
-                        </p>
-                      </div>
+                      <p className="text-xs text-gray-500 mt-2 opacity-70">
+                        {new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -408,15 +397,13 @@ export default function ChatPage() {
             )}
             {sendMessageMutation.isPending && (
               <div className="flex justify-start">
-                <div className="flex space-x-3 max-w-lg">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-sm">🤖</span>
-                  </div>
-                  <div className="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border border-gray-100">
-                    <div className="flex space-x-2">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                <div className="max-w-lg animate-fadeIn">
+                  <div className="bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100">
+                    <div className="flex space-x-2 items-center">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      <span className="text-xs text-gray-500 ml-2">EVERLIV Помощник печатает...</span>
                     </div>
                   </div>
                 </div>
