@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,16 @@ export default function ChatPage() {
   const queryClient = useQueryClient();
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  
+  // Scroll to bottom function
+  const scrollToBottom = useCallback(() => {
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
+    }
+  }, []);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -99,14 +109,7 @@ export default function ChatPage() {
       setMessage("");
       
       // Scroll to bottom immediately
-      setTimeout(() => {
-        if (scrollAreaRef.current) {
-          const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-          if (scrollContainer) {
-            scrollContainer.scrollTop = scrollContainer.scrollHeight;
-          }
-        }
-      }, 50);
+      setTimeout(scrollToBottom, 50);
 
       // Return a context object with the snapshotted value
       return { previousMessages };
@@ -151,12 +154,9 @@ export default function ChatPage() {
   useEffect(() => {
     // Auto-scroll to bottom when messages change
     if (messages && scrollAreaRef.current) {
-      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (scrollContainer) {
-        scrollContainer.scrollTop = scrollContainer.scrollHeight;
-      }
+      setTimeout(scrollToBottom, 100);
     }
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -491,6 +491,7 @@ export default function ChatPage() {
                             text={msg.content} 
                             speed={15} 
                             className="text-gray-700"
+                            onTyping={scrollToBottom}
                           />
                         ) : (
                           <p className="text-gray-700 whitespace-pre-line">{msg.content}</p>
