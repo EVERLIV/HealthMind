@@ -19,7 +19,7 @@ export default function LoginPage() {
   // Перенаправление при успешной аутентификации
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
-      setLocation('/dashboard');
+      setLocation('/app/dashboard');
     }
   }, [isAuthenticated, isLoading, setLocation]);
 
