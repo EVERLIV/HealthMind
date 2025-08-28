@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 import MobileNav from "@/components/layout/mobile-nav";
 import BottomNav from "@/components/layout/bottom-nav";
 import SmartHealthGuide from "@/components/smart-health-guide";
@@ -31,6 +32,7 @@ import profileBg from '@assets/generated_images/Health_profile_medical_backgroun
 export default function Dashboard() {
   const [, navigate] = useLocation();
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
+  const { user } = useAuth();
 
   const { data: healthProfile } = useQuery({
     queryKey: ["/api/health-profile"],
@@ -62,7 +64,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-xl font-bold mb-1">
-                    Привет, <span data-testid="user-name" className="text-white/95">{hasProfile ? "Анна" : "Пользователь"}</span>
+                    Привет, <span data-testid="user-name" className="text-white/95">{user?.name || user?.username || "Пользователь"}</span>
                   </h1>
                   <p className="text-white/90 text-sm font-medium">
                     Добро пожаловать в EVERLIV HEALTH 🏥

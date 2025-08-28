@@ -1,5 +1,6 @@
 import { Bell, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 import logoUrl from '@assets/logo_1756364617629.png';
 
 export default function MobileNav() {
@@ -25,14 +26,16 @@ export default function MobileNav() {
             >
               <Bell className="w-5 h-5 text-muted-foreground" />
             </Button>
-            <Button 
-              data-testid="button-user-menu"
-              variant="ghost" 
-              size="sm" 
-              className="p-2 rounded-lg hover:bg-accent"
-            >
-              <UserCircle className="w-5 h-5 text-muted-foreground" />
-            </Button>
+            <Link href="/user-settings">
+              <Button 
+                data-testid="button-user-menu"
+                variant="ghost" 
+                size="sm" 
+                className="p-2 rounded-lg hover:bg-accent"
+              >
+                <UserCircle className="w-5 h-5 text-muted-foreground" />
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
