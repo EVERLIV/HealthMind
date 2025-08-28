@@ -84,7 +84,7 @@ export default function Dashboard() {
                     </div>
                     <Button 
                       size="sm"
-                      onClick={() => navigate("/health-profile")}
+                      onClick={() => navigate("/app/health-profile")}
                       className="bg-white text-medical-blue hover:bg-white/90 rounded-xl px-3 py-1.5 text-xs font-bold shadow-lg"
                       data-testid="button-create-profile"
                     >
@@ -100,7 +100,7 @@ export default function Dashboard() {
         {/* Main Action Cards - 2x2 Grid */}
         <div className="grid grid-cols-2 gap-3 mb-4">
           {/* AI Doctor */}
-          <Link href="/chat">
+          <Link href="/app/chat">
             <button
               data-testid="button-ai-chat"
               className="p-4 flex flex-col items-center justify-center gap-3 text-center text-white h-[160px] hover:scale-[1.02] transition-all duration-300 relative overflow-hidden w-full rounded-2xl shadow-xl hover:shadow-2xl"
@@ -123,7 +123,7 @@ export default function Dashboard() {
           </Link>
           
           {/* Blood Analysis */}
-          <Link href="/blood-analysis">
+          <Link href="/app/blood-analysis">
             <button
               data-testid="button-blood-upload"
               className="p-4 flex flex-col items-center justify-center gap-3 text-center text-white h-[160px] hover:scale-[1.02] transition-all duration-300 relative overflow-hidden w-full rounded-2xl shadow-xl hover:shadow-2xl"
@@ -146,7 +146,7 @@ export default function Dashboard() {
           </Link>
 
           {/* My Biomarkers - New Card */}
-          <Link href="/biomarkers">
+          <Link href="/app/biomarkers">
             <button
               data-testid="button-biomarkers"
               className="p-4 flex flex-col items-center justify-center gap-3 text-center text-white h-[160px] hover:scale-[1.02] transition-all duration-300 relative overflow-hidden w-full rounded-2xl shadow-xl hover:shadow-2xl"
@@ -169,7 +169,7 @@ export default function Dashboard() {
           </Link>
 
           {/* Health Profile Summary - Compact */}
-          <Link href="/profile">
+          <Link href="/app/profile">
             <button
               data-testid="button-health-profile"
               className="p-4 flex flex-col items-center justify-center gap-3 text-center text-white h-[160px] hover:scale-[1.02] transition-all duration-300 relative overflow-hidden w-full rounded-2xl shadow-xl hover:shadow-2xl"
@@ -214,7 +214,7 @@ export default function Dashboard() {
                   <p className="text-sm text-muted-foreground leading-relaxed mb-3">
                     💧 Пейте больше воды! Рекомендуем 8-10 стаканов в день для поддержания оптимального уровня гидратации.
                   </p>
-                  <Link href="/recommendations">
+                  <Link href="/app/recommendations">
                     <Button size="sm" className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:opacity-90 text-white rounded-xl">
                       <Target className="w-4 h-4 mr-1" />
                       Все рекомендации

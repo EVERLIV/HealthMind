@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import NotFound from "@/pages/not-found";
+import LandingPage from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import Biomarkers from "@/pages/biomarkers";
 import Profile from "@/pages/profile";
@@ -43,27 +44,26 @@ function ProtectedRoute({ component: Component }: { component: React.FC }) {
 }
 
 function Router() {
-  const { isAuthenticated } = useAuth();
-  
   return (
     <Switch>
-      <Route path="/">
-        {isAuthenticated ? <Redirect to="/dashboard" /> : <Redirect to="/login" />}
-      </Route>
+      <Route path="/" component={LandingPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
-      <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
-      <Route path="/blood-analysis" component={() => <ProtectedRoute component={BloodAnalysisPage} />} />
-      <Route path="/biomarkers" component={() => <ProtectedRoute component={Biomarkers} />} />
-      <Route path="/profile" component={() => <ProtectedRoute component={Profile} />} />
-      <Route path="/recommendations" component={() => <ProtectedRoute component={Recommendations} />} />
-      <Route path="/ai-consultation" component={() => <ProtectedRoute component={AIConsultation} />} />
-      <Route path="/health-profile" component={() => <ProtectedRoute component={HealthProfilePage} />} />
-      <Route path="/chat" component={() => <ProtectedRoute component={ChatPage} />} />
-      <Route path="/blood-analyses" component={() => <ProtectedRoute component={BloodAnalysesListPage} />} />
-      <Route path="/blood-analyses/:id" component={() => <ProtectedRoute component={BloodAnalysisDetailPage} />} />
-      <Route path="/article/:id" component={() => <ProtectedRoute component={ArticleDetail} />} />
-      <Route path="/user-settings" component={() => <ProtectedRoute component={UserSettingsPage} />} />
+      <Route path="/app">
+        <Redirect to="/app/dashboard" />
+      </Route>
+      <Route path="/app/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/app/blood-analysis" component={() => <ProtectedRoute component={BloodAnalysisPage} />} />
+      <Route path="/app/biomarkers" component={() => <ProtectedRoute component={Biomarkers} />} />
+      <Route path="/app/profile" component={() => <ProtectedRoute component={Profile} />} />
+      <Route path="/app/recommendations" component={() => <ProtectedRoute component={Recommendations} />} />
+      <Route path="/app/ai-consultation" component={() => <ProtectedRoute component={AIConsultation} />} />
+      <Route path="/app/health-profile" component={() => <ProtectedRoute component={HealthProfilePage} />} />
+      <Route path="/app/chat" component={() => <ProtectedRoute component={ChatPage} />} />
+      <Route path="/app/blood-analyses" component={() => <ProtectedRoute component={BloodAnalysesListPage} />} />
+      <Route path="/app/blood-analyses/:id" component={() => <ProtectedRoute component={BloodAnalysisDetailPage} />} />
+      <Route path="/app/article/:id" component={() => <ProtectedRoute component={ArticleDetail} />} />
+      <Route path="/app/user-settings" component={() => <ProtectedRoute component={UserSettingsPage} />} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -3,10 +3,10 @@ import { Home, Brain, BriefcaseMedical, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { path: "/", icon: Home, label: "Главная" },
-  { path: "/blood-analyses", icon: BriefcaseMedical, label: "Анализы" },
-  { path: "/recommendations", icon: Brain, label: "Рекомендации" },
-  { path: "/profile", icon: User, label: "Профиль" },
+  { path: "/app/dashboard", icon: Home, label: "Главная" },
+  { path: "/app/blood-analyses", icon: BriefcaseMedical, label: "Анализы" },
+  { path: "/app/recommendations", icon: Brain, label: "Рекомендации" },
+  { path: "/app/profile", icon: User, label: "Профиль" },
 ];
 
 export default function BottomNav() {

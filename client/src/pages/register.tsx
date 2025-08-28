@@ -43,7 +43,7 @@ export default function RegisterPage() {
         password: formData.password,
         name: formData.name,
       });
-      setLocation('/dashboard');
+      setLocation('/app/dashboard');
     } catch (error: any) {
       setError(error.message || 'Ошибка регистрации');
     } finally {
