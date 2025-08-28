@@ -9,6 +9,7 @@ import Dashboard from "@/pages/dashboard";
 import Biomarkers from "@/pages/biomarkers";
 import Profile from "@/pages/profile";
 import AIConsultation from "@/pages/deepseek-consultation";
+import Recommendations from "@/pages/recommendations";
 import HealthProfilePage from "@/pages/health-profile-page";
 import ChatPage from "@/pages/chat";
 import BloodAnalysisPage from "@/pages/blood-analysis";
@@ -55,7 +56,8 @@ function Router() {
       <Route path="/blood-analysis" component={() => <ProtectedRoute component={BloodAnalysisPage} />} />
       <Route path="/biomarkers" component={() => <ProtectedRoute component={Biomarkers} />} />
       <Route path="/profile" component={() => <ProtectedRoute component={Profile} />} />
-      <Route path="/recommendations" component={() => <ProtectedRoute component={AIConsultation} />} />
+      <Route path="/recommendations" component={() => <ProtectedRoute component={Recommendations} />} />
+      <Route path="/ai-consultation" component={() => <ProtectedRoute component={AIConsultation} />} />
       <Route path="/health-profile" component={() => <ProtectedRoute component={HealthProfilePage} />} />
       <Route path="/chat" component={() => <ProtectedRoute component={ChatPage} />} />
       <Route path="/blood-analyses" component={() => <ProtectedRoute component={BloodAnalysesListPage} />} />
