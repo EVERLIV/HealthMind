@@ -169,21 +169,25 @@ export default function BloodAnalysisPage() {
 
   const createAnalysisMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest("POST", "/api/blood-analyses", {
-        status: "pending",
+      return await apiRequest("/api/blood-analyses", {
+        method: "POST",
+        body: JSON.stringify({
+          status: "pending",
+        }),
       });
-      return response.json();
     },
   });
 
   const extractTextMutation = useMutation({
     mutationFn: async ({ analysisId, imageBase64, mimeType }: { analysisId: string; imageBase64: string; mimeType?: string }) => {
       console.log('Sending extract text request...');
-      const response = await apiRequest("POST", `/api/blood-analyses/${analysisId}/extract-text`, {
-        imageBase64,
-        mimeType,
+      const result = await apiRequest(`/api/blood-analyses/${analysisId}/extract-text`, {
+        method: "POST",
+        body: JSON.stringify({
+          imageBase64,
+          mimeType,
+        }),
       });
-      const result = await response.json();
       console.log('Extract text result:', result);
       return result;
     },
@@ -217,10 +221,12 @@ export default function BloodAnalysisPage() {
 
   const analyzeTextMutation = useMutation({
     mutationFn: async ({ analysisId, text }: { analysisId: string; text: string }) => {
-      const response = await apiRequest("POST", `/api/blood-analyses/${analysisId}/analyze-text`, {
-        text,
+      return await apiRequest(`/api/blood-analyses/${analysisId}/analyze-text`, {
+        method: "POST",
+        body: JSON.stringify({
+          text,
+        }),
       });
-      return response.json();
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["/api/blood-analyses"] });
@@ -247,8 +253,9 @@ export default function BloodAnalysisPage() {
 
   const handleGetUploadParameters = async () => {
     try {
-      const response = await apiRequest("POST", "/api/objects/upload");
-      const { uploadURL } = await response.json();
+      const { uploadURL } = await apiRequest("/api/objects/upload", {
+        method: "POST",
+      });
       return {
         method: "PUT" as const,
         url: uploadURL,

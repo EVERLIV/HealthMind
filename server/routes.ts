@@ -5,14 +5,18 @@ import { ObjectStorageService } from "./objectStorage";
 import { DeepSeekAnalysisService, DeepSeekService } from "./deepseekService";
 import OpenAIVisionService from "./openaiVisionService";
 import { insertBloodAnalysisSchema, insertChatSessionSchema, insertChatMessageSchema, insertHealthMetricsSchema, insertHealthProfileSchema } from "@shared/schema";
+import { authenticate, AuthenticatedRequest, logActivity } from "./auth";
+import { registerAuthRoutes } from "./authRoutes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  const DEFAULT_USER_ID = "user-1"; // For demo purposes
+  // Register authentication routes
+  registerAuthRoutes(app);
 
-  // Health Profile routes
-  app.get("/api/health-profile", async (req, res) => {
+  // Health Profile routes (protected)
+  app.get("/api/health-profile", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
-      const profile = await storage.getHealthProfile(DEFAULT_USER_ID);
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      const profile = await storage.getHealthProfile(req.user.id);
       res.json(profile);
     } catch (error) {
       console.error("Error fetching health profile:", error);
@@ -20,10 +24,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/health-profile", async (req, res) => {
+  app.put("/api/health-profile", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
       const validatedData = insertHealthProfileSchema.parse(req.body);
-      const profile = await storage.updateHealthProfile(DEFAULT_USER_ID, validatedData);
+      const profile = await storage.updateHealthProfile(req.user.id, validatedData);
+      await logActivity(req.user.id, "health_profile_updated");
       res.json(profile);
     } catch (error) {
       console.error("Error updating health profile:", error);
@@ -31,10 +37,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Health Metrics routes
-  app.get("/api/health-metrics/latest", async (req, res) => {
+  // Health Metrics routes (protected)
+  app.get("/api/health-metrics/latest", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
-      const metrics = await storage.getLatestHealthMetrics(DEFAULT_USER_ID);
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      const metrics = await storage.getLatestHealthMetrics(req.user.id);
       res.json(metrics);
     } catch (error) {
       console.error("Error fetching health metrics:", error);
@@ -42,9 +49,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/health-metrics", async (req, res) => {
+  app.get("/api/health-metrics", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
-      const metrics = await storage.getHealthMetrics(DEFAULT_USER_ID);
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      const metrics = await storage.getHealthMetrics(req.user.id);
       res.json(metrics);
     } catch (error) {
       console.error("Error fetching health metrics:", error);
@@ -52,13 +60,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/health-metrics", async (req, res) => {
+  app.post("/api/health-metrics", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
       const validatedData = insertHealthMetricsSchema.parse({
         ...req.body,
-        userId: DEFAULT_USER_ID,
+        userId: req.user.id,
       });
       const metrics = await storage.createHealthMetrics(validatedData);
+      await logActivity(req.user.id, "health_metrics_created");
       res.json(metrics);
     } catch (error) {
       console.error("Error creating health metrics:", error);
@@ -66,10 +76,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Blood Analysis routes
-  app.get("/api/blood-analyses", async (req, res) => {
+  // Blood Analysis routes (protected)
+  app.get("/api/blood-analyses", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
-      const analyses = await storage.getBloodAnalysesByUser(DEFAULT_USER_ID);
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      const analyses = await storage.getBloodAnalysesByUser(req.user.id);
       res.json(analyses);
     } catch (error) {
       console.error("Error fetching blood analyses:", error);
@@ -77,11 +88,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/blood-analyses/:id", async (req, res) => {
+  app.get("/api/blood-analyses/:id", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
       const analysis = await storage.getBloodAnalysis(req.params.id);
       if (!analysis) {
         return res.status(404).json({ error: "Blood analysis not found" });
+      }
+      // Ensure user can only access their own analyses
+      if (analysis.userId !== req.user.id) {
+        return res.status(403).json({ error: "Forbidden" });
       }
       res.json(analysis);
     } catch (error) {
@@ -90,13 +106,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/blood-analyses", async (req, res) => {
+  app.post("/api/blood-analyses", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
       const validatedData = insertBloodAnalysisSchema.parse({
         ...req.body,
-        userId: DEFAULT_USER_ID,
+        userId: req.user.id,
       });
       const analysis = await storage.createBloodAnalysis(validatedData);
+      await logActivity(req.user.id, "blood_analysis_created", { analysisId: analysis.id });
       res.json(analysis);
     } catch (error) {
       console.error("Error creating blood analysis:", error);
@@ -104,8 +122,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Object storage for blood test images
-  app.get("/objects/:objectPath(*)", async (req, res) => {
+  // Object storage for blood test images (protected)
+  app.get("/objects/:objectPath(*)", authenticate, async (req: AuthenticatedRequest, res) => {
     const objectStorageService = new ObjectStorageService();
     try {
       const objectFile = await objectStorageService.getObjectEntityFile(req.path);
@@ -116,8 +134,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/objects/upload", async (req, res) => {
+  app.post("/api/objects/upload", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
       const objectStorageService = new ObjectStorageService();
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();
       res.json({ uploadURL });
@@ -127,8 +146,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/blood-analyses/:id/image", async (req, res) => {
+  app.put("/api/blood-analyses/:id/image", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      // Check if analysis belongs to user
+      const analysis = await storage.getBloodAnalysis(req.params.id);
+      if (!analysis || analysis.userId !== req.user.id) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      
       const { imageURL } = req.body;
       if (!imageURL) {
         return res.status(400).json({ error: "imageURL is required" });
@@ -138,21 +165,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const objectPath = objectStorageService.normalizeObjectEntityPath(imageURL);
       
       // Update blood analysis with image URL
-      const analysis = await storage.updateBloodAnalysis(req.params.id, {
+      const updatedAnalysis = await storage.updateBloodAnalysis(req.params.id, {
         imageUrl: objectPath,
         status: "analyzing",
       });
 
-      res.json({ objectPath, analysis });
+      await logActivity(req.user.id, "blood_analysis_image_uploaded", { analysisId: req.params.id });
+      res.json({ objectPath, analysis: updatedAnalysis });
     } catch (error) {
       console.error("Error updating blood analysis image:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
 
-  // DeepSeek Analysis routes
-  app.post("/api/blood-analyses/:id/analyze-text", async (req, res) => {
+  // DeepSeek Analysis routes (protected)
+  app.post("/api/blood-analyses/:id/analyze-text", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      // Check if analysis belongs to user
+      const analysis = await storage.getBloodAnalysis(req.params.id);
+      if (!analysis || analysis.userId !== req.user.id) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      
       const { text } = req.body;
       if (!text) {
         return res.status(400).json({ error: "Text is required" });
@@ -244,9 +280,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Extract text from image using OpenAI Vision (OCR step)
-  app.post("/api/blood-analyses/:id/extract-text", async (req, res) => {
+  // Extract text from image using OpenAI Vision (OCR step) - protected
+  app.post("/api/blood-analyses/:id/extract-text", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      // Check if analysis belongs to user
+      const analysis = await storage.getBloodAnalysis(req.params.id);
+      if (!analysis || analysis.userId !== req.user.id) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      
       const { imageBase64, mimeType } = req.body;
       if (!imageBase64) {
         return res.status(400).json({ error: "Image data is required" });
@@ -296,22 +340,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const recommendationsCache = new Map();
   const CACHE_TTL = 10 * 60 * 1000; // 10 минут
 
-  // Recommendations route
-  app.get("/api/recommendations", async (req, res) => {
+  // Recommendations route (protected)
+  app.get("/api/recommendations", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
       const deepSeekApiKey = process.env.DEEPSEEK_API_KEY;
       if (!deepSeekApiKey) {
         return res.status(500).json({ error: "DeepSeek API key not configured" });
       }
 
       // Get user's health profile
-      const healthProfile = await storage.getHealthProfile(DEFAULT_USER_ID);
+      const healthProfile = await storage.getHealthProfile(req.user.id);
       
       // Get user's latest blood analyses
-      const bloodAnalyses = await storage.getBloodAnalysesByUser(DEFAULT_USER_ID);
+      const bloodAnalyses = await storage.getBloodAnalysesByUser(req.user.id);
       
       // Create cache key based on profile and analyses data
-      const cacheKey = `recommendations_${DEFAULT_USER_ID}_${JSON.stringify({
+      const cacheKey = `recommendations_${req.user.id}_${JSON.stringify({
         profile: healthProfile?.updatedAt,
         analyses: bloodAnalyses.map(a => ({ id: a.id, updatedAt: a.updatedAt }))
       })}`;
@@ -391,9 +437,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Biomarkers routes
-  app.get("/api/biomarkers", async (req, res) => {
+  // Biomarkers routes (protected)
+  app.get("/api/biomarkers", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
       const biomarkers = await storage.getAllBiomarkers();
       res.json(biomarkers);
     } catch (error) {
@@ -402,8 +449,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/biomarkers/:id", async (req, res) => {
+  app.get("/api/biomarkers/:id", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
       const biomarker = await storage.getBiomarker(req.params.id);
       if (!biomarker) {
         return res.status(404).json({ error: "Biomarker not found" });
@@ -415,8 +463,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/blood-analyses/:id/biomarker-results", async (req, res) => {
+  app.get("/api/blood-analyses/:id/biomarker-results", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      // Check if analysis belongs to user
+      const analysis = await storage.getBloodAnalysis(req.params.id);
+      if (!analysis || analysis.userId !== req.user.id) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
       const results = await storage.getBiomarkerResults(req.params.id);
       const resultsWithBiomarkers = await Promise.all(
         results.map(async (result) => {
@@ -431,11 +486,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get biomarker history across all analyses
-  app.get("/api/biomarkers/:id/history", async (req, res) => {
+  // Get biomarker history across all analyses (protected)
+  app.get("/api/biomarkers/:id/history", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
       const biomarkerId = req.params.id;
-      const analyses = await storage.getBloodAnalysesByUser(DEFAULT_USER_ID);
+      const analyses = await storage.getBloodAnalysesByUser(req.user.id);
       const history: any[] = [];
 
       for (const analysis of analyses) {
@@ -464,10 +520,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Chat routes
-  app.get("/api/chat-sessions", async (req, res) => {
+  // Chat routes (protected)
+  app.get("/api/chat-sessions", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
-      const sessions = await storage.getChatSessionsByUser(DEFAULT_USER_ID);
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      const sessions = await storage.getChatSessionsByUser(req.user.id);
       res.json(sessions);
     } catch (error) {
       console.error("Error fetching chat sessions:", error);
@@ -475,13 +532,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/chat-sessions", async (req, res) => {
+  app.post("/api/chat-sessions", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
       const validatedData = insertChatSessionSchema.parse({
         ...req.body,
-        userId: DEFAULT_USER_ID,
+        userId: req.user.id,
       });
       const session = await storage.createChatSession(validatedData);
+      await logActivity(req.user.id, "chat_session_created", { sessionId: session.id });
       res.json(session);
     } catch (error) {
       console.error("Error creating chat session:", error);
@@ -489,8 +548,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/chat-sessions/:id/messages", async (req, res) => {
+  app.get("/api/chat-sessions/:id/messages", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      // Check if session belongs to user
+      const session = await storage.getChatSession(req.params.id);
+      if (!session || session.userId !== req.user.id) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      
       const messages = await storage.getChatMessages(req.params.id);
       res.json(messages);
     } catch (error) {
@@ -499,8 +566,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/chat-sessions/:id/messages", async (req, res) => {
+  app.post("/api/chat-sessions/:id/messages", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      // Check if session belongs to user
+      const session = await storage.getChatSession(req.params.id);
+      if (!session || session.userId !== req.user.id) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      
       const validatedData = insertChatMessageSchema.parse({
         ...req.body,
         sessionId: req.params.id,
@@ -525,10 +600,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Complete health profile
-  app.post("/api/health-profile/complete", async (req, res) => {
+  // Complete health profile (protected)
+  app.post("/api/health-profile/complete", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = "user-1"; // Demo user
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      const userId = req.user.id;
       const profileData = req.body;
       
       // Check if profile exists

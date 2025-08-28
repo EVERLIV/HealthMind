@@ -5,10 +5,20 @@ import { z } from "zod";
 
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
+  username: text("username").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
   name: text("name").notNull(),
+  role: text("role").notNull().default("user"), // user, admin
+  subscriptionType: text("subscription_type").notNull().default("basic"), // basic, premium, enterprise
+  subscriptionExpiresAt: timestamp("subscription_expires_at"),
+  isEmailVerified: integer("is_email_verified").default(0), // 0 = false, 1 = true
+  emailVerificationToken: text("email_verification_token"),
+  resetPasswordToken: text("reset_password_token"),
+  resetPasswordExpires: timestamp("reset_password_expires"),
+  lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const healthProfiles = pgTable("health_profiles", {
@@ -82,8 +92,30 @@ export const healthMetrics = pgTable("health_metrics", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Sessions table for auth
+export const sessions = pgTable("sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User activity logs
+export const userActivityLogs = pgTable("user_activity_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  action: text("action").notNull(), // login, logout, view_analysis, create_chat, etc.
+  metadata: json("metadata"), // Additional context data
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
-export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
+export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertSessionSchema = createInsertSchema(sessions).omit({ id: true, createdAt: true });
+export const insertUserActivityLogSchema = createInsertSchema(userActivityLogs).omit({ id: true, createdAt: true });
 export const insertHealthProfileSchema = createInsertSchema(healthProfiles).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertBloodAnalysisSchema = createInsertSchema(bloodAnalyses).omit({ id: true, createdAt: true });
 export const insertBiomarkerSchema = createInsertSchema(biomarkers).omit({ id: true });
@@ -95,6 +127,10 @@ export const insertHealthMetricsSchema = createInsertSchema(healthMetrics).omit(
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type Session = typeof sessions.$inferSelect;
+export type InsertSession = z.infer<typeof insertSessionSchema>;
+export type UserActivityLog = typeof userActivityLogs.$inferSelect;
+export type InsertUserActivityLog = z.infer<typeof insertUserActivityLogSchema>;
 export type HealthProfile = typeof healthProfiles.$inferSelect;
 export type InsertHealthProfile = z.infer<typeof insertHealthProfileSchema>;
 export type BloodAnalysis = typeof bloodAnalyses.$inferSelect;

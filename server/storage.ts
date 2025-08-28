@@ -282,7 +282,7 @@ export class MemStorage implements IStorage {
       category: insertBiomarker.category,
       importance: insertBiomarker.importance,
       normalRange: insertBiomarker.normalRange ?? null,
-      recommendations: Array.isArray(insertBiomarker.recommendations) ? insertBiomarker.recommendations : null,
+      recommendations: Array.isArray(insertBiomarker.recommendations) ? insertBiomarker.recommendations as string[] : null,
     };
     this.biomarkers.set(id, biomarker);
     return biomarker;
