@@ -661,55 +661,8 @@ ${userContext}
         }
       }
       
-      // Get user's health context for personalized advice
-      const healthProfile = await storage.getHealthProfile(req.user.id);
-      const bloodAnalyses = await storage.getBloodAnalysesByUser(req.user.id);
-      
-      let contextualAdvice = imageAnalysis;
-      
-      // Add personalized context if OpenAI is available
-      const openaiPersonalizationKey = process.env.OPENAI_API_KEY;
-      if (openaiPersonalizationKey && healthProfile) {
-        try {
-          const openai = new OpenAI({ apiKey: openaiPersonalizationKey });
-          const profileData = healthProfile.profileData as any;
-          
-          const contextPrompt = `Персонализируй медицинские рекомендации для пользователя:
-          
-АНАЛИЗ ИЗОБРАЖЕНИЯ: ${imageAnalysis}
-
-ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ:
-- Возраст: ${profileData?.age || 'не указан'}
-- Пол: ${profileData?.gender || 'не указан'} 
-- Активность: ${profileData?.activityLevel || 'не указана'}
-- Хронические заболевания: ${profileData?.chronicConditions?.join(', ') || 'не указаны'}
-- Аллергии: ${profileData?.allergies?.join(', ') || 'не указаны'}
-
-Дай персонализированные рекомендации, учитывая профиль пользователя. Отвечай на русском языке как опытный врач-консультант.`;
-
-          const completion = await openai.chat.completions.create({
-            model: "gpt-4o",
-            messages: [
-              {
-                role: "system",
-                content: "Ты опытный медицинский консультант. Персонализируй рекомендации для пользователя."
-              },
-              {
-                role: "user",
-                content: contextPrompt
-              }
-            ],
-            max_tokens: 800,
-            temperature: 0.7
-          });
-
-          contextualAdvice = completion.choices[0].message.content || imageAnalysis;
-        } catch (error) {
-          console.error("Error getting personalized advice:", error);
-        }
-      }
-      
-      res.json({ analysis: contextualAdvice });
+      // Send the analysis result directly without additional processing
+      res.json({ analysis: imageAnalysis });
     } catch (error) {
       console.error("Error analyzing chat image:", error);
       res.status(500).json({ error: "Image analysis failed" });
