@@ -101,8 +101,11 @@ export default function Profile() {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest("PUT", "/api/health-profile", data);
-      return response.json();
+      const response = await apiRequest("/api/health-profile", {
+        method: "PUT", 
+        body: JSON.stringify(data)
+      });
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/health-profile"] });
@@ -191,7 +194,7 @@ export default function Profile() {
                   </div>
                   <div>
                     <h1 className="text-xl font-bold tracking-tight">
-                      HealthAI Профиль
+                      EVERLIV HEALTH Профиль
                     </h1>
                     <p className="text-white/90 text-sm font-medium">
                       Персональный медицинский профиль

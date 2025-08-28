@@ -180,7 +180,7 @@ export const articlesDatabase: Record<string, Article> = {
       "Не пейте кофе сразу - подождите 90-120 минут",
       "Избегайте слишком интенсивных тренировок сразу после пробуждения"
     ],
-    author: "Команда HealthAI",
+    author: "Команда EVERLIV HEALTH",
     publishDate: "2024-01-20",
     new: true,
     relatedArticles: ["5", "8"]
@@ -290,7 +290,7 @@ export const articlesDatabase: Record<string, Article> = {
       "Не допускайте длительного чувства недомогания",
       "Прекратите практику при появлении расстройств пищевого поведения"
     ],
-    author: "Команда HealthAI",
+    author: "Команда EVERLIV HEALTH",
     publishDate: "2024-01-22",
     trending: true,
     relatedArticles: ["1", "6"]

@@ -177,7 +177,7 @@ const categoryColors = {
       "Держите стакан воды у кровати",
       "Откройте шторы сразу после пробуждения"
     ],
-    author: "Команда HealthAI",
+    author: "Команда EVERLIV HEALTH",
     publishDate: "2024-01-20"
   }
 };
