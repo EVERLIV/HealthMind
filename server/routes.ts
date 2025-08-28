@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService } from "./objectStorage";
-import { DeepSeekAnalysisService, DeepSeekService } from "./deepseekService";
+import DeepSeekService, { DeepSeekAnalysisService } from "./deepseekService";
 import OpenAIVisionService from "./openaiVisionService";
 import { insertBloodAnalysisSchema, insertChatSessionSchema, insertChatMessageSchema, insertHealthMetricsSchema, insertHealthProfileSchema } from "@shared/schema";
 import { authenticate, AuthenticatedRequest, logActivity } from "./auth";
@@ -358,8 +358,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create cache key based on profile and analyses data
       const cacheKey = `recommendations_${req.user.id}_${JSON.stringify({
-        profile: healthProfile?.updatedAt,
-        analyses: bloodAnalyses.map(a => ({ id: a.id, updatedAt: a.updatedAt }))
+        profile: healthProfile?.createdAt,
+        analyses: bloodAnalyses.map(a => ({ id: a.id, analyzedAt: a.analyzedAt }))
       })}`;
 
       // Check cache first
@@ -591,12 +591,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Use OpenAI Vision to analyze the image
-      const openaiService = new OpenAIVisionService(openaiApiKey);
-      
-      const analysisPrompt = question || "Проанализируйте это изображение на предмет кожных проблем, симптомов или других медицинских вопросов. Дайте профессиональные рекомендации.";
-      
-      const imageAnalysis = await openaiService.analyzeHealthImage(imageBase64, mimeType, analysisPrompt);
+      // Try to use OpenAI Vision to analyze the image
+      let imageAnalysis;
+      try {
+        const openaiService = new OpenAIVisionService(openaiApiKey);
+        const analysisPrompt = question || "Проанализируйте это изображение на предмет кожных проблем, симптомов или других медицинских вопросов. Дайте профессиональные рекомендации.";
+        imageAnalysis = await openaiService.analyzeHealthImage(imageBase64, mimeType, analysisPrompt);
+      } catch (openaiError: any) {
+        console.log('OpenAI Vision failed, using fallback analysis');
+        if (openaiError.status === 429) {
+          imageAnalysis = "⚠️ **Анализ изображения (базовый режим)**\n\nВ данный момент система анализа изображений перегружена. Могу дать общие рекомендации:\n\n**Общие советы по кожным проблемам:**\n• Следите за гигиеной проблемной области\n• Избегайте расчесывания\n• При покраснении или воспалении - холодный компресс\n• Если симптомы усиливаются или не проходят 2-3 дня - обратитесь к дерматологу\n\n**Опишите проблему текстом** для более точных рекомендаций:\n- Где расположено?\n- Когда появилось?\n- Какие ощущения (зуд, боль, жжение)?\n- Принимаете ли какие-то лекарства?\n\n⚠️ **Важно**: При любых серьезных изменениях кожи рекомендую очную консультацию дерматолога.";
+        } else {
+          imageAnalysis = "⚠️ **Временная проблема с анализом изображений**\n\nПопробуйте описать проблему текстом:\n• Что беспокоит?\n• Где расположено?\n• Как давно появилось?\n• Какие симптомы?\n\nЯ дам рекомендации на основе описания!";
+        }
+      }
       
       // Get user's health context for personalized advice
       const healthProfile = await storage.getHealthProfile(req.user.id);
