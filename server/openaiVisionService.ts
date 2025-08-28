@@ -36,7 +36,7 @@ export default class OpenAIVisionService {
       }
 
       const response = await this.client.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini", // Updated to use gpt-4o-mini for faster processing
         messages: [
           {
             role: "system",
@@ -103,7 +103,7 @@ export default class OpenAIVisionService {
       console.log('Using MIME type:', validatedMimeType);
       
       const response = await this.client.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini", // Updated to use gpt-4o-mini for faster processing
         messages: [
           {
             role: "system",
@@ -287,7 +287,7 @@ export default class OpenAIVisionService {
   async analyzeBloodTestText(text: string): Promise<AnalysisResult> {
     try {
       const response = await this.client.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini", // Updated to use gpt-4o-mini for faster processing
         messages: [
           {
             role: "system",
@@ -368,7 +368,7 @@ ${text}
       }
 
       const response = await this.client.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini", // Updated to use gpt-4o-mini for faster processing
         messages: [
           {
             role: "system",
