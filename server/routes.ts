@@ -456,6 +456,162 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // DeepSeek Consultation endpoint
+  app.post("/api/deepseek-consultation", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+
+      const { question, healthProfile, bloodAnalyses } = req.body;
+      
+      if (!question || !question.trim()) {
+        return res.status(400).json({ error: "Вопрос обязателен" });
+      }
+
+      // Prepare detailed user context for consultation
+      let userContext = "";
+      
+      if (healthProfile?.profileData) {
+        const pd = healthProfile.profileData;
+        userContext += `\nДанные профиля пользователя:`;
+        if (pd.age) userContext += `\n- Возраст: ${pd.age} лет`;
+        if (pd.gender) userContext += `\n- Пол: ${pd.gender}`;
+        if (pd.height && pd.weight) {
+          const bmi = pd.weight / ((pd.height/100) ** 2);
+          userContext += `\n- Рост: ${pd.height} см, Вес: ${pd.weight} кг (ИМТ: ${bmi.toFixed(1)})`;
+        }
+        if (pd.activityLevel) userContext += `\n- Уровень активности: ${pd.activityLevel}`;
+        if (pd.smokingStatus) userContext += `\n- Курение: ${pd.smokingStatus}`;
+        if (pd.alcoholConsumption) userContext += `\n- Алкоголь: ${pd.alcoholConsumption}`;
+        if (pd.sleepHours) userContext += `\n- Сон: ${pd.sleepHours} часов`;
+        if (pd.stressLevel) userContext += `\n- Уровень стресса: ${pd.stressLevel}`;
+        if (pd.healthGoals?.length > 0) userContext += `\n- Цели здоровья: ${pd.healthGoals.join(', ')}`;
+        if (pd.chronicConditions?.length > 0) userContext += `\n- Хронические заболевания: ${pd.chronicConditions.join(', ')}`;
+        if (pd.allergies?.length > 0) userContext += `\n- Аллергии: ${pd.allergies.join(', ')}`;
+        if (pd.currentMedications?.length > 0) {
+          userContext += `\n- Текущие лекарства: ${pd.currentMedications.map((m: any) => `${m.name} ${m.dosage} ${m.frequency}`).join(', ')}`;
+        }
+      }
+
+      if (bloodAnalyses && Array.isArray(bloodAnalyses) && bloodAnalyses.length > 0) {
+        const latestAnalysis = bloodAnalyses[0];
+        if (latestAnalysis?.biomarkers?.length > 0) {
+          userContext += `\n\nПоследние анализы крови:`;
+          latestAnalysis.biomarkers.forEach((biomarker: any) => {
+            userContext += `\n- ${biomarker.name}: ${biomarker.value} ${biomarker.unit || ''} (норма: ${biomarker.referenceRange || 'не указана'})`;
+          });
+        }
+      }
+
+      // Generate comprehensive consultation using DeepSeek
+      const deepSeekApiKey = process.env.DEEPSEEK_API_KEY;
+      if (!deepSeekApiKey) {
+        return res.json({ 
+          analysis: "ИИ-консультант временно недоступен. Обратитесь позже.",
+          recommendations: ["Проконсультируйтесь с врачом"],
+          priority: "medium",
+          followUp: ["Повторите запрос позже"],
+          disclaimer: "Данная консультация недоступна из-за технических проблем."
+        });
+      }
+
+      try {
+        const systemPrompt = `Ты - EVERLIV HEALTH Консультант, эксперт-врач и ИИ-ассистент по здоровью.
+
+ТВОЯ ЗАДАЧА:
+- Проанализировать вопрос пользователя в контексте его медицинских данных
+- Дать персональные, профессиональные рекомендации
+- Определить приоритетность и следующие шаги
+- Всегда подчеркивать важность консультации с врачом
+
+ПРИНЦИПЫ ОТВЕТА:
+- Дружелюбный и профессиональный тон
+- Русский язык, медицинская терминология с объяснениями
+- Конкретные рекомендации с научным обоснованием
+- Безопасность превыше всего
+
+ФОРМАТ ОТВЕТА (JSON):
+{
+  "analysis": "Подробный анализ вопроса и состояния пользователя (2-3 абзаца)",
+  "recommendations": ["Конкретная рекомендация 1", "Конкретная рекомендация 2", "..."],
+  "priority": "high|medium|low",
+  "followUp": ["Следующий шаг 1", "Следующий шаг 2", "..."],
+  "disclaimer": "Важное предупреждение о необходимости консультации с врачом"
+}
+
+${userContext}
+
+ДЕВИЗ: "Get Your Health in order"`;
+
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${deepSeekApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: "deepseek-chat",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: question }
+            ],
+            max_tokens: 1200,
+            temperature: 0.7,
+            response_format: { type: "json_object" }
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`DeepSeek API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const aiResponse = data.choices[0]?.message?.content;
+        
+        if (!aiResponse) {
+          throw new Error("Empty response from DeepSeek");
+        }
+
+        // Parse and validate JSON response
+        const consultation = JSON.parse(aiResponse);
+        
+        // Ensure required fields exist
+        const validatedConsultation = {
+          analysis: consultation.analysis || "Не удалось проанализировать ваш запрос.",
+          recommendations: Array.isArray(consultation.recommendations) ? consultation.recommendations : ["Обратитесь к врачу для консультации"],
+          priority: ["high", "medium", "low"].includes(consultation.priority) ? consultation.priority : "medium",
+          followUp: Array.isArray(consultation.followUp) ? consultation.followUp : ["Проконсультируйтесь с врачом"],
+          disclaimer: consultation.disclaimer || "Данные рекомендации не заменяют консультацию врача."
+        };
+
+        res.json(validatedConsultation);
+
+      } catch (error: any) {
+        console.error("Error in DeepSeek consultation:", error);
+        
+        // Fallback consultation response
+        res.json({
+          analysis: `Я готов помочь с вашим вопросом: "${question.substring(0, 100)}..."\n\nК сожалению, сейчас ИИ-анализ недоступен, но могу дать общие рекомендации. ${userContext ? 'Учитывая ваш профиль здоровья, ' : ''}рекомендую обратиться к врачу для персональной консультации.`,
+          recommendations: [
+            "Обратитесь к врачу для профессиональной консультации",
+            "Ведите дневник симптомов и изменений",
+            "Соблюдайте здоровый образ жизни",
+            "Следите за показателями здоровья"
+          ],
+          priority: "medium",
+          followUp: [
+            "Запишитесь на прием к врачу",
+            "Подготовьте список вопросов для консультации",
+            "Возвращайтесь за консультацией позже"
+          ],
+          disclaimer: "⚠️ Важно: Данные рекомендации носят общий характер и не заменяют медицинскую консультацию. При серьезных симптомах немедленно обращайтесь к врачу!"
+        });
+      }
+    } catch (error) {
+      console.error("Consultation endpoint error:", error);
+      res.status(500).json({ error: "Внутренняя ошибка сервера" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
