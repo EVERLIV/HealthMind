@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService } from "./objectStorage";
 import DeepSeekService, { DeepSeekAnalysisService } from "./deepseekService";
+import OpenAI from "openai";
 import OpenAIVisionService from "./openaiVisionService";
 import { insertBloodAnalysisSchema, insertChatSessionSchema, insertChatMessageSchema, insertHealthMetricsSchema, insertHealthProfileSchema } from "@shared/schema";
 import { authenticate, AuthenticatedRequest, logActivity } from "./auth";
@@ -600,9 +601,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (openaiError: any) {
         console.log('OpenAI Vision failed, using fallback analysis');
         if (openaiError.status === 429) {
-          imageAnalysis = "⚠️ **Анализ изображения (базовый режим)**\n\nВ данный момент система анализа изображений перегружена. Могу дать общие рекомендации:\n\n**Общие советы по кожным проблемам:**\n• Следите за гигиеной проблемной области\n• Избегайте расчесывания\n• При покраснении или воспалении - холодный компресс\n• Если симптомы усиливаются или не проходят 2-3 дня - обратитесь к дерматологу\n\n**Опишите проблему текстом** для более точных рекомендаций:\n- Где расположено?\n- Когда появилось?\n- Какие ощущения (зуд, боль, жжение)?\n- Принимаете ли какие-то лекарства?\n\n⚠️ **Важно**: При любых серьезных изменениях кожи рекомендую очную консультацию дерматолога.";
+          imageAnalysis = "📋 **Анализ изображения (базовый режим)**\n\nВ данный момент ИИ анализ изображений недоступен, но я могу помочь на основе описания!\n\n**📝 Опишите проблему подробно:**\n• Что именно беспокоит?\n• Где расположено?\n• Когда появилось?\n• Какие ощущения (зуд, боль, жжение)?\n• Размер, цвет, форма?\n• Принимаете ли лекарства?\n\n**🩺 Общие рекомендации при кожных проблемах:**\n• Не расчесывайте и не трогайте руками\n• Соблюдайте гигиену области\n• При воспалении - холодный компресс\n• Избегайте агрессивной косметики\n\n⚠️ **ВАЖНО**: При любых подозрительных изменениях кожи, особенно родинок, обязательно обратитесь к дерматологу для очного осмотра!";
         } else {
-          imageAnalysis = "⚠️ **Временная проблема с анализом изображений**\n\nПопробуйте описать проблему текстом:\n• Что беспокоит?\n• Где расположено?\n• Как давно появилось?\n• Какие симптомы?\n\nЯ дам рекомендации на основе описания!";
+          imageAnalysis = "🔧 **Временные технические проблемы**\n\nСистема анализа изображений сейчас недоступна. Но не переживайте - я помогу на основе описания!\n\n**💭 Расскажите подробнее:**\n• Что именно на фото?\n• Какие симптомы или проблемы?\n• Как давно это беспокоит?\n• Есть ли изменения со временем?\n\n**🎯 Я смогу дать рекомендации** на основе вашего описания, учитывая ваш профиль здоровья и анализы!\n\n⚠️ При серьезных симптомах - не откладывайте визит к врачу.";
         }
       }
       
@@ -612,11 +613,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let contextualAdvice = imageAnalysis;
       
-      // Add personalized context if DeepSeek is available
-      const deepSeekApiKey = process.env.DEEPSEEK_API_KEY;
-      if (deepSeekApiKey && healthProfile) {
+      // Add personalized context if OpenAI is available
+      const openaiPersonalizationKey = process.env.OPENAI_API_KEY;
+      if (openaiPersonalizationKey && healthProfile) {
         try {
-          const deepSeekService = new DeepSeekService(deepSeekApiKey);
+          const openai = new OpenAI({ apiKey: openaiPersonalizationKey });
           const profileData = healthProfile.profileData as any;
           
           const contextPrompt = `Персонализируй медицинские рекомендации для пользователя:
@@ -630,9 +631,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
 - Хронические заболевания: ${profileData?.chronicConditions?.join(', ') || 'не указаны'}
 - Аллергии: ${profileData?.allergies?.join(', ') || 'не указаны'}
 
-Дай персонализированные рекомендации, учитывая профиль пользователя.`;
+Дай персонализированные рекомендации, учитывая профиль пользователя. Отвечай на русском языке как опытный врач-консультант.`;
 
-          contextualAdvice = await deepSeekService.generateChatResponse(contextPrompt) || imageAnalysis;
+          const completion = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [
+              {
+                role: "system",
+                content: "Ты опытный медицинский консультант. Персонализируй рекомендации для пользователя."
+              },
+              {
+                role: "user",
+                content: contextPrompt
+              }
+            ],
+            max_tokens: 800,
+            temperature: 0.7
+          });
+
+          contextualAdvice = completion.choices[0].message.content || imageAnalysis;
         } catch (error) {
           console.error("Error getting personalized advice:", error);
         }
@@ -727,11 +744,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 async function generateAIResponse(userMessage: string, userId: string): Promise<string> {
   try {
-    const deepSeekApiKey = process.env.DEEPSEEK_API_KEY;
-    if (!deepSeekApiKey) {
-      console.log("DeepSeek API key not available, using fallback response");
-      return generateFallbackResponse(userMessage);
-    }
 
     // Get user's health data for personalization
     const healthProfile = await storage.getHealthProfile(userId);
@@ -771,7 +783,15 @@ async function generateAIResponse(userMessage: string, userId: string): Promise<
     const hasImageAttachment = userMessage.includes("📎") && userMessage.includes("jpg") || 
                                userMessage.includes("png") || userMessage.includes("jpeg");
 
-    const deepSeekService = new DeepSeekService(deepSeekApiKey);
+    const openaiApiKey = process.env.OPENAI_API_KEY;
+    if (!openaiApiKey) {
+      console.log("OpenAI API key not available, using fallback response");
+      return generateFallbackResponse(userMessage);
+    }
+
+    const openai = new OpenAI({
+      apiKey: openaiApiKey,
+    });
     
     const prompt = `Ты EVERLIV Помощник - персональный ИИ-консультант по здоровью. 
     
@@ -800,11 +820,31 @@ ${hasImageAttachment ? "ВНИМАНИЕ: Пользователь прикре�
 
 Ответь как опытный медицинский консультант, учитывая персональные данные пользователя.`;
 
-    const response = await deepSeekService.generateChatResponse(prompt);
+    // Use OpenAI GPT for chat responses
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o", // Using GPT-4o for better medical knowledge
+      messages: [
+        {
+          role: "system",
+          content: "Ты опытный медицинский консультант и ИИ-помощник по здоровью. Отвечай профессионально, но доступно, всегда напоминая что ты не заменяешь врача."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      max_tokens: 1000,
+      temperature: 0.7
+    });
+
+    const response = completion.choices[0].message.content;
     
     return response || generateFallbackResponse(userMessage);
   } catch (error) {
     console.error("Error generating AI response:", error);
+    if (error instanceof Error && (error.message.includes('429') || error.message.includes('quota'))) {
+      return "⚠️ **Временная перегрузка системы ИИ**\n\nСейчас большая нагрузка на сервис. Попробуйте через несколько минут или опишите проблему более подробно!\n\n🩺 Если есть срочные симптомы - обратитесь к врачу немедленно.";
+    }
     return generateFallbackResponse(userMessage);
   }
 }
@@ -813,7 +853,7 @@ function generateFallbackResponse(userMessage: string): string {
   const message = userMessage.toLowerCase();
   
   if (message.includes("фото") || message.includes("изображение") || message.includes("📎")) {
-    return "📷 Вижу, что вы хотите отправить фото! К сожалению, сейчас у меня временные проблемы с обработкой изображений. Попробуйте описать проблему текстом - я постараюсь помочь. Например: 'красная сыпь на руке уже 3 дня' или 'странное пятно на коже'";
+    return "📸 **Готов помочь с анализом изображений!**\n\nЧтобы получить максимально полезные рекомендации:\n\n**📋 Опишите что на фото:**\n• Кожная проблема, родинка, высыпание?\n• Результаты анализов?\n• Симптомы или изменения?\n\n**🎯 Дополнительная информация:**\n• Когда появилось?\n• Беспокоит ли (зуд, боль)?\n• Принимаете ли лекарства?\n\n**Примеры:** 'красная сыпь на руке 3 дня, чешется' или 'странное темное пятно на спине, появилось недавно'\n\nЯ учту ваш профиль здоровья и дам персональные рекомендации! 🩺";
   }
   
   if (message.includes("анализ") || message.includes("результат")) {
