@@ -7,6 +7,7 @@ import { ArrowLeft, Send, Paperclip, Mic, MicOff } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
+import { TypingAnimation } from "@/components/TypingAnimation";
 
 export default function ChatPage() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
@@ -57,12 +58,30 @@ export default function ChatPage() {
         }),
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ 
-        queryKey: ["/api/chat-sessions", currentSessionId, "messages"] 
-      });
+    onMutate: async (content: string) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["/api/chat-sessions", currentSessionId, "messages"] });
+
+      // Snapshot the previous value
+      const previousMessages = queryClient.getQueryData(["/api/chat-sessions", currentSessionId, "messages"]);
+
+      // Optimistically update to the new value
+      const optimisticMessage = {
+        id: `temp-${Date.now()}`,
+        content,
+        role: "user",
+        sessionId: currentSessionId,
+        createdAt: new Date().toISOString(),
+      };
+
+      queryClient.setQueryData(
+        ["/api/chat-sessions", currentSessionId, "messages"],
+        (old: any) => old ? [...old, optimisticMessage] : [optimisticMessage]
+      );
+
       setMessage("");
-      // Scroll to bottom after new message
+      
+      // Scroll to bottom immediately
       setTimeout(() => {
         if (scrollAreaRef.current) {
           const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
@@ -70,9 +89,27 @@ export default function ChatPage() {
             scrollContainer.scrollTop = scrollContainer.scrollHeight;
           }
         }
-      }, 100);
+      }, 50);
+
+      // Return a context object with the snapshotted value
+      return { previousMessages };
     },
-    onError: () => {
+    onSuccess: () => {
+      // Invalidate to get the actual response with AI message
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/chat-sessions", currentSessionId, "messages"] 
+      });
+    },
+    onError: (err, variables, context: any) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      queryClient.setQueryData(
+        ["/api/chat-sessions", currentSessionId, "messages"],
+        context?.previousMessages
+      );
+      
+      // Restore the message input
+      setMessage(variables);
+      
       toast({
         title: "Ошибка",
         description: "Не удалось отправить сообщение",
@@ -151,9 +188,25 @@ export default function ChatPage() {
     if (!currentSessionId) return;
     
     try {
-      // First, send user message about image
+      // First, add user message optimistically
       const userMessage = `📷 Отправляю изображение для анализа: ${fileName}`;
-      const userMsgResponse = await apiRequest(`/api/chat-sessions/${currentSessionId}/messages`, {
+      
+      // Add optimistic user message
+      const optimisticUserMessage = {
+        id: `temp-user-${Date.now()}`,
+        content: userMessage,
+        role: "user",
+        sessionId: currentSessionId,
+        createdAt: new Date().toISOString(),
+      };
+
+      queryClient.setQueryData(
+        ["/api/chat-sessions", currentSessionId, "messages"],
+        (old: any) => old ? [...old, optimisticUserMessage] : [optimisticUserMessage]
+      );
+
+      // Send actual user message
+      await apiRequest(`/api/chat-sessions/${currentSessionId}/messages`, {
         method: "POST",
         body: JSON.stringify({
           role: "user",
@@ -171,16 +224,31 @@ export default function ChatPage() {
         }),
       });
 
-      // Send AI analysis as assistant message
+      // Add optimistic AI response
+      const aiContent = `🤖 **Анализ изображения "${fileName}":**\n\n${response.analysis}`;
+      const optimisticAIMessage = {
+        id: `temp-ai-${Date.now()}`,
+        content: aiContent,
+        role: "assistant", 
+        sessionId: currentSessionId,
+        createdAt: new Date().toISOString(),
+      };
+
+      queryClient.setQueryData(
+        ["/api/chat-sessions", currentSessionId, "messages"],
+        (old: any) => old ? [...old, optimisticAIMessage] : [optimisticAIMessage]
+      );
+
+      // Send actual AI message
       await apiRequest(`/api/chat-sessions/${currentSessionId}/messages`, {
         method: "POST",
         body: JSON.stringify({
           role: "assistant",
-          content: `🤖 **Анализ изображения "${fileName}":**\n\n${response.analysis}`,
+          content: aiContent,
         }),
       });
 
-      // Refresh messages
+      // Refresh messages to get server IDs
       queryClient.invalidateQueries({ 
         queryKey: ["/api/chat-sessions", currentSessionId, "messages"] 
       });
@@ -362,9 +430,9 @@ export default function ChatPage() {
               (messages as any[]).map((msg: any, index: number) => (
                 <div
                   key={msg.id}
-                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} animate-fadeIn`}
+                  className={`flex ${msg.role === "user" ? "justify-end animate-slideInRight" : "justify-start animate-slideInLeft"}`}
                   style={{ 
-                    animation: `fadeInUp 0.4s ease-out ${index * 0.1}s both`,
+                    animationDelay: `${index * 0.1}s`,
                   }}
                 >
                   {msg.role === "user" ? (
@@ -385,7 +453,11 @@ export default function ChatPage() {
                         className="bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 transform transition-all duration-200 hover:shadow-md"
                         data-testid={`message-${msg.role}`}
                       >
-                        <p className="text-gray-700 whitespace-pre-line">{msg.content}</p>
+                        <TypingAnimation 
+                          text={msg.content} 
+                          speed={15} 
+                          className="text-gray-700"
+                        />
                       </div>
                       <p className="text-xs text-gray-500 mt-2 opacity-70">
                         {new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
