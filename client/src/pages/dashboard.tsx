@@ -116,8 +116,8 @@ export default function Dashboard() {
                 <MessageCircle className="w-6 h-6 text-white drop-shadow-lg" />
               </div>
               <div className="relative z-10 text-center">
-                <div className="font-bold text-lg leading-tight text-white mb-0.5" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>ИИ Доктор</div>
-                <div className="text-xs font-medium text-white/90" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>24/7 Консультации</div>
+                <div className="font-bold text-lg leading-tight text-white mb-0.5" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>EVERLIV Помощник</div>
+                <div className="text-xs font-medium text-white/90" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>Персональный ИИ-консультант</div>
               </div>
             </button>
           </Link>

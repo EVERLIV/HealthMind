@@ -566,6 +566,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Upload image for chat analysis
+  app.post("/api/chat-sessions/:id/analyze-image", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      // Check if session belongs to user
+      const session = await storage.getChatSession(req.params.id);
+      if (!session || session.userId !== req.user.id) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+
+      const { imageBase64, mimeType, question } = req.body;
+      if (!imageBase64) {
+        return res.status(400).json({ error: "Image data is required" });
+      }
+
+      console.log('Chat image analysis - MIME type:', mimeType);
+
+      const openaiApiKey = process.env.OPENAI_API_KEY;
+      if (!openaiApiKey) {
+        return res.status(500).json({ 
+          error: "OpenAI API key not configured for image analysis",
+        });
+      }
+
+      // Use OpenAI Vision to analyze the image
+      const openaiService = new OpenAIVisionService(openaiApiKey);
+      
+      const analysisPrompt = question || "Проанализируйте это изображение на предмет кожных проблем, симптомов или других медицинских вопросов. Дайте профессиональные рекомендации.";
+      
+      const imageAnalysis = await openaiService.analyzeHealthImage(imageBase64, mimeType, analysisPrompt);
+      
+      // Get user's health context for personalized advice
+      const healthProfile = await storage.getHealthProfile(req.user.id);
+      const bloodAnalyses = await storage.getBloodAnalysesByUser(req.user.id);
+      
+      let contextualAdvice = imageAnalysis;
+      
+      // Add personalized context if DeepSeek is available
+      const deepSeekApiKey = process.env.DEEPSEEK_API_KEY;
+      if (deepSeekApiKey && healthProfile) {
+        try {
+          const deepSeekService = new DeepSeekService(deepSeekApiKey);
+          const profileData = healthProfile.profileData as any;
+          
+          const contextPrompt = `Персонализируй медицинские рекомендации для пользователя:
+          
+АНАЛИЗ ИЗОБРАЖЕНИЯ: ${imageAnalysis}
+
+ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ:
+- Возраст: ${profileData?.age || 'не указан'}
+- Пол: ${profileData?.gender || 'не указан'} 
+- Активность: ${profileData?.activityLevel || 'не указана'}
+- Хронические заболевания: ${profileData?.chronicConditions?.join(', ') || 'не указаны'}
+- Аллергии: ${profileData?.allergies?.join(', ') || 'не указаны'}
+
+Дай персонализированные рекомендации, учитывая профиль пользователя.`;
+
+          contextualAdvice = await deepSeekService.generateChatResponse(contextPrompt) || imageAnalysis;
+        } catch (error) {
+          console.error("Error getting personalized advice:", error);
+        }
+      }
+      
+      res.json({ analysis: contextualAdvice });
+    } catch (error) {
+      console.error("Error analyzing chat image:", error);
+      res.status(500).json({ error: "Image analysis failed" });
+    }
+  });
+
   app.post("/api/chat-sessions/:id/messages", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.user) return res.status(401).json({ error: "Unauthorized" });
@@ -584,7 +655,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Generate AI response if the message is from user
       if (validatedData.role === "user") {
-        const aiResponse = generateAIResponse(validatedData.content);
+        const aiResponse = await generateAIResponse(validatedData.content, req.user.id);
         const aiMessage = await storage.createChatMessage({
           sessionId: req.params.id,
           role: "assistant",
@@ -646,32 +717,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
   return httpServer;
 }
 
-function generateAIResponse(userMessage: string): string {
+async function generateAIResponse(userMessage: string, userId: string): Promise<string> {
+  try {
+    const deepSeekApiKey = process.env.DEEPSEEK_API_KEY;
+    if (!deepSeekApiKey) {
+      console.log("DeepSeek API key not available, using fallback response");
+      return generateFallbackResponse(userMessage);
+    }
+
+    // Get user's health data for personalization
+    const healthProfile = await storage.getHealthProfile(userId);
+    const bloodAnalyses = await storage.getBloodAnalysesByUser(userId);
+    const healthMetrics = await storage.getHealthMetrics(userId);
+
+    // Prepare context data
+    let userContext = "Пользователь: ";
+    if (healthProfile) {
+      const profileData = healthProfile.profileData as any;
+      userContext += `Возраст: ${profileData?.age || 'не указан'}, `;
+      userContext += `Пол: ${profileData?.gender || 'не указан'}, `;
+      userContext += `Активность: ${profileData?.activityLevel || 'не указана'}. `;
+    }
+
+    // Add latest biomarkers if available
+    let biomarkersContext = "";
+    for (const analysis of bloodAnalyses) {
+      if (analysis.status === 'analyzed' && analysis.results) {
+        const results = analysis.results as any;
+        if (results.markers && Array.isArray(results.markers)) {
+          biomarkersContext += "Последние анализы: ";
+          results.markers.slice(0, 5).forEach((marker: any) => {
+            biomarkersContext += `${marker.name}: ${marker.value}${marker.unit || ''} `;
+            if (marker.isOutOfRange) {
+              biomarkersContext += "(вне нормы), ";
+            } else {
+              biomarkersContext += "(норма), ";
+            }
+          });
+          break;
+        }
+      }
+    }
+
+    // Check if message contains image attachment
+    const hasImageAttachment = userMessage.includes("📎") && userMessage.includes("jpg") || 
+                               userMessage.includes("png") || userMessage.includes("jpeg");
+
+    const deepSeekService = new DeepSeekService(deepSeekApiKey);
+    
+    const prompt = `Ты EVERLIV Помощник - персональный ИИ-консультант по здоровью. 
+    
+КОНТЕКСТ ПОЛЬЗОВАТЕЛЯ:
+${userContext}
+${biomarkersContext}
+
+ВОЗМОЖНОСТИ:
+- Анализ результатов анализов крови и лабораторных исследований
+- Интерпретация биомаркеров и отклонений от нормы
+- Персональные рекомендации по питанию, физической активности и образу жизни
+- Анализ фотографий кожных проблем, родинок, высыпаний
+- Общие медицинские консультации и рекомендации
+
+${hasImageAttachment ? "ВНИМАНИЕ: Пользователь прикрепил изображение. Это может быть фото кожной проблемы, результатов анализов или симптомов. Проанализируй описание и дай рекомендации." : ""}
+
+ВАЖНЫЕ ПРАВИЛА:
+1. Всегда указывай, что ты ИИ-консультант, а не замена врачу
+2. При серьезных симптомах рекомендуй обратиться к врачу
+3. Используй персональные данные пользователя для более точных рекомендаций
+4. Отвечай на русском языке, дружелюбно и профессионально
+5. Используй эмодзи для улучшения восприятия
+6. Если есть данные анализов - ссылайся на конкретные показатели
+
+Вопрос пользователя: ${userMessage}
+
+Ответь как опытный медицинский консультант, учитывая персональные данные пользователя.`;
+
+    const response = await deepSeekService.generateChatResponse(prompt);
+    
+    return response || generateFallbackResponse(userMessage);
+  } catch (error) {
+    console.error("Error generating AI response:", error);
+    return generateFallbackResponse(userMessage);
+  }
+}
+
+function generateFallbackResponse(userMessage: string): string {
   const message = userMessage.toLowerCase();
   
-  if (message.includes("холестерин")) {
-    return "Понимаю вашу обеспокоенность. Повышенный холестерин - это серьезно, но управляемо. Рекомендую:\n\n• Увеличить физическую активность\n• Ограничить насыщенные жиры\n• Употреблять больше овощей и фруктов\n• Обратиться к кардиологу\n\nХотите узнать больше о диетических рекомендациях?";
+  if (message.includes("фото") || message.includes("изображение") || message.includes("📎")) {
+    return "📷 Вижу, что вы хотите отправить фото! К сожалению, сейчас у меня временные проблемы с обработкой изображений. Попробуйте описать проблему текстом - я постараюсь помочь. Например: 'красная сыпь на руке уже 3 дня' или 'странное пятно на коже'";
   }
   
   if (message.includes("анализ") || message.includes("результат")) {
-    return "Я могу помочь интерпретировать результаты ваших анализов. По вашим последним данным:\n\n✅ Гемоглобин в норме\n⚠️ Холестерин повышен\n✅ Глюкоза в норме\n✅ Креатинин в норме\n\nОсновное внимание стоит обратить на холестерин. Нужна ли подробная консультация?";
+    return "📊 Я готов помочь с анализами! Загрузите результаты через раздел 'Анализ крови' или опишите конкретные показатели. Например: 'холестерин 6.2, что это значит?' или 'гемоглобин понижен до 110'";
   }
   
-  if (message.includes("давление") || message.includes("сердце")) {
-    return "Ваши показатели артериального давления 120/80 находятся в оптимальных пределах. Пульс 72 уд/мин также в норме.\n\nДля поддержания здоровья сердца рекомендую:\n• Регулярную физическую активность\n• Ограничение соли\n• Контроль стресса\n• Отказ от курения";
-  }
-  
-  if (message.includes("температура")) {
-    return "Ваша температура 36.6°C находится в пределах нормы. Это оптимальная температура тела для большинства людей.\n\nЕсли у вас есть симптомы недомогания при нормальной температуре, это может указывать на другие состояния. Есть ли дополнительные симптомы?";
-  }
-  
-  if (message.includes("диета") || message.includes("питание")) {
-    return "Учитывая повышенный холестерин, рекомендую следующую диету:\n\n🥬 Больше клетчатки: овощи, фрукты, цельнозерновые\n🐟 Омега-3: рыба 2-3 раза в неделю\n🥜 Орехи и семена в умеренном количестве\n❌ Ограничить: жирное мясо, трансжиры, сладости\n\nХотите персональный план питания?";
-  }
-  
-  if (message.includes("спорт") || message.includes("упражнения") || message.includes("активность")) {
-    return "Отличный вопрос! Физическая активность поможет снизить холестерин:\n\n🚶‍♀️ Ходьба: 30-40 минут ежедневно\n🏃‍♀️ Кардио: 150 минут умеренной активности в неделю\n💪 Силовые упражнения: 2-3 раза в неделю\n🧘‍♀️ Йога или растяжка для гибкости\n\nНачните постепенно и увеличивайте нагрузку. Есть ли ограничения по здоровью?";
-  }
-  
-  return "Спасибо за ваш вопрос! Как ваш ИИ-доктор, я готов помочь с интерпретацией анализов, рекомендациями по здоровому образу жизни и общими медицинскими вопросами.\n\nМогу проконсультировать по:\n• Результатам анализов крови\n• Рекомендациям по питанию\n• Физической активности\n• Профилактике заболеваний\n\nО чем бы вы хотели узнать подробнее?";
+  return "🤖 Здравствуйте! Я EVERLIV Помощник. Могу помочь с:\n\n📋 Интерпретацией анализов крови\n🩺 Вопросами о здоровье\n📷 Анализом фото кожных проблем\n💊 Персональными рекомендациями\n\nО чем хотели бы узнать? Можете прикрепить фото или просто задать вопрос!";
 }
