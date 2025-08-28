@@ -4,6 +4,7 @@ import { z } from "zod";
 import { storage } from "./storage";
 import OpenAI from "openai";
 import OpenAIVisionService from "./openaiVisionService";
+import DeepSeekVisionService from "./deepSeekVisionService";
 import { authenticate, createSession, type AuthenticatedRequest } from "./auth";
 import {
   insertChatSessionSchema,
@@ -259,17 +260,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Try to use OpenAI Vision to analyze the image
+      // Try to use DeepSeek Vision to analyze the image
       let imageAnalysis;
-      try {
-        const openaiService = new OpenAIVisionService(openaiApiKey);
-        const analysisPrompt = question || "Проанализируйте это изображение на предмет кожных заболеваний, проблем кожи, симптомов или других медицинских вопросов. Дайте профессиональные медицинские рекомендации и возможный диагноз.";
-        imageAnalysis = await openaiService.analyzeHealthImage(imageBase64, mimeType, analysisPrompt);
-      } catch (openaiError: any) {
-        console.log('OpenAI Vision failed, using intelligent fallback analysis');
-        
-        if (openaiError.status === 429) {
-          imageAnalysis = `📸 **Изображение получено! ИИ анализ временно недоступен**
+      const deepSeekApiKey = process.env.DEEPSEEK_API_KEY;
+      
+      if (deepSeekApiKey) {
+        try {
+          const deepSeekService = new DeepSeekVisionService(deepSeekApiKey);
+          const analysisPrompt = question || "Проанализируйте это изображение на предмет кожных заболеваний, проблем кожи, симптомов или других медицинских вопросов. Дайте профессиональные медицинские рекомендации и возможный диагноз.";
+          imageAnalysis = await deepSeekService.analyzeHealthImage(imageBase64, mimeType, analysisPrompt);
+        } catch (deepSeekError: any) {
+          console.log('DeepSeek Vision failed, trying OpenAI fallback');
+          
+          // Fallback to OpenAI if DeepSeek fails
+          try {
+            const openaiService = new OpenAIVisionService(openaiApiKey);
+            const analysisPrompt = question || "Проанализируйте это изображение на предмет кожных заболеваний, проблем кожи, симптомов или других медицинских вопросов. Дайте профессиональные медицинские рекомендации и возможный диагноз.";
+            imageAnalysis = await openaiService.analyzeHealthImage(imageBase64, mimeType, analysisPrompt);
+          } catch (openaiError: any) {
+            console.log('Both DeepSeek and OpenAI Vision failed, using intelligent fallback');
+            
+            if (deepSeekError.message?.includes('quota') || openaiError.status === 429) {
+              imageAnalysis = `📸 **Изображение получено! Анализ временно недоступен**
 
 🤖 **Я готов помочь с анализом! Опишите подробно:**
 
@@ -295,8 +307,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 ⚠️ **Важно**: При серьезных симптомах не откладывайте визит к врачу!
 
 💬 **Опишите что на фото, и я помогу!**`;
-        } else {
-          imageAnalysis = `🔧 **Фото получено! Временные технические сложности**
+            } else {
+              imageAnalysis = `🔧 **Фото получено! Временные технические сложности**
 
 **💭 Что на изображении? Опишите:**
 • Кожная проблема или симптомы?
@@ -306,6 +318,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 🎯 **Я помогу на основе описания!**
 
 ⚠️ При серьезных симптомах обратитесь к врачу.`;
+            }
+          }
+        }
+      } else {
+        // No DeepSeek API key available, use OpenAI fallback
+        try {
+          const openaiService = new OpenAIVisionService(openaiApiKey);
+          const analysisPrompt = question || "Проанализируйте это изображение на предмет кожных заболеваний, проблем кожи, симптомов или других медицинских вопросов. Дайте профессиональные медицинские рекомендации и возможный диагноз.";
+          imageAnalysis = await openaiService.analyzeHealthImage(imageBase64, mimeType, analysisPrompt);
+        } catch (error: any) {
+          console.log('OpenAI Vision fallback failed');
+          imageAnalysis = `📸 **Фото получено! Сервис анализа недоступен**
+          
+🤖 Опишите что на изображении, и я помогу с анализом текстом!`;
         }
       }
       
@@ -422,16 +448,13 @@ async function generateAIResponse(
       userContext = `Пользователь: Возраст ${profileData?.age || 'не указан'}, Пол ${profileData?.gender || 'не указан'}. `;
     }
 
-    // Simple context-aware AI response without data dumps
-    const openaiApiKey = process.env.OPENAI_API_KEY;
-    if (!openaiApiKey) {
+    // Use DeepSeek API for AI responses
+    const deepSeekApiKey = process.env.DEEPSEEK_API_KEY;
+    if (!deepSeekApiKey) {
       return "Извините, сервис ИИ временно недоступен. Попробуйте позже или опишите свой вопрос подробнее.";
     }
 
     try {
-      const openai = new OpenAI({ apiKey: openaiApiKey });
-      
-      // Use GPT-4 for AI responses
       const systemPrompt = `Ты - EVERLIV Помощник, опытный медицинский консультант и ИИ-ассистент по здоровью.
       
       ТВОЯ РОЛЬ:
@@ -452,17 +475,29 @@ async function generateAIResponse(
       
       ДЕВИЗ: "Get Your Health in order"`;
 
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini", 
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userMessage }
-        ],
-        max_tokens: 800,
-        temperature: 0.7,
+      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${deepSeekApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: "deepseek-chat",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userMessage }
+          ],
+          max_tokens: 800,
+          temperature: 0.7,
+        }),
       });
 
-      return completion.choices[0].message.content || "Извините, не смог обработать ваш запрос.";
+      if (!response.ok) {
+        throw new Error(`DeepSeek API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.choices[0]?.message?.content || "Извините, не смог обработать ваш запрос.";
       
     } catch (error: any) {
       console.error("Error generating AI response:", error);
