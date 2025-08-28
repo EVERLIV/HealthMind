@@ -680,7 +680,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Generate AI response if the message is from user
       if (validatedData.role === "user") {
-        const aiResponse = await generateAIResponse(validatedData.content, req.user.id);
+        // Get user context for AI response
+        const healthProfile = await storage.getHealthProfile(req.user.id);
+        const bloodAnalyses = await storage.getBloodAnalysesByUser(req.user.id);
+        
+        const aiResponse = await generateAIResponse(validatedData.content, req.user.id, healthProfile, bloodAnalyses);
         const aiMessage = await storage.createChatMessage({
           sessionId: req.params.id,
           role: "assistant",
@@ -742,12 +746,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   return httpServer;
 }
 
-async function generateAIResponse(userMessage: string, userId: string): Promise<string> {
+async function generateAIResponse(
+  userMessage: string, 
+  userId: string, 
+  healthProfile?: any, 
+  bloodAnalyses?: any[]
+): Promise<string> {
   try {
-
-    // Get user's health data for personalization
-    const healthProfile = await storage.getHealthProfile(userId);
-    const bloodAnalyses = await storage.getBloodAnalysesByUser(userId);
+    // Use provided data or fetch if not provided
+    if (!healthProfile) {
+      healthProfile = await storage.getHealthProfile(userId);
+    }
+    if (!bloodAnalyses) {
+      bloodAnalyses = await storage.getBloodAnalysesByUser(userId);
+    }
     const healthMetrics = await storage.getHealthMetrics(userId);
 
     // Prepare context data
@@ -822,7 +834,7 @@ ${hasImageAttachment ? "ВНИМАНИЕ: Пользователь прикре�
 
     // Use OpenAI GPT for chat responses
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o", // Using GPT-4o for better medical knowledge
+      model: "gpt-4o-mini", // Using GPT-4o-mini for faster and more efficient responses
       messages: [
         {
           role: "system",
@@ -843,7 +855,7 @@ ${hasImageAttachment ? "ВНИМАНИЕ: Пользователь прикре�
   } catch (error) {
     console.error("Error generating AI response:", error);
     // Use intelligent fallback instead of generic error message  
-    return generateIntelligentFallback(userMessage, healthProfile || null, bloodAnalyses || []);
+    return generateIntelligentFallback(userMessage, healthProfile, bloodAnalyses || []);
   }
 }
 
