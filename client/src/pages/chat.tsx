@@ -33,10 +33,13 @@ export default function ChatPage() {
 
   const createSessionMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest("POST", "/api/chat-sessions", {
-        title: "Консультация с ИИ Доктором",
+      const response = await apiRequest("/api/chat-sessions", {
+        method: "POST",
+        body: JSON.stringify({
+          title: "Консультация с EVERLIV Помощником",
+        }),
       });
-      return response.json();
+      return response;
     },
     onSuccess: (session) => {
       setCurrentSessionId(session.id);
@@ -46,11 +49,13 @@ export default function ChatPage() {
 
   const sendMessageMutation = useMutation({
     mutationFn: async (content: string) => {
-      const response = await apiRequest("POST", `/api/chat-sessions/${currentSessionId}/messages`, {
-        role: "user",
-        content,
+      return await apiRequest(`/api/chat-sessions/${currentSessionId}/messages`, {
+        method: "POST",
+        body: JSON.stringify({
+          role: "user",
+          content,
+        }),
       });
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ 
@@ -113,10 +118,83 @@ export default function ChatPage() {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-      setAttachedFiles(prev => [...prev, ...newFiles]);
+      
+      // Check if files are images for analysis
+      const imageFiles = newFiles.filter(file => file.type.startsWith('image/'));
+      const otherFiles = newFiles.filter(file => !file.type.startsWith('image/'));
+      
+      if (imageFiles.length > 0) {
+        // Process images for AI analysis
+        imageFiles.forEach(file => {
+          const reader = new FileReader();
+          reader.onload = async (event) => {
+            if (event.target?.result && currentSessionId) {
+              const imageBase64 = (event.target.result as string).split(',')[1];
+              await analyzeImageWithAI(imageBase64, file.type, file.name);
+            }
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      
+      if (otherFiles.length > 0) {
+        setAttachedFiles(prev => [...prev, ...otherFiles]);
+        toast({
+          title: "Файлы прикреплены",
+          description: `Добавлено ${otherFiles.length} файл(ов)`,
+        });
+      }
+    }
+  };
+
+  const analyzeImageWithAI = async (imageBase64: string, mimeType: string, fileName: string) => {
+    if (!currentSessionId) return;
+    
+    try {
+      // First, send user message about image
+      const userMessage = `📷 Отправляю изображение для анализа: ${fileName}`;
+      const userMsgResponse = await apiRequest(`/api/chat-sessions/${currentSessionId}/messages`, {
+        method: "POST",
+        body: JSON.stringify({
+          role: "user",
+          content: userMessage,
+        }),
+      });
+
+      // Then analyze the image
+      const response = await apiRequest(`/api/chat-sessions/${currentSessionId}/analyze-image`, {
+        method: "POST",
+        body: JSON.stringify({
+          imageBase64,
+          mimeType,
+          question: message.trim() || "Проанализируйте это изображение с медицинской точки зрения"
+        }),
+      });
+
+      // Send AI analysis as assistant message
+      await apiRequest(`/api/chat-sessions/${currentSessionId}/messages`, {
+        method: "POST",
+        body: JSON.stringify({
+          role: "assistant",
+          content: `🤖 **Анализ изображения "${fileName}":**\n\n${response.analysis}`,
+        }),
+      });
+
+      // Refresh messages
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/chat-sessions", currentSessionId, "messages"] 
+      });
+
       toast({
-        title: "Файлы прикреплены",
-        description: `Добавлено ${newFiles.length} файл(ов)`,
+        title: "Изображение проанализировано",
+        description: "ИИ проанализировал ваше изображение",
+      });
+    } catch (error) {
+      console.error("Error analyzing image:", error);
+      toast({
+        title: "Ошибка анализа",
+        description: "Не удалось проанализировать изображение",
+        variant: "destructive",
       });
     }
   };
@@ -225,8 +303,8 @@ export default function ChatPage() {
                 <span className="text-white text-lg">🤖</span>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800">ИИ Доктор</h3>
-                <p className="text-xs text-green-600 font-medium">● Онлайн</p>
+                <h3 className="font-semibold text-gray-800">EVERLIV Помощник</h3>
+                <p className="text-xs text-green-600 font-medium">● Персональный ИИ-консультант</p>
               </div>
             </div>
           </div>
@@ -259,9 +337,10 @@ export default function ChatPage() {
                     className="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border border-gray-100"
                   >
                     <p className="text-gray-700">
-                      Здравствуйте! Я ваш персональный ИИ-консультант по здоровью. 
-                      Могу помочь с интерпретацией анализов, ответить на вопросы о здоровье 
-                      или дать рекомендации по улучшению самочувствия. Чем могу помочь?
+                      Здравствуйте! Я EVERLIV Помощник — ваш персональный ИИ-консультант по здоровью. 
+                      Могу анализировать ваши анализы крови, отвечать на вопросы о здоровье, 
+                      анализировать фото кожных проблем и давать персонализированные рекомендации. 
+                      📷 Отправьте фото или задайте вопрос!
                     </p>
                   </div>
                 </div>

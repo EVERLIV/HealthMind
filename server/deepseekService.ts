@@ -118,8 +118,7 @@ JSON структура:
           }
         ],
         max_tokens: 2000,    // Уменьшаем для более быстрого ответа
-        temperature: 0.2,    // Делаем более детерминированным
-        timeout: 30000,      // Таймаут 30 секунд
+        temperature: 0.2     // Делаем более детерминированным
       });
 
       const content = response.choices[0].message.content;
@@ -458,6 +457,32 @@ ${text}`;
     });
     
     return markers;
+  }
+
+  async generateChatResponse(prompt: string): Promise<string> {
+    try {
+      const response = await this.client.chat.completions.create({
+        model: "deepseek-chat",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        max_tokens: 1000,
+        temperature: 0.7
+      });
+
+      const content = response.choices[0].message.content;
+      if (!content) {
+        throw new Error("Не удалось получить ответ от DeepSeek");
+      }
+
+      return content.trim();
+    } catch (error) {
+      console.error("Ошибка генерации ответа DeepSeek:", error);
+      throw new Error("Не удалось сгенерировать ответ");
+    }
   }
 }
 

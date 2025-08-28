@@ -355,4 +355,71 @@ ${text}
       throw new Error("Не удалось проанализировать текст");
     }
   }
+
+  async analyzeHealthImage(imageBase64: string, mimeType: string = 'image/jpeg', analysisPrompt: string): Promise<string> {
+    try {
+      // Validate and normalize MIME type
+      const validMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      let validatedMimeType = mimeType?.toLowerCase();
+      
+      if (!validatedMimeType || !validMimeTypes.includes(validatedMimeType)) {
+        console.log('Invalid MIME type:', mimeType, 'defaulting to image/jpeg');
+        validatedMimeType = 'image/jpeg';
+      }
+
+      const response = await this.client.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: `Вы - опытный врач-дерматолог и диагност с 20-летним стажем. Специализируетесь на визуальной диагностике кожных заболеваний, анализе симптомов и медицинской консультации по изображениям.
+
+ВАЖНЫЕ ПРИНЦИПЫ:
+1. Анализируйте изображение детально и объективно
+2. Указывайте на возможные диагнозы, но ВСЕГДА подчеркивайте необходимость очной консультации
+3. Давайте практические рекомендации по уходу и первой помощи
+4. Предупреждайте о "красных флагах" - симптомах, требующих немедленного обращения к врачу
+5. Используйте понятный язык для пациента
+
+СТРУКТУРА ОТВЕТА:
+- Описание того, что видно на изображении
+- Возможные диагнозы (в порядке вероятности)  
+- Рекомендации по домашнему уходу
+- Когда срочно обратиться к врачу
+- Профилактические меры
+
+Отвечайте на русском языке, профессионально, но доступно.`
+          },
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: analysisPrompt
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:${validatedMimeType};base64,${imageBase64}`,
+                  detail: "high"
+                }
+              }
+            ]
+          }
+        ],
+        max_tokens: 2000,
+        temperature: 0.3,
+      });
+
+      const content = response.choices[0].message.content;
+      if (!content) {
+        throw new Error("Не удалось получить анализ изображения");
+      }
+
+      return content;
+    } catch (error) {
+      console.error("Ошибка анализа медицинского изображения с OpenAI Vision:", error);
+      throw new Error("Не удалось проанализировать изображение. Попробуйте описать проблему текстом.");
+    }
+  }
 }
