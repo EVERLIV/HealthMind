@@ -1,8 +1,8 @@
-# HealthAI - AI-Powered Health Analysis Platform
+# EVERLIV HEALTH - AI-Powered Health Analysis Platform
 
 ## Overview
 
-HealthAI is a modern web application that provides AI-powered analysis of blood test results and health metrics. The platform features a mobile-first design with comprehensive health tracking capabilities, including blood analysis interpretation with **DeepSeek AI integration**, biomarker monitoring, health profile management, and AI-powered health consultations. Built with React and Express, it offers a seamless user experience for managing personal health data and receiving intelligent insights powered by advanced AI models.
+EVERLIV HEALTH is a modern web application that provides AI-powered analysis of blood test results and health metrics. The platform features a mobile-first design with comprehensive health tracking capabilities, including blood analysis interpretation with **DeepSeek AI integration**, biomarker monitoring, health profile management, and AI-powered health consultations. Built with React and Express, it offers a seamless user experience for managing personal health data and receiving intelligent insights powered by advanced AI models.
 
 ## User Preferences
 

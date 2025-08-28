@@ -1,5 +1,6 @@
-import { Bell, UserCircle, Heart } from "lucide-react";
+import { Bell, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logoUrl from '@assets/logo_1756364617629.png';
 
 export default function MobileNav() {
   return (
@@ -7,10 +8,13 @@ export default function MobileNav() {
       <div className="max-w-md mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-medical-blue rounded-lg flex items-center justify-center">
-              <Heart className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+              <img src={logoUrl} alt="EVERLIV HEALTH" className="w-8 h-8 object-contain" />
             </div>
-            <span className="text-lg font-semibold text-card-foreground">HealthAI</span>
+            <div>
+              <div className="text-lg font-bold text-card-foreground tracking-wide">EVERLIV HEALTH</div>
+              <div className="text-xs text-muted-foreground font-medium">Get your health in order</div>
+            </div>
           </div>
           <div className="flex items-center space-x-3">
             <Button 
