@@ -57,11 +57,13 @@ export default function RegisterPage() {
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
             <div className="relative">
-              <div className="w-20 h-20 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 rounded-3xl flex items-center justify-center shadow-2xl transform rotate-3 p-3">
-                <img src={logoUrl} alt="EVERLIV HEALTH" className="w-full h-full object-contain" />
-              </div>
-              <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                <Sparkles className="w-3 h-3 text-white" />
+              <img 
+                src={logoUrl} 
+                alt="EVERLIV HEALTH" 
+                className="w-20 h-20 object-contain drop-shadow-xl hover:scale-105 transition-transform duration-300 filter brightness-110" 
+              />
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                <Sparkles className="w-2.5 h-2.5 text-white" />
               </div>
             </div>
           </div>
