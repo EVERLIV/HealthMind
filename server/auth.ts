@@ -97,12 +97,14 @@ export async function authenticate(req: AuthenticatedRequest, res: Response, nex
     const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
     
     if (!token) {
+      console.log('No token provided in request');
       return res.status(401).json({ error: "Unauthorized" });
     }
 
     // Verify token
     const decoded = verifyToken(token);
     if (!decoded) {
+      console.log('Token verification failed');
       return res.status(401).json({ error: "Invalid token" });
     }
 

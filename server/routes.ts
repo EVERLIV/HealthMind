@@ -202,7 +202,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/chat-sessions", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.user) return res.status(401).json({ error: "Unauthorized" });
-      const sessions = await storage.getChatSessionsByUser(req.user.id);
+      const sessions = await storage.getChatSessions(req.user.id);
       res.json(sessions);
     } catch (error) {
       console.error("Error fetching chat sessions:", error);
@@ -273,7 +273,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let imageAnalysis;
       try {
         const openaiService = new OpenAIVisionService(openaiApiKey);
-        const analysisPrompt = question || "Проанализируйте это изображение на предмет кожных проблем, симптомов или других медицинских вопросов. Дайте профессиональные рекомендации.";
+        const analysisPrompt = question || "Проанализируйте это изображение на предмет кожных заболеваний, проблем кожи, симптомов или других медицинских вопросов. Дайте профессиональные медицинские рекомендации и возможный диагноз.";
         imageAnalysis = await openaiService.analyzeHealthImage(imageBase64, mimeType, analysisPrompt);
       } catch (openaiError: any) {
         console.log('OpenAI Vision failed, using intelligent fallback analysis');
@@ -441,21 +441,34 @@ async function generateAIResponse(
     try {
       const openai = new OpenAI({ apiKey: openaiApiKey });
       
-      const systemPrompt = `Ты опытный медицинский консультант EVERLIV Помощник. 
-      Отвечай дружелюбно, профессионально и по делу. 
-      Если пользователь спрашивает о здоровье, давай полезные советы.
-      Если нужна медицинская помощь - рекомендуй обратиться к врачу.
-      Говори на русском языке. Будь кратким но информативным.
-      НЕ упоминай анализы крови если пользователь их не спрашивал.
-      ${userContext}`;
+      // Use GPT-4 for AI responses
+      const systemPrompt = `Ты - EVERLIV Помощник, опытный медицинский консультант и ИИ-ассистент по здоровью.
+      
+      ТВОЯ РОЛЬ:
+      - Помогаешь пользователям понимать их здоровье
+      - Анализируешь медицинские данные и анализы
+      - Даешь персонализированные рекомендации
+      - Объясняешь медицинские термины простым языком
+      - Всегда напоминаешь о необходимости консультации с врачом
+      
+      ПРИНЦИПЫ:
+      - Будь дружелюбным и заботливым
+      - Говори на русском языке
+      - Давай конкретные и полезные советы
+      - Не ставь диагнозы, только информируй
+      - При серьезных симптомах - рекомендуй врача
+      
+      ${userContext}
+      
+      ДЕВИЗ: "Get Your Health in order"`;
 
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini", // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
+        model: "gpt-4o-mini", 
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userMessage }
         ],
-        max_tokens: 500,
+        max_tokens: 800,
         temperature: 0.7,
       });
 
