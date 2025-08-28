@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +38,9 @@ interface BeforeInstallPromptEvent extends Event {
 export default function LandingPage() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isPWAInstalled, setIsPWAInstalled] = useState(false);
+  
+  const featuresRef = useRef<HTMLElement>(null);
+  const securityRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     // Check if PWA is already installed
@@ -55,6 +58,34 @@ export default function LandingPage() {
     
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  // Intersection Observer for smooth section animations
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '-10px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.remove('section-hidden');
+          entry.target.classList.add('section-visible');
+        }
+      });
+    }, observerOptions);
+
+    const sections = [featuresRef.current, securityRef.current].filter(Boolean);
+    sections.forEach((section) => {
+      if (section) observer.observe(section);
+    });
+
+    return () => {
+      sections.forEach((section) => {
+        if (section) observer.unobserve(section);
+      });
     };
   }, []);
 
@@ -158,12 +189,12 @@ export default function LandingPage() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 text-center text-white">
           {/* Logo */}
           <div className="flex items-center justify-center mb-8">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full blur-xl opacity-70 animate-pulse"></div>
+            <div className="relative animate-fadeInScale hero-logo">
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full blur-xl opacity-70 animate-pulseGlow"></div>
               <div className="relative p-6 bg-white/10 backdrop-blur-lg rounded-full border border-white/20 shadow-2xl">
                 <img src={logoImage} alt="EVERLIV HEALTH" className="w-16 h-16 drop-shadow-lg" />
               </div>
-              <div className="absolute -top-2 -right-2 animate-bounce">
+              <div className="absolute -top-2 -right-2 animate-smoothFloat">
                 <div className="w-6 h-6 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full flex items-center justify-center shadow-lg">
                   <Sparkles className="w-3 h-3 text-white" />
                 </div>
@@ -173,7 +204,7 @@ export default function LandingPage() {
           
           {/* Main Title with Animation */}
           <div className="mb-8">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-4">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-4 animate-fadeInUp hero-title">
               <span className="bg-gradient-to-r from-white via-emerald-100 to-green-200 bg-clip-text text-transparent drop-shadow-2xl">
                 EVERLIV
               </span>
@@ -182,22 +213,22 @@ export default function LandingPage() {
                 HEALTH
               </span>
             </h1>
-            <div className="h-1 w-32 bg-gradient-to-r from-emerald-400 to-green-500 mx-auto rounded-full mb-6"></div>
+            <div className="h-1 w-32 bg-gradient-to-r from-emerald-400 to-green-500 mx-auto rounded-full mb-6 animate-fadeInScale hero-title"></div>
           </div>
           
           {/* Subtitle */}
-          <p className="text-2xl md:text-3xl text-emerald-100 font-light mb-6 tracking-wide">
+          <p className="text-2xl md:text-3xl text-emerald-100 font-light mb-6 tracking-wide animate-fadeInUp hero-subtitle">
             Будущее персональной медицины
           </p>
           
           {/* Description */}
-          <p className="text-lg md:text-xl text-white/80 max-w-3xl mx-auto mb-12 leading-relaxed font-light">
+          <p className="text-lg md:text-xl text-white/80 max-w-3xl mx-auto mb-12 leading-relaxed font-light animate-fadeInUp hero-subtitle">
             Революционная платформа с искусственным интеллектом для анализа здоровья. 
             Получайте профессиональные медицинские рекомендации и персональные планы оздоровления.
           </p>
           
           {/* PWA Install Buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center animate-fadeInUp hero-buttons">
             {!isPWAInstalled && (
               <>
                 <Button
@@ -238,27 +269,33 @@ export default function LandingPage() {
           </div>
           
           {/* Scroll Indicator */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-            <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
-              <div className="w-1 h-3 bg-white/70 rounded-full animate-pulse mt-2"></div>
+          <div className="absolute bottom-16 sm:bottom-8 left-1/2 -translate-x-1/2 group cursor-pointer animate-fadeInUp hero-scroll">
+            <div className="relative">
+              <div className="w-7 h-12 border-2 border-white/50 rounded-full flex justify-center group-hover:border-white/70 transition-all duration-300 animate-scrollBounce">
+                <div className="w-1.5 h-4 bg-white/70 rounded-full mt-2 group-hover:bg-white animate-pulse group-hover:h-5 transition-all duration-300"></div>
+              </div>
+              <div className="absolute -inset-2 bg-white/10 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
+            <div className="text-white/60 text-xs mt-3 text-center font-medium group-hover:text-white/80 transition-colors duration-300">
+              Прокрутите вниз
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-gradient-to-br from-slate-50 via-gray-100 to-blue-50">
+      <section ref={featuresRef} className="py-24 bg-gradient-to-br from-slate-50 via-gray-100 to-blue-50 section-hidden">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-gradient-to-r from-emerald-500 to-green-600 text-white px-6 py-2 rounded-full text-sm font-bold mb-6 shadow-lg">
+            <div className="inline-flex items-center bg-gradient-to-r from-emerald-500 to-green-600 text-white px-6 py-2 rounded-full text-sm font-bold mb-6 shadow-lg animate-fadeInDown">
               <Zap className="w-4 h-4 mr-2" />
               ВОЗМОЖНОСТИ ПЛАТФОРМЫ
             </div>
-            <h2 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight">
+            <h2 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight animate-fadeInUp">
               Революционные
               <span className="bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent"> технологии</span>
             </h2>
-            <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed animate-fadeInUp">
               Объединяем искусственный интеллект, медицинскую экспертизу и персональный подход 
               для создания будущего здравоохранения
             </p>
@@ -268,7 +305,7 @@ export default function LandingPage() {
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <div key={index} className="group relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-2 h-[400px]">
+                <div key={index} className={`group relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-2 h-[400px] animate-fadeInScale stagger-${index + 1}`}>
                   {/* Background Image */}
                   <div 
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 group-hover:scale-110"
@@ -331,7 +368,7 @@ export default function LandingPage() {
       </section>
 
       {/* Security Section */}
-      <section className="py-24 bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 relative overflow-hidden">
+      <section ref={securityRef} className="py-24 bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 relative overflow-hidden section-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl"></div>
           <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-teal-400/20 rounded-full blur-3xl"></div>
@@ -339,15 +376,15 @@ export default function LandingPage() {
         
         <div className="relative z-10 max-w-7xl mx-auto px-4">
           <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-gradient-to-r from-emerald-400 to-teal-500 text-white px-6 py-3 rounded-full text-sm font-bold mb-8 shadow-lg">
+            <div className="inline-flex items-center bg-gradient-to-r from-emerald-400 to-teal-500 text-white px-6 py-3 rounded-full text-sm font-bold mb-8 shadow-lg animate-fadeInDown">
               <Shield className="w-4 h-4 mr-2" />
               МАКСИМАЛЬНАЯ ЗАЩИТА
             </div>
-            <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight">
+            <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight animate-fadeInUp">
               Безопасность
               <span className="bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent"> данных</span>
             </h2>
-            <p className="text-xl text-emerald-100 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl text-emerald-100 max-w-4xl mx-auto leading-relaxed animate-fadeInUp">
               Военный уровень шифрования и международные стандарты защиты 
               для вашей медицинской информации
             </p>
@@ -358,7 +395,7 @@ export default function LandingPage() {
               const Icon = feature.icon;
               return (
                 <div key={index} className="group relative">
-                  <Card className="relative p-8 text-center border-0 bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-2 group">
+                  <Card className={`relative p-8 text-center border-0 bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-2 group animate-fadeInScale stagger-${index + 1}`}>
                     <div className="relative mb-8">
                       <div className="w-20 h-20 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
                         <Icon className="w-10 h-10 text-white" />
