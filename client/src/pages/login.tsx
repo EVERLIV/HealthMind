@@ -50,11 +50,13 @@ export default function LoginPage() {
           <div className="text-center mb-12">
             <div className="flex justify-center mb-8">
               <div className="relative">
-                <div className="w-24 h-24 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 rounded-3xl flex items-center justify-center shadow-2xl transform rotate-3 p-4">
-                  <img src={logoUrl} alt="EVERLIV HEALTH" className="w-full h-full object-contain" />
-                </div>
-                <div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-white" />
+                <img 
+                  src={logoUrl} 
+                  alt="EVERLIV HEALTH" 
+                  className="w-24 h-24 object-contain drop-shadow-2xl hover:scale-110 transition-transform duration-300 filter brightness-110" 
+                />
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                  <Sparkles className="w-3 h-3 text-white" />
                 </div>
               </div>
             </div>
