@@ -67,7 +67,7 @@ export class MemStorage implements IStorage {
   }
 
   private seedData() {
-    // Create default user
+    // Create default users
     const defaultUser: User = {
       id: "user-1",
       username: "anna_user",
@@ -86,6 +86,26 @@ export class MemStorage implements IStorage {
       updatedAt: new Date(),
     };
     this.users.set(defaultUser.id, defaultUser);
+
+    // Create hoaandrey user
+    const hoaandreyUser: User = {
+      id: "user-2",
+      username: "hoaandrey",
+      email: "hoaandrey@gmail.com",
+      name: "Андрей",
+      passwordHash: "$2b$12$WIoID/H.HxjZQbg4gpJypuiWZ4EO87nKR869KKMNtLNj7n6fmNcVC", // password: "123456"
+      role: "user",
+      subscriptionType: "free",
+      subscriptionExpiresAt: null,
+      isEmailVerified: 1,
+      emailVerificationToken: null,
+      resetPasswordToken: null,
+      resetPasswordExpires: null,
+      lastLoginAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.users.set(hoaandreyUser.id, hoaandreyUser);
 
     // Note: Health profile will be created when user completes the wizard
 
