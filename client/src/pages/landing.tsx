@@ -24,11 +24,11 @@ import {
   Sparkles,
   PlayCircle
 } from "lucide-react";
-import heroImage from '@assets/generated_images/Medical_hero_background_d80eb1a6.png';
 import aiBloodImage from '@assets/generated_images/AI_blood_analysis_a3b7806b.png';
 import healthMonitoringImage from '@assets/generated_images/Health_monitoring_scene_e2ffcf2b.png';
 import aiConsultationImage from '@assets/generated_images/AI_medical_consultation_211a67ef.png';
 import personalGoalsImage from '@assets/generated_images/Personal_health_goals_200a8db1.png';
+import logoImage from '@assets/logo_1756398870105.png';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -145,14 +145,8 @@ export default function LandingPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${heroImage})` }}
-        />
-        
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-blue-900/80 to-indigo-900/85"></div>
+        {/* Clean Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900 via-green-800 to-teal-900"></div>
         
         {/* Animated Background Elements */}
         <div className="absolute inset-0">
@@ -162,15 +156,15 @@ export default function LandingPage() {
         </div>
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 text-center text-white">
-          {/* Logo Animation */}
+          {/* Logo */}
           <div className="flex items-center justify-center mb-8">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full blur-xl opacity-70 animate-pulse"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full blur-xl opacity-70 animate-pulse"></div>
               <div className="relative p-6 bg-white/10 backdrop-blur-lg rounded-full border border-white/20 shadow-2xl">
-                <Microscope className="w-16 h-16 text-white drop-shadow-lg" />
+                <img src={logoImage} alt="EVERLIV HEALTH" className="w-16 h-16 drop-shadow-lg" />
               </div>
               <div className="absolute -top-2 -right-2 animate-bounce">
-                <div className="w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                <div className="w-6 h-6 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full flex items-center justify-center shadow-lg">
                   <Sparkles className="w-3 h-3 text-white" />
                 </div>
               </div>
@@ -180,19 +174,19 @@ export default function LandingPage() {
           {/* Main Title with Animation */}
           <div className="mb-8">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-4">
-              <span className="bg-gradient-to-r from-white via-blue-100 to-purple-200 bg-clip-text text-transparent drop-shadow-2xl">
+              <span className="bg-gradient-to-r from-white via-emerald-100 to-green-200 bg-clip-text text-transparent drop-shadow-2xl">
                 EVERLIV
               </span>
               <br />
-              <span className="bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-emerald-200 via-green-200 to-teal-200 bg-clip-text text-transparent">
                 HEALTH
               </span>
             </h1>
-            <div className="h-1 w-32 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full mb-6"></div>
+            <div className="h-1 w-32 bg-gradient-to-r from-emerald-400 to-green-500 mx-auto rounded-full mb-6"></div>
           </div>
           
           {/* Subtitle */}
-          <p className="text-2xl md:text-3xl text-blue-100 font-light mb-6 tracking-wide">
+          <p className="text-2xl md:text-3xl text-emerald-100 font-light mb-6 tracking-wide">
             Будущее персональной медицины
           </p>
           
@@ -209,7 +203,7 @@ export default function LandingPage() {
                 <Button
                   onClick={handleInstallPWA}
                   size="lg"
-                  className="group bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-16 px-10 rounded-2xl shadow-2xl border-0 min-w-[280px] transform hover:scale-105 transition-all duration-300"
+                  className="group bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold h-16 px-10 rounded-2xl shadow-2xl border-0 min-w-[280px] transform hover:scale-105 transition-all duration-300"
                   data-testid="button-install-android"
                 >
                   <Smartphone className="w-6 h-6 mr-4 group-hover:rotate-12 transition-transform duration-300" />
@@ -232,7 +226,7 @@ export default function LandingPage() {
             
             {isPWAInstalled && (
               <div className="text-center animate-in fade-in-50 duration-1000">
-                <div className="inline-flex items-center bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl mb-4">
+                <div className="inline-flex items-center bg-gradient-to-r from-emerald-500 to-green-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl mb-4">
                   <CheckCircle2 className="w-6 h-6 mr-3" />
                   Приложение успешно установлено
                 </div>
@@ -256,13 +250,13 @@ export default function LandingPage() {
       <section className="py-24 bg-gradient-to-br from-slate-50 via-gray-100 to-blue-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-bold mb-6 shadow-lg">
+            <div className="inline-flex items-center bg-gradient-to-r from-emerald-500 to-green-600 text-white px-6 py-2 rounded-full text-sm font-bold mb-6 shadow-lg">
               <Zap className="w-4 h-4 mr-2" />
               ВОЗМОЖНОСТИ ПЛАТФОРМЫ
             </div>
             <h2 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight">
               Революционные
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> технологии</span>
+              <span className="bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent"> технологии</span>
             </h2>
             <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
               Объединяем искусственный интеллект, медицинскую экспертизу и персональный подход 
@@ -324,7 +318,7 @@ export default function LandingPage() {
           {/* Call to Action */}
           <div className="text-center mt-16">
             <div className="inline-flex items-center bg-white rounded-2xl p-2 shadow-xl">
-              <div className="flex items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl font-bold">
+              <div className="flex items-center bg-gradient-to-r from-emerald-500 to-green-600 text-white px-6 py-3 rounded-xl font-bold">
                 <PlayCircle className="w-5 h-5 mr-2" />
                 Начать сейчас
               </div>
@@ -364,11 +358,9 @@ export default function LandingPage() {
               const Icon = feature.icon;
               return (
                 <div key={index} className="group relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/20 to-teal-500/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 opacity-50 group-hover:opacity-70"></div>
                   <Card className="relative p-8 text-center border-0 bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-2 group">
                     <div className="relative mb-8">
-                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full blur-lg opacity-50 group-hover:opacity-70 transition-opacity duration-300"></div>
-                      <div className="relative w-20 h-20 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      <div className="w-20 h-20 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
                         <Icon className="w-10 h-10 text-white" />
                       </div>
                     </div>
