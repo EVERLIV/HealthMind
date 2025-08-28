@@ -99,7 +99,7 @@ export default function RegisterPage() {
                   Полное имя
                 </Label>
                 <div className="relative group">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-600 z-10 group-focus-within:text-blue-500 transition-colors pointer-events-none" />
                   <Input
                     id="name"
                     type="text"
@@ -119,7 +119,7 @@ export default function RegisterPage() {
                   Имя пользователя
                 </Label>
                 <div className="relative group">
-                  <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+                  <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-600 z-10 group-focus-within:text-blue-500 transition-colors pointer-events-none" />
                   <Input
                     id="username"
                     type="text"
@@ -139,7 +139,7 @@ export default function RegisterPage() {
                   Email адрес
                 </Label>
                 <div className="relative group">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-600 z-10 group-focus-within:text-blue-500 transition-colors pointer-events-none" />
                   <Input
                     id="email"
                     type="email"
@@ -159,7 +159,7 @@ export default function RegisterPage() {
                   Пароль
                 </Label>
                 <div className="relative group">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-600 z-10 group-focus-within:text-blue-500 transition-colors pointer-events-none" />
                   <Input
                     id="password"
                     type="password"
@@ -180,7 +180,7 @@ export default function RegisterPage() {
                   Подтвердите пароль
                 </Label>
                 <div className="relative group">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-600 z-10 group-focus-within:text-blue-500 transition-colors pointer-events-none" />
                   <Input
                     id="confirmPassword"
                     type="password"
