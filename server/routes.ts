@@ -4,7 +4,7 @@ import { z } from "zod";
 import { storage } from "./storage";
 import OpenAI from "openai";
 import OpenAIVisionService from "./openaiVisionService";
-import { authenticate, type AuthenticatedRequest } from "./auth";
+import { authenticate, createSession, type AuthenticatedRequest } from "./auth";
 import {
   insertChatSessionSchema,
   insertChatMessageSchema,
@@ -32,12 +32,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Неверный email или пароль" });
       }
 
-      const jwt = await import('jsonwebtoken');
-      const token = jwt.default.sign(
-        { userId: user.id },
-        process.env.JWT_SECRET || 'dev-secret',
-        { expiresIn: '30d' }
-      );
+      const { token } = await createSession(user.id);
 
       const userResponse = {
         id: user.id,
@@ -81,12 +76,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subscriptionType: 'free'
       });
 
-      const jwt = await import('jsonwebtoken');
-      const token = jwt.default.sign(
-        { userId: newUser.id },
-        process.env.JWT_SECRET || 'dev-secret',
-        { expiresIn: '30d' }
-      );
+      const { token } = await createSession(newUser.id);
 
       const userResponse = {
         id: newUser.id,
