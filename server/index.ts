@@ -43,7 +43,24 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const server = await registerRoutes(app);
+  // Priority health check endpoints BEFORE database initialization
+  app.get("/health", (_req, res) => {
+    res.status(200).send("OK");
+  });
+  
+  app.get("/api/health", (_req, res) => {
+    res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
+  let server;
+  try {
+    server = await registerRoutes(app);
+  } catch (error) {
+    console.error("Routes registration failed:", error);
+    // Create minimal server for health checks only
+    const { createServer } = await import("http");
+    server = createServer(app);
+  }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

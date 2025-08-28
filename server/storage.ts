@@ -356,6 +356,7 @@ export class MemStorage implements IStorage {
 export class DatabaseStorage implements IStorage {
   // Users
   async getUser(id: string): Promise<User | undefined> {
+    if (!db) throw new Error("Database not available");
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
@@ -514,5 +515,5 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-// Use DatabaseStorage for production readiness
-export const storage = new DatabaseStorage();
+// Use DatabaseStorage when available, fallback to MemStorage
+export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();

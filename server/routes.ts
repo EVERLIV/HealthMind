@@ -13,11 +13,6 @@ import {
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Health check endpoint for deployment
-  app.get("/api/health", (_req, res) => {
-    res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
-  });
-
   // Auth routes
   app.post("/api/auth/login", async (req, res) => {
     try {
