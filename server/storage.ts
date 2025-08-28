@@ -1,5 +1,8 @@
 import { type User, type InsertUser, type HealthProfile, type InsertHealthProfile, type BloodAnalysis, type InsertBloodAnalysis, type Biomarker, type InsertBiomarker, type BiomarkerResult, type InsertBiomarkerResult, type ChatSession, type InsertChatSession, type ChatMessage, type InsertChatMessage, type HealthMetrics, type InsertHealthMetrics } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { db } from "./db";
+import { users, healthProfiles, bloodAnalyses, biomarkers, biomarkerResults, chatSessions, chatMessages, healthMetrics } from "@shared/schema";
+import { eq, desc, and } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -15,12 +18,12 @@ export interface IStorage {
   
   // Blood Analyses
   getBloodAnalysis(id: string): Promise<BloodAnalysis | undefined>;
-  getBloodAnalysesByUser(userId: string): Promise<BloodAnalysis[]>;
+  getBloodAnalyses(userId: string): Promise<BloodAnalysis[]>;
   createBloodAnalysis(analysis: InsertBloodAnalysis): Promise<BloodAnalysis>;
   updateBloodAnalysis(id: string, analysis: Partial<InsertBloodAnalysis>): Promise<BloodAnalysis>;
   
   // Biomarkers
-  getAllBiomarkers(): Promise<Biomarker[]>;
+  getBiomarkers(): Promise<Biomarker[]>;
   getBiomarker(id: string): Promise<Biomarker | undefined>;
   createBiomarker(biomarker: InsertBiomarker): Promise<Biomarker>;
   
@@ -30,7 +33,7 @@ export interface IStorage {
   
   // Chat Sessions
   getChatSession(id: string): Promise<ChatSession | undefined>;
-  getChatSessionsByUser(userId: string): Promise<ChatSession[]>;
+  getChatSessions(userId: string): Promise<ChatSession[]>;
   createChatSession(session: InsertChatSession): Promise<ChatSession>;
   
   // Chat Messages
@@ -67,48 +70,7 @@ export class MemStorage implements IStorage {
   }
 
   private seedData() {
-    // Create default users
-    const defaultUser: User = {
-      id: "user-1",
-      username: "anna_user",
-      email: "anna@example.com",
-      name: "Анна",
-      passwordHash: "$2b$12$Wq0sk.Th.nhoN5NDXbKBxOMLsaod9aWz5f4AyjmOEfTTTzCyV9/Ui", // password: "password123"
-      role: "user",
-      subscriptionType: "premium",
-      subscriptionExpiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-      isEmailVerified: 1,
-      emailVerificationToken: null,
-      resetPasswordToken: null,
-      resetPasswordExpires: null,
-      lastLoginAt: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.users.set(defaultUser.id, defaultUser);
-
-    // Create hoaandrey user
-    const hoaandreyUser: User = {
-      id: "user-2",
-      username: "hoaandrey",
-      email: "hoaandrey@gmail.com",
-      name: "Андрей",
-      passwordHash: "$2b$12$WIoID/H.HxjZQbg4gpJypuiWZ4EO87nKR869KKMNtLNj7n6fmNcVC", // password: "123456"
-      role: "user",
-      subscriptionType: "free",
-      subscriptionExpiresAt: null,
-      isEmailVerified: 1,
-      emailVerificationToken: null,
-      resetPasswordToken: null,
-      resetPasswordExpires: null,
-      lastLoginAt: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.users.set(hoaandreyUser.id, hoaandreyUser);
-
-    // Note: Health profile will be created when user completes the wizard
-
+    // Create essential biomarkers only (no test users)
     // Create sample biomarkers
     const sampleBiomarkers: Biomarker[] = [
       {
@@ -153,52 +115,7 @@ export class MemStorage implements IStorage {
       this.biomarkers.set(biomarker.id, biomarker);
     });
 
-    // Create sample health metrics
-    const healthMetrics: HealthMetrics = {
-      id: "metrics-1",
-      userId: defaultUser.id,
-      heartRate: 72,
-      bloodPressureSystolic: 120,
-      bloodPressureDiastolic: 80,
-      temperature: "36.6",
-      recordedAt: new Date(),
-      createdAt: new Date(),
-    };
-    this.healthMetrics.set(healthMetrics.id, healthMetrics);
-
-    // Create sample blood analysis
-    const bloodAnalysis: BloodAnalysis = {
-      id: "analysis-1",
-      userId: defaultUser.id,
-      imageUrl: "/objects/uploads/sample-blood-test.jpg",
-      results: {
-        summary: "Общий анализ крови показывает хорошие результаты. Большинство показателей в пределах нормы, обнаружен повышенный уровень холестерина.",
-        markers: [
-          { name: "Гемоглобин", value: "138 г/л", status: "normal", recommendation: "Поддерживать текущий уровень", education: "Гемоглобин переносит кислород в крови" },
-          { name: "Холестерин", value: "6.2 ммоль/л", status: "high", recommendation: "Снизить потребление жирной пищи", education: "Холестерин важен для здоровья сосудов" },
-          { name: "Глюкоза", value: "5.1 ммоль/л", status: "normal", recommendation: "Поддерживать здоровый образ жизни", education: "Глюкоза - основной источник энергии" },
-          { name: "Креатинин", value: "82 мкмоль/л", status: "normal", recommendation: "Пить достаточно воды", education: "Креатинин показывает работу почек" },
-        ],
-        recommendations: ["Снизить потребление насыщенных жиров", "Увеличить физическую активность"],
-        riskFactors: ["Повышенный холестерин может привести к сердечно-сосудистым заболеваниям"],
-      },
-      status: "analyzed",
-      analyzedAt: new Date("2024-12-15"),
-      createdAt: new Date("2024-12-15"),
-    };
-    this.bloodAnalyses.set(bloodAnalysis.id, bloodAnalysis);
-
-    // Create sample biomarker results
-    const biomarkerResults: BiomarkerResult[] = [
-      { id: "result-1", analysisId: bloodAnalysis.id, biomarkerId: "bio-1", value: "138", unit: "г/л", status: "normal", createdAt: new Date() },
-      { id: "result-2", analysisId: bloodAnalysis.id, biomarkerId: "bio-2", value: "6.2", unit: "ммоль/л", status: "high", createdAt: new Date() },
-      { id: "result-3", analysisId: bloodAnalysis.id, biomarkerId: "bio-3", value: "5.1", unit: "ммоль/л", status: "normal", createdAt: new Date() },
-      { id: "result-4", analysisId: bloodAnalysis.id, biomarkerId: "bio-4", value: "82", unit: "мкмоль/л", status: "normal", createdAt: new Date() },
-    ];
-
-    biomarkerResults.forEach(result => {
-      this.biomarkerResults.set(result.id, result);
-    });
+    // No sample data for production
   }
 
   // Users
@@ -295,7 +212,7 @@ export class MemStorage implements IStorage {
     return this.bloodAnalyses.get(id);
   }
 
-  async getBloodAnalysesByUser(userId: string): Promise<BloodAnalysis[]> {
+  async getBloodAnalyses(userId: string): Promise<BloodAnalysis[]> {
     return Array.from(this.bloodAnalyses.values()).filter(analysis => analysis.userId === userId);
   }
 
@@ -325,7 +242,7 @@ export class MemStorage implements IStorage {
   }
 
   // Biomarkers
-  async getAllBiomarkers(): Promise<Biomarker[]> {
+  async getBiomarkers(): Promise<Biomarker[]> {
     return Array.from(this.biomarkers.values());
   }
 
@@ -369,7 +286,7 @@ export class MemStorage implements IStorage {
     return this.chatSessions.get(id);
   }
 
-  async getChatSessionsByUser(userId: string): Promise<ChatSession[]> {
+  async getChatSessions(userId: string): Promise<ChatSession[]> {
     return Array.from(this.chatSessions.values()).filter(session => session.userId === userId);
   }
 
@@ -435,4 +352,167 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Database Storage Implementation
+export class DatabaseStorage implements IStorage {
+  // Users
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+
+  async updateUser(id: string, updates: Partial<InsertUser>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    if (!user) throw new Error("User not found");
+    return user;
+  }
+
+  // Health Profiles
+  async getHealthProfile(userId: string): Promise<HealthProfile | undefined> {
+    const [profile] = await db.select().from(healthProfiles).where(eq(healthProfiles.userId, userId));
+    return profile || undefined;
+  }
+
+  async createHealthProfile(insertProfile: InsertHealthProfile): Promise<HealthProfile> {
+    const [profile] = await db.insert(healthProfiles).values({
+      ...insertProfile,
+      medicalConditions: insertProfile.medicalConditions || null,
+      medications: insertProfile.medications || null,
+    }).returning();
+    return profile;
+  }
+
+  async updateHealthProfile(userId: string, updates: Partial<InsertHealthProfile>): Promise<HealthProfile> {
+    const [profile] = await db
+      .update(healthProfiles)
+      .set({ 
+        ...updates, 
+        updatedAt: new Date(),
+        medicalConditions: updates.medicalConditions || null,
+        medications: updates.medications || null,
+      })
+      .where(eq(healthProfiles.userId, userId))
+      .returning();
+    if (!profile) throw new Error("Health profile not found");
+    return profile;
+  }
+
+  // Blood Analyses
+  async getBloodAnalyses(userId: string): Promise<BloodAnalysis[]> {
+    return db.select().from(bloodAnalyses).where(eq(bloodAnalyses.userId, userId)).orderBy(desc(bloodAnalyses.createdAt));
+  }
+
+  async getBloodAnalysis(id: string): Promise<BloodAnalysis | undefined> {
+    const [analysis] = await db.select().from(bloodAnalyses).where(eq(bloodAnalyses.id, id));
+    return analysis || undefined;
+  }
+
+  async createBloodAnalysis(insertAnalysis: InsertBloodAnalysis): Promise<BloodAnalysis> {
+    const [analysis] = await db.insert(bloodAnalyses).values(insertAnalysis).returning();
+    return analysis;
+  }
+
+  async updateBloodAnalysis(id: string, updates: Partial<InsertBloodAnalysis>): Promise<BloodAnalysis> {
+    const [analysis] = await db
+      .update(bloodAnalyses)
+      .set(updates)
+      .where(eq(bloodAnalyses.id, id))
+      .returning();
+    if (!analysis) throw new Error("Blood analysis not found");
+    return analysis;
+  }
+
+  // Biomarkers
+  async getBiomarkers(): Promise<Biomarker[]> {
+    return db.select().from(biomarkers);
+  }
+
+  async getBiomarker(id: string): Promise<Biomarker | undefined> {
+    const [biomarker] = await db.select().from(biomarkers).where(eq(biomarkers.id, id));
+    return biomarker || undefined;
+  }
+
+  async createBiomarker(insertBiomarker: InsertBiomarker): Promise<Biomarker> {
+    const [biomarker] = await db.insert(biomarkers).values({
+      ...insertBiomarker,
+      recommendations: insertBiomarker.recommendations || null,
+    }).returning();
+    return biomarker;
+  }
+
+  // Biomarker Results
+  async getBiomarkerResults(analysisId: string): Promise<BiomarkerResult[]> {
+    return db.select().from(biomarkerResults).where(eq(biomarkerResults.analysisId, analysisId));
+  }
+
+  async createBiomarkerResult(insertResult: InsertBiomarkerResult): Promise<BiomarkerResult> {
+    const [result] = await db.insert(biomarkerResults).values(insertResult).returning();
+    return result;
+  }
+
+  // Chat Sessions
+  async getChatSessions(userId: string): Promise<ChatSession[]> {
+    return db.select().from(chatSessions).where(eq(chatSessions.userId, userId)).orderBy(desc(chatSessions.updatedAt));
+  }
+
+  async getChatSession(id: string): Promise<ChatSession | undefined> {
+    const [session] = await db.select().from(chatSessions).where(eq(chatSessions.id, id));
+    return session || undefined;
+  }
+
+  async createChatSession(insertSession: InsertChatSession): Promise<ChatSession> {
+    const [session] = await db.insert(chatSessions).values(insertSession).returning();
+    return session;
+  }
+
+  async updateChatSession(id: string, updates: Partial<InsertChatSession>): Promise<ChatSession> {
+    const [session] = await db
+      .update(chatSessions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(chatSessions.id, id))
+      .returning();
+    if (!session) throw new Error("Chat session not found");
+    return session;
+  }
+
+  // Chat Messages
+  async getChatMessages(sessionId: string): Promise<ChatMessage[]> {
+    return db.select().from(chatMessages).where(eq(chatMessages.sessionId, sessionId)).orderBy(chatMessages.createdAt);
+  }
+
+  async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
+    const [message] = await db.insert(chatMessages).values(insertMessage).returning();
+    return message;
+  }
+
+  // Health Metrics
+  async getLatestHealthMetrics(userId: string): Promise<HealthMetrics | undefined> {
+    const [metrics] = await db.select().from(healthMetrics).where(eq(healthMetrics.userId, userId)).orderBy(desc(healthMetrics.recordedAt)).limit(1);
+    return metrics || undefined;
+  }
+
+  async getHealthMetrics(userId: string): Promise<HealthMetrics[]> {
+    return db.select().from(healthMetrics).where(eq(healthMetrics.userId, userId)).orderBy(desc(healthMetrics.recordedAt));
+  }
+
+  async createHealthMetrics(insertMetrics: InsertHealthMetrics): Promise<HealthMetrics> {
+    const [metrics] = await db.insert(healthMetrics).values(insertMetrics).returning();
+    return metrics;
+  }
+}
+
+// Use DatabaseStorage for production readiness
+export const storage = new DatabaseStorage();
