@@ -22,8 +22,8 @@ export default function AnalysisResultsModal({ open, onOpenChange, analysis }: A
     return null;
   }
 
-  // Check if we have DeepSeek analysis results
-  const hasDeepSeekResults = analysis.results && analysis.results.markers && analysis.results.markers.length > 0;
+  // Check if we have AI analysis results
+  const hasAIResults = analysis.results && analysis.results.markers && analysis.results.markers.length > 0;
 
   const formatDate = (date: Date | string) => {
     const d = typeof date === 'string' ? new Date(date) : date;
@@ -125,12 +125,12 @@ export default function AnalysisResultsModal({ open, onOpenChange, analysis }: A
               </div>
             </div>
 
-            {/* DeepSeek AI Results */}
-            {hasDeepSeekResults && (
+            {/* AI Analysis Results */}
+            {hasAIResults && (
               <div className="space-y-4 mb-6">
                 <h4 className="font-semibold text-card-foreground flex items-center">
                   <TrendingUp className="w-5 h-5 text-medical-blue mr-2" />
-                  Результаты анализа DeepSeek AI
+                  Результаты ИИ-анализа
                 </h4>
                 {analysis.results.markers.map((marker: any, index: number) => (
                   <div 

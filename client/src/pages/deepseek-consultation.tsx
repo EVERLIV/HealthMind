@@ -36,7 +36,7 @@ interface ConsultationResponse {
   disclaimer: string;
 }
 
-export default function DeepSeekConsultation() {
+export default function AIConsultation() {
   const [, navigate] = useLocation();
   const [question, setQuestion] = useState("");
   const [consultationHistory, setConsultationHistory] = useState<Array<{
@@ -59,7 +59,7 @@ export default function DeepSeekConsultation() {
 
   const consultationMutation = useMutation({
     mutationFn: async (consultationData: { question: string; healthProfile?: any; bloodAnalyses?: any }) => {
-      const response = await apiRequest("/api/deepseek-consultation", {
+      const response = await apiRequest("/api/ai-consultation", {
         method: "POST",
         body: JSON.stringify(consultationData)
       });
@@ -75,7 +75,7 @@ export default function DeepSeekConsultation() {
       setQuestion("");
       toast({
         title: "✅ Консультация готова!",
-        description: "DeepSeek проанализировал ваш запрос",
+        description: "ИИ-консультант проанализировал ваш запрос",
         className: "bg-gradient-to-r from-medical-blue to-trust-green text-white border-0",
       });
     },
@@ -117,14 +117,14 @@ export default function DeepSeekConsultation() {
   };
 
   const quickQuestions = [
-    "Проанализируйте мои последние анализы крови",
-    "Как улучшить мой уровень холестерина?",
-    "Рекомендации по питанию на основе моего профиля",
-    "Оцените риски для здоровья сердца"
+    "Анализ крови: что означают результаты?",
+    "Как снизить холестерин?",
+    "Персональное питание",
+    "Здоровье сердца: профилактика"
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 overflow-x-hidden">
       <MobileNav />
       
       <main className="px-3 py-4 pb-24">
@@ -144,7 +144,7 @@ export default function DeepSeekConsultation() {
                 </button>
                 <Badge className="bg-white/20 backdrop-blur-sm text-white border border-white/30 px-3 py-1">
                   <Brain className="w-3 h-3 mr-1.5" />
-                  DeepSeek AI
+                  ИИ Консультант
                 </Badge>
               </div>
               
@@ -244,10 +244,10 @@ export default function DeepSeekConsultation() {
                     key={index}
                     variant="outline"
                     onClick={() => setQuestion(q)}
-                    className="text-left justify-start h-auto py-3 px-4 hover:bg-gray-50 dark:hover:bg-slate-700"
+                    className="text-left justify-start h-auto py-3 px-4 hover:bg-gray-50 dark:hover:bg-slate-700 whitespace-normal text-wrap"
                     disabled={consultationMutation.isPending}
                   >
-                    <span className="text-sm">{q}</span>
+                    <span className="text-xs leading-relaxed break-words">{q}</span>
                   </Button>
                 ))}
               </div>
@@ -290,7 +290,7 @@ export default function DeepSeekConsultation() {
                         <Brain className="w-4 h-4 text-white" />
                       </div>
                       <span className="font-medium text-gray-900 dark:text-white">
-                        DeepSeek Консультант
+                        ИИ Консультант
                       </span>
                       <Badge className={`${getPriorityColor(consultation.response.priority)} border text-xs`}>
                         {getPriorityIcon(consultation.response.priority)}
