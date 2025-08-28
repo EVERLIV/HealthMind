@@ -292,6 +292,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Simple in-memory cache for recommendations
+  const recommendationsCache = new Map();
+  const CACHE_TTL = 10 * 60 * 1000; // 10 минут
+
   // Recommendations route
   app.get("/api/recommendations", async (req, res) => {
     try {
@@ -305,6 +309,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get user's latest blood analyses
       const bloodAnalyses = await storage.getBloodAnalysesByUser(DEFAULT_USER_ID);
+      
+      // Create cache key based on profile and analyses data
+      const cacheKey = `recommendations_${DEFAULT_USER_ID}_${JSON.stringify({
+        profile: healthProfile?.updatedAt,
+        analyses: bloodAnalyses.map(a => ({ id: a.id, updatedAt: a.updatedAt }))
+      })}`;
+
+      // Check cache first
+      const cached = recommendationsCache.get(cacheKey);
+      if (cached && (Date.now() - cached.timestamp) < CACHE_TTL) {
+        console.log("Returning cached recommendations");
+        return res.json(cached.data);
+      }
       
       // Extract markers from the latest analyzed blood tests
       const bloodMarkers: any[] = [];
@@ -352,12 +369,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
       }
 
+      console.log("Генерируем новые рекомендации через DeepSeek...");
+      
       // Generate recommendations using DeepSeek
       const deepSeekService = new DeepSeekService(deepSeekApiKey);
       const recommendations = await deepSeekService.generateHealthRecommendations(
         profile,
         bloodMarkers
       );
+
+      // Cache the result
+      recommendationsCache.set(cacheKey, {
+        data: recommendations,
+        timestamp: Date.now()
+      });
 
       res.json(recommendations);
     } catch (error) {

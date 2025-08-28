@@ -80,20 +80,6 @@ export default function Recommendations() {
   const [selectedBiomarker, setSelectedBiomarker] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("overview");
 
-  const { data: recommendations, isLoading, refetch, error } = useQuery<HealthRecommendations>({
-    queryKey: ["/api/recommendations"],
-    enabled: true,
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: true,
-    retry: 2,
-    retryDelay: 1000,
-    meta: {
-      errorMessage: "Не удалось сгенерировать рекомендации"
-    }
-  });
-
   const { data: healthProfile } = useQuery({
     queryKey: ["/api/health-profile"],
   });
@@ -105,6 +91,20 @@ export default function Recommendations() {
   const hasProfile = healthProfile && ((healthProfile as any)?.profileData || (healthProfile as any)?.completionPercentage > 0);
   const hasAnalyses = bloodAnalyses && Array.isArray(bloodAnalyses) && bloodAnalyses.length > 0;
   const canGenerateRecommendations = hasProfile || hasAnalyses;
+
+  const { data: recommendations, isLoading, refetch, error } = useQuery<HealthRecommendations>({
+    queryKey: ["/api/recommendations"],
+    enabled: canGenerateRecommendations,
+    staleTime: 10 * 60 * 1000, // 10 минут кэша
+    gcTime: 30 * 60 * 1000,    // 30 минут в памяти
+    refetchOnMount: false,      // Не обновлять при каждом монтировании
+    refetchOnWindowFocus: false, // Не обновлять при фокусе окна
+    retry: 1,                   // Только одна попытка повтора
+    retryDelay: 2000,
+    meta: {
+      errorMessage: "Не удалось сгенерировать рекомендации"
+    }
+  });
 
   const handleGenerateRecommendations = async () => {
     setIsGenerating(true);
@@ -502,7 +502,7 @@ export default function Recommendations() {
             <h2 className="text-base font-bold">Детальные рекомендации</h2>
           </div>
           
-          <div className="grid grid-cols-2 gap-2">
+          <div className="flex flex-wrap gap-2">
             {[
               { key: "nutrition", label: "Питание", icon: Apple },
               { key: "physicalActivity", label: "Активность", icon: Activity },
@@ -514,15 +514,15 @@ export default function Recommendations() {
                 variant={selectedCategory === key ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedCategory(key)}
-                className={`h-auto py-3 px-3 flex-col gap-1 ${
+                className={`h-8 px-3 flex items-center gap-1.5 text-xs ${
                   selectedCategory === key 
                     ? 'bg-gradient-to-r from-medical-blue to-trust-green text-white' 
                     : ''
                 }`}
                 data-testid={`category-${key}`}
               >
-                <Icon className="w-4 h-4" />
-                <span className="text-xs">{label}</span>
+                <Icon className="w-3 h-3" />
+                <span>{label}</span>
               </Button>
             ))}
           </div>
