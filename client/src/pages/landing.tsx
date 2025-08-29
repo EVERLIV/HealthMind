@@ -22,13 +22,15 @@ import {
   TrendingUp,
   ArrowRight,
   Sparkles,
-  PlayCircle
+  PlayCircle,
+  Monitor,
+  Plus
 } from "lucide-react";
 import aiBloodImage from '@assets/generated_images/AI_blood_analysis_a3b7806b.png';
 import healthMonitoringImage from '@assets/generated_images/Health_monitoring_scene_e2ffcf2b.png';
 import aiConsultationImage from '@assets/generated_images/AI_medical_consultation_211a67ef.png';
 import personalGoalsImage from '@assets/generated_images/Personal_health_goals_200a8db1.png';
-import logoImage from '@assets/logo_1756398870105.png';
+import logoImage from '@assets/logo_1756447359961.png';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -227,10 +229,19 @@ export default function LandingPage() {
             Получайте профессиональные медицинские рекомендации и персональные планы оздоровления.
           </p>
           
-          {/* PWA Install Buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center animate-fadeInUp hero-buttons">
+          {/* PWA Install Section */}
+          <div className="animate-fadeInUp hero-buttons space-y-6">
+            {/* Install to Home Screen Badge */}
+            <div className="flex justify-center">
+              <div className="inline-flex items-center bg-white/10 backdrop-blur-lg border border-white/20 text-white px-6 py-3 rounded-full font-semibold shadow-lg">
+                <Monitor className="w-5 h-5 mr-2 text-emerald-300" />
+                <span className="mr-2">Установите на главный экран</span>
+                <Plus className="w-4 h-4 text-emerald-300" />
+              </div>
+            </div>
+            
             {!isPWAInstalled && (
-              <>
+              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                 <Button
                   onClick={handleInstallPWA}
                   size="lg"
@@ -252,7 +263,7 @@ export default function LandingPage() {
                   Установить на iOS
                   <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform duration-300" />
                 </Button>
-              </>
+              </div>
             )}
             
             {isPWAInstalled && (
@@ -266,6 +277,22 @@ export default function LandingPage() {
                 </p>
               </div>
             )}
+            
+            {/* Additional PWA Benefits */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center text-white/80 text-sm">
+              <div className="flex items-center">
+                <CheckCircle2 className="w-4 h-4 mr-2 text-emerald-300" />
+                Работает без интернета
+              </div>
+              <div className="flex items-center">
+                <CheckCircle2 className="w-4 h-4 mr-2 text-emerald-300" />
+                Быстрый доступ с экрана
+              </div>
+              <div className="flex items-center">
+                <CheckCircle2 className="w-4 h-4 mr-2 text-emerald-300" />
+                Уведомления о здоровье
+              </div>
+            </div>
           </div>
           
         </div>
