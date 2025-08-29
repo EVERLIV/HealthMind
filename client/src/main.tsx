@@ -16,7 +16,7 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed') {
               if (navigator.serviceWorker.controller) {
-                console.log('[SW] New content is available; please refresh.');
+if ('serviceWorker' in navigator && !window.location.hostname.includes('stackblitz')) {
                 // You could show a toast notification here
               } else {
                 console.log('[SW] Content is cached for offline use.');
@@ -29,6 +29,8 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
       console.error('[SW] Service Worker registration failed:', error);
     }
   });
+} else {
+  console.log('[SW] Service Worker not supported in this environment');
 }
 
 createRoot(document.getElementById("root")!).render(<App />);
