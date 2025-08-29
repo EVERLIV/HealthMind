@@ -16,10 +16,11 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed') {
               if (navigator.serviceWorker.controller) {
-if ('serviceWorker' in navigator && !window.location.hostname.includes('stackblitz')) {
-                // You could show a toast notification here
-              } else {
-                console.log('[SW] Content is cached for offline use.');
+                if ('serviceWorker' in navigator && !window.location.hostname.includes('stackblitz')) {
+                  // You could show a toast notification here
+                } else {
+                  console.log('[SW] Content is cached for offline use.');
+                }
               }
             }
           });
