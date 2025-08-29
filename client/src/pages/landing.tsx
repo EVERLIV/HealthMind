@@ -129,11 +129,17 @@ export default function LandingPage() {
   }, []);
 
   const handleInstallPWA = async () => {
+    console.log('Install button clicked');
+    console.log('deferredPrompt available:', !!deferredPrompt);
+    
     if (deferredPrompt) {
       try {
+        console.log('Showing install prompt...');
         // Show the install prompt
         await deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
+        
+        console.log('User choice:', outcome);
         
         if (outcome === 'accepted') {
           console.log('PWA install accepted');
@@ -146,17 +152,56 @@ export default function LandingPage() {
         console.error('Error during PWA install:', error);
       }
     } else {
-      // Fallback for browsers that don't support PWA install prompt
-      // Try to detect if it's mobile Chrome
-      const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      console.log('No deferred prompt available, showing manual instructions');
       
-      if (isChrome && isMobile) {
-        alert('Для установки приложения:\n1. Нажмите меню браузера (⋮)\n2. Выберите "Добавить на главный экран"\n3. Нажмите "Установить"');
+      // Более детальные инструкции в зависимости от браузера и устройства
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isAndroid = /android/.test(userAgent);
+      const isChrome = /chrome/.test(userAgent) && !/edg|opr/.test(userAgent);
+      const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+      const isDesktop = !isMobile;
+      
+      let instructions = '';
+      
+      if (isAndroid && isChrome) {
+        instructions = `🤖 Установка на Android:
+
+1. Нажмите меню браузера (три точки ⋮ справа вверху)
+2. Выберите "Добавить на главный экран" или "Установить приложение"
+3. Нажмите "Установить" или "Добавить"
+4. Приложение EVERLIV HEALTH появится на главном экране
+
+Если не видите опцию установки, убедитесь что:
+• Вы используете Chrome или другой современный браузер
+• Сайт открыт по HTTPS (безопасное соединение)`;
+      } else if (isDesktop && isChrome) {
+        instructions = `💻 Установка на компьютер:
+
+1. Найдите иконку установки в адресной строке (справа)
+2. Нажмите на неё и выберите "Установить"
+3. Или используйте меню Chrome ⋮ → "Установить EVERLIV HEALTH..."
+
+После установки приложение будет доступно как обычная программа!`;
+      } else if (isMobile) {
+        instructions = `📱 Добавление на главный экран:
+
+1. Откройте меню браузера
+2. Найдите "Добавить на главный экран" или "Add to Home Screen"
+3. Нажмите "Добавить"
+
+Для лучшей работы рекомендуем использовать Chrome или Safari.`;
       } else {
-        // For desktop Chrome or other browsers
-        alert('Для установки:\n• В Chrome: нажмите значок установки в адресной строке\n• В Firefox: добавьте в закладки для быстрого доступа\n• На мобильном: используйте меню "Добавить на главный экран"');
+        instructions = `🌐 Для установки приложения:
+
+• Chrome: найдите иконку установки в адресной строке
+• Firefox: добавьте в закладки для быстрого доступа
+• Safari: используйте "Добавить в Dock" (macOS)
+• Edge: найдите "Установить это приложение" в меню
+
+Современные браузеры поддерживают установку веб-приложений как обычных программ!`;
       }
+      
+      alert(instructions);
     }
   };
 
