@@ -10,32 +10,28 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "npm run build"]
 
 [[ports]]
-localPort = 3000
+localPort = 3021
 externalPort = 3000
 
 [[ports]]
-localPort = 3001
+localPort = 3022
 externalPort = 3001
 
 [[ports]]
-localPort = 3005
+localPort = 3023
 externalPort = 3002
 
 [[ports]]
-localPort = 3008
+localPort = 3024
 externalPort = 3003
 
 [[ports]]
-localPort = 3011
+localPort = 3025
 externalPort = 4200
 
 [[ports]]
-localPort = 3013
+localPort = 3026
 externalPort = 5000
-
-[[ports]]
-localPort = 3016
-externalPort = 5173
 
 [[ports]]
 localPort = 5000
