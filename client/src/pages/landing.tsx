@@ -48,18 +48,55 @@ export default function LandingPage() {
     // Check if PWA is already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsPWAInstalled(true);
+      console.log('PWA is already installed');
     }
 
     // Listen for PWA install prompt
     const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('beforeinstallprompt event fired');
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
 
+    // Listen for app installed event
+    const handleAppInstalled = () => {
+      console.log('PWA was installed');
+      setIsPWAInstalled(true);
+      setDeferredPrompt(null);
+    };
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+    
+    // Check PWA requirements
+    const checkPWARequirements = async () => {
+      const checks = {
+        serviceWorker: 'serviceWorker' in navigator,
+        manifest: document.querySelector('link[rel="manifest"]') !== null,
+        https: location.protocol === 'https:' || location.hostname === 'localhost',
+      };
+      
+      console.log('PWA requirements check:', checks);
+      
+      // Try to fetch manifest
+      try {
+        const response = await fetch('/manifest.json');
+        if (response.ok) {
+          const manifest = await response.json();
+          console.log('Manifest loaded successfully:', manifest.name);
+        } else {
+          console.error('Failed to load manifest.json');
+        }
+      } catch (error) {
+        console.error('Error loading manifest:', error);
+      }
+    };
+    
+    checkPWARequirements();
     
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);
 
@@ -93,18 +130,50 @@ export default function LandingPage() {
 
   const handleInstallPWA = async () => {
     if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        setDeferredPrompt(null);
-        setIsPWAInstalled(true);
+      try {
+        // Show the install prompt
+        await deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        if (outcome === 'accepted') {
+          console.log('PWA install accepted');
+          setDeferredPrompt(null);
+          setIsPWAInstalled(true);
+        } else {
+          console.log('PWA install dismissed');
+        }
+      } catch (error) {
+        console.error('Error during PWA install:', error);
+      }
+    } else {
+      // Fallback for browsers that don't support PWA install prompt
+      // Try to detect if it's mobile Chrome
+      const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isChrome && isMobile) {
+        alert('Для установки приложения:\n1. Нажмите меню браузера (⋮)\n2. Выберите "Добавить на главный экран"\n3. Нажмите "Установить"');
+      } else {
+        // For desktop Chrome or other browsers
+        alert('Для установки:\n• В Chrome: нажмите значок установки в адресной строке\n• В Firefox: добавьте в закладки для быстрого доступа\n• На мобильном: используйте меню "Добавить на главный экран"');
       }
     }
   };
 
   const handleIOSInstall = () => {
-    // For iOS, show instructions modal or redirect to app store
-    alert("Для установки на iOS: нажмите кнопку 'Поделиться' в Safari и выберите 'На экран «Домой»'");
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+    
+    if (isIOS) {
+      if (isSafari) {
+        alert("Для установки приложения на iOS:\n\n1. Нажмите кнопку 'Поделиться' внизу экрана (📤)\n2. Прокрутите вниз и выберите 'На экран «Домой»'\n3. Нажмите 'Добавить' в правом верхнем углу\n\nПосле этого EVERLIV HEALTH появится на вашем главном экране!");
+      } else {
+        alert("Для лучшей работы на iOS рекомендуем открыть приложение в Safari, затем добавить на главный экран через кнопку 'Поделиться'.");
+      }
+    } else {
+      // Not iOS, redirect to Android flow
+      handleInstallPWA();
+    }
   };
 
   const features = [
@@ -245,11 +314,14 @@ export default function LandingPage() {
                 <Button
                   onClick={handleInstallPWA}
                   size="lg"
-                  className="group bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold h-16 px-10 rounded-2xl shadow-2xl border-0 min-w-[280px] transform hover:scale-105 transition-all duration-300"
+                  className="group bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold h-16 px-10 rounded-2xl shadow-2xl border-0 min-w-[280px] transform hover:scale-105 transition-all duration-300 relative"
                   data-testid="button-install-android"
                 >
-                  <Smartphone className="w-6 h-6 mr-4 group-hover:rotate-12 transition-transform duration-300" />
-                  Установить на Android
+                  {deferredPrompt && (
+                    <div className="absolute -top-2 -right-2 w-4 h-4 bg-yellow-400 rounded-full animate-pulse"></div>
+                  )}
+                  <Download className="w-6 h-6 mr-4 group-hover:translate-y-1 transition-transform duration-300" />
+                  {deferredPrompt ? 'Установить приложение' : 'Скачать для Android'}
                   <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform duration-300" />
                 </Button>
                 
@@ -259,8 +331,8 @@ export default function LandingPage() {
                   className="group bg-white/10 text-white border-2 border-white/30 hover:bg-white/20 font-bold h-16 px-10 rounded-2xl backdrop-blur-lg min-w-[280px] transform hover:scale-105 transition-all duration-300"
                   data-testid="button-install-ios"
                 >
-                  <Smartphone className="w-6 h-6 mr-4 group-hover:rotate-12 transition-transform duration-300" />
-                  Установить на iOS
+                  <Download className="w-6 h-6 mr-4 group-hover:translate-y-1 transition-transform duration-300" />
+                  Скачать для iOS
                   <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform duration-300" />
                 </Button>
               </div>
