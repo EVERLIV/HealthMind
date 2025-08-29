@@ -5,10 +5,6 @@ import { serveStatic } from "./vite";
 const app = express();
 
 // PRIORITY: Health check endpoints for deployment - MUST be first
-app.get("/", (_req, res) => {
-  res.status(200).send("OK - EVERLIV HEALTH is running!");
-});
-
 app.get("/health", (_req, res) => {
   res.status(200).send("OK");
 });
