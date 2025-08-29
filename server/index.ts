@@ -1,4 +1,6 @@
-import express from "express";
+import express, { type Request, Response, NextFunction } from "express";
+import { registerRoutes } from "./routes";
+import { serveStatic } from "./vite";
 
 const app = express();
 
@@ -15,22 +17,63 @@ app.get("/api/health", (_req, res) => {
   res.status(200).json({ 
     status: "ok", 
     service: "EVERLIV HEALTH",
-    timestamp: new Date().toISOString() 
+    timestamp: new Date().toISOString(),
+    database: process.env.DATABASE_URL ? "connected" : "not configured"
   });
 });
 
-// Basic middleware
-app.use(express.json());
-app.use(express.static('dist/public'));
+// Set environment for Express
+if (process.env.NODE_ENV === 'production') {
+  app.set('env', 'production');
+}
 
-// Catch-all for client-side routing
-app.get('*', (_req, res) => {
-  res.sendFile('index.html', { root: 'dist/public' });
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: false, limit: '50mb' }));
+
+// Logging middleware for API requests
+app.use((req, res, next) => {
+  const start = Date.now();
+  const path = req.path;
+  
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (path.startsWith("/api")) {
+      console.log(`${req.method} ${path} ${res.statusCode} in ${duration}ms`);
+    }
+  });
+
+  next();
 });
 
-const port = parseInt(process.env.PORT || "5000", 10);
+(async () => {
+  let server;
+  try {
+    // Register API routes
+    server = await registerRoutes(app);
+    console.log("✅ API routes registered successfully");
+  } catch (error) {
+    console.error("❌ Routes registration failed:", error);
+    // Create minimal server for health checks only
+    const { createServer } = await import("http");
+    server = createServer(app);
+  }
 
-app.listen(port, "0.0.0.0", () => {
-  console.log(`🚀 EVERLIV HEALTH server running on port ${port}`);
-  console.log(`📊 Health check available at http://localhost:${port}/health`);
-});
+  // Error handling middleware
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+    console.error("Server error:", err);
+    res.status(status).json({ message });
+  });
+
+  // Serve static files in production
+  console.log("🗂️  Starting production static file server");
+  serveStatic(app);
+
+  const port = parseInt(process.env.PORT || "5000", 10);
+  server.listen(port, "0.0.0.0", () => {
+    console.log(`🚀 EVERLIV HEALTH server running on port ${port}`);
+    console.log(`📊 Health check available at http://0.0.0.0:${port}/health`);
+    console.log(`🗄️  Database: ${process.env.DATABASE_URL ? 'Connected' : 'Not configured'}`);
+  });
+})();
