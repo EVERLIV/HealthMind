@@ -2,8 +2,12 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 
-// Service Worker Registration
-if ('serviceWorker' in navigator && 'PushManager' in window) {
+// Service Worker Registration - only in supported environments
+if ('serviceWorker' in navigator && 
+    'PushManager' in window && 
+    !window.location.hostname.includes('stackblitz') &&
+    !window.location.hostname.includes('webcontainer')) {
+  
   window.addEventListener('load', async () => {
     try {
       const registration = await navigator.serviceWorker.register('/sw.js');
@@ -16,11 +20,9 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed') {
               if (navigator.serviceWorker.controller) {
-                if ('serviceWorker' in navigator && !window.location.hostname.includes('stackblitz')) {
-                  // You could show a toast notification here
-                } else {
-                  console.log('[SW] Content is cached for offline use.');
-                }
+                console.log('[SW] New content is available; please refresh.');
+              } else {
+                console.log('[SW] Content is cached for offline use.');
               }
             }
           });
