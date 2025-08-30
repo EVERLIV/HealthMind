@@ -30,7 +30,6 @@ import aiBloodImage from '@assets/generated_images/AI_blood_analysis_a3b7806b.pn
 import healthMonitoringImage from '@assets/generated_images/Health_monitoring_scene_e2ffcf2b.png';
 import aiConsultationImage from '@assets/generated_images/AI_medical_consultation_211a67ef.png';
 import personalGoalsImage from '@assets/generated_images/Personal_health_goals_200a8db1.png';
-import logoImage from '@assets/logo_1756447359961.png';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -322,8 +321,15 @@ export default function LandingPage() {
           <div className="flex items-center justify-center mb-8">
             <div className="relative animate-fadeInScale hero-logo">
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full blur-xl opacity-70 animate-pulseGlow"></div>
-              <div className="relative p-6 bg-white/10 backdrop-blur-lg rounded-full border border-white/20 shadow-2xl">
-                <img src={logoImage} alt="EVERLIV HEALTH" className="w-16 h-16 drop-shadow-lg" />
+              <div className="relative p-6 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl">
+                <div className="text-center">
+                  <div className="text-2xl font-black text-white tracking-wider">
+                    EVERLIV
+                  </div>
+                  <div className="text-xs font-semibold text-emerald-200 tracking-widest mt-1">
+                    HEALTH
+                  </div>
+                </div>
               </div>
               <div className="absolute -top-2 -right-2 animate-smoothFloat">
                 <div className="w-6 h-6 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full flex items-center justify-center shadow-lg">

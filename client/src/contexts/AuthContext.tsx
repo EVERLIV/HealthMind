@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { useLocation } from 'wouter';
 
 interface User {
   id: string;
@@ -47,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   // Load auth state from localStorage on mount
   useEffect(() => {
@@ -101,6 +103,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         title: 'Добро пожаловать!',
         description: `Вы успешно вошли как ${response.user.name}`,
       });
+      
+      // Redirect to dashboard after successful login
+      setTimeout(() => {
+        setLocation('/app/dashboard');
+      }, 500);
     } catch (error: any) {
       toast({
         title: 'Ошибка входа',
@@ -129,6 +136,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         title: 'Регистрация успешна!',
         description: 'Добро пожаловать в EVERLIV HEALTH',
       });
+      
+      // Redirect to dashboard after successful registration
+      setTimeout(() => {
+        setLocation('/app/dashboard');
+      }, 500);
     } catch (error: any) {
       toast({
         title: 'Ошибка регистрации',
