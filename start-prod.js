@@ -1,23 +1,3 @@
-#!/bin/bash
-
-echo "🏗️ EVERLIV HEALTH - Real React App Production"
-echo "============================================="
-
-# Kill any running servers
-pkill -f "tsx server/index.ts" || true
-pkill -f "node.*server" || true
-sleep 2
-
-# Build React app
-echo "📦 Building React application..."
-npm run build:client 2>&1 | grep -E "(built in|✓|error)" || true
-
-# Check if build succeeded (even if files don't appear due to Replit bug)
-if [ $? -eq 0 ]; then
-    echo "✅ Build completed"
-    
-    # Create production start script
-    cat > start-prod.js << 'EOF'
 import express from 'express';
 import { createServer } from 'http';
 import { fileURLToPath } from 'url';
@@ -67,16 +47,3 @@ import('./server/routes.js').then(({ registerRoutes }) => {
         console.log(`🚀 EVERLIV HEALTH Frontend Only - Port ${port}`);
     });
 });
-EOF
-
-    echo "✅ Production setup complete!"
-    echo ""
-    echo "🚀 To deploy:"
-    echo "   1. Run: node start-prod.js"
-    echo "   2. Or use this script in Deployments"
-    echo ""
-    echo "📱 Full React app with all features will be served"
-else
-    echo "❌ Build failed"
-    exit 1
-fi
