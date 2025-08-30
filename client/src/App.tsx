@@ -49,6 +49,16 @@ function Router() {
       <Route path="/" component={LandingPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
+      {/* Redirects for old URLs */}
+      <Route path="/article/:id">
+        {(params) => <Redirect to={`/app/article/${params.id}`} />}
+      </Route>
+      <Route path="/health-profile">
+        <Redirect to="/app/health-profile" />
+      </Route>
+      <Route path="/dashboard">
+        <Redirect to="/app/dashboard" />
+      </Route>
       <Route path="/app">
         <Redirect to="/app/dashboard" />
       </Route>
