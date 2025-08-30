@@ -210,9 +210,20 @@ export default function BloodAnalysisPage() {
     onError: (error: any) => {
       console.error('Extract text error:', error);
       updateProcessingState('idle', 0, 'Ошибка распознавания');
+      
+      let errorMessage = "Не удалось распознать текст. Попробуйте еще раз или введите данные вручную.";
+      
+      // Handle specific error types
+      if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+        errorMessage = "Сессия истекла. Войдите в систему заново.";
+        setTimeout(() => window.location.href = '/login', 2000);
+      } else if (error.message?.includes('Service temporarily unavailable')) {
+        errorMessage = "Сервис распознавания временно недоступен. Попробуйте позже.";
+      }
+      
       toast({
         title: "Ошибка",
-        description: "Не удалось распознать текст. Попробуйте еще раз или введите данные вручную.",
+        description: errorMessage,
         variant: "destructive",
       });
       setAnalysisMode('text');
@@ -253,19 +264,36 @@ export default function BloodAnalysisPage() {
 
   const handleGetUploadParameters = async () => {
     try {
+      console.log('Getting upload parameters...');
       const { uploadURL } = await apiRequest("/api/objects/upload", {
         method: "POST",
       });
+      console.log('Got upload URL successfully');
       return {
         method: "PUT" as const,
         url: uploadURL,
       };
-    } catch (error) {
-      toast({
-        title: "Ошибка",
-        description: "Не удалось получить URL для загрузки",
-        variant: "destructive",
-      });
+    } catch (error: any) {
+      console.error('Upload parameters error:', error);
+      
+      // Handle auth errors specifically
+      if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+        toast({
+          title: "Ошибка авторизации",
+          description: "Сессия истекла. Пожалуйста, войдите в систему заново.",
+          variant: "destructive",
+        });
+        // Redirect to login after a short delay
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 2000);
+      } else {
+        toast({
+          title: "Ошибка",
+          description: error.message || "Не удалось получить URL для загрузки",
+          variant: "destructive",
+        });
+      }
       throw error;
     }
   };
