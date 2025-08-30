@@ -5,7 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, TrendingUp, TrendingDown, Minus, AlertTriangle, Info, Heart, Shield, Brain, Activity, Droplets, Zap, Filter, Grid3X3, BarChart3 } from "lucide-react";
+import { ArrowLeft, TrendingUp, TrendingDown, Minus, AlertTriangle, Info, Heart, Shield, Brain, Activity, Droplets, Zap, Filter, Grid3X3, BarChart3, CheckCircle, Sparkles, Stethoscope } from "lucide-react";
+import { IconContainer, iconSizes } from "@/components/ui/icon-container";
 import MobileNav from "@/components/layout/mobile-nav";
 import BottomNav from "@/components/layout/bottom-nav";
 import { useState, useMemo } from "react";
@@ -185,42 +186,73 @@ export default function BloodAnalysisDetailPage() {
       <MobileNav />
       
       <main className="eva-page-content pb-24">
-        {/* Компактный Header с ключевой статистикой */}
-        <div className="bg-white sticky top-0 z-10 -mx-4 px-4 py-3 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Link href="/app/blood-analyses">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hover:bg-gray-100"
-                  data-testid="button-back"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </Button>
-              </Link>
-              <div>
-                <h1 className="text-lg font-bold">Анализ крови</h1>
-                <div className="flex items-center gap-4 text-xs text-gray-600">
-                  <span className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                    {normalCount}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
-                    {abnormalCount}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    {criticalCount}
-                  </span>
+        {/* EVA Header с градиентом */}
+        <div className="eva-gradient-primary sticky top-16 z-10 -mx-4 text-white overflow-hidden">
+          <div className="p-4 relative">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <Link href="/app/blood-analyses">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white border-0"
+                    data-testid="button-back"
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                  </Button>
+                </Link>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <IconContainer size="xs" className="bg-white/20 text-white border-white/30">
+                      <Brain className={iconSizes.xs} />
+                    </IconContainer>
+                    <h1 className="text-lg font-bold">ИИ Анализ крови</h1>
+                  </div>
+                  <p className="text-white/90 text-sm">Результаты готовы</p>
                 </div>
               </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold">{healthScore}%</div>
+                <div className="text-xs text-white/80">здоровья</div>
+              </div>
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-emerald-600">{healthScore}%</div>
-              <div className="text-xs text-gray-500">здоровья</div>
+            
+            {/* Компактная статистика */}
+            <div className="bg-white/15 rounded-2xl p-3 backdrop-blur-sm">
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <IconContainer size="xs" variant="soft-success" className="bg-green-100/20 text-green-200 border-green-200/30">
+                      <CheckCircle className={iconSizes.xs} />
+                    </IconContainer>
+                    <span>{normalCount} норма</span>
+                  </div>
+                  {abnormalCount > 0 && (
+                    <div className="flex items-center gap-2">
+                      <IconContainer size="xs" variant="soft-warning" className="bg-amber-100/20 text-amber-200 border-amber-200/30">
+                        <AlertTriangle className={iconSizes.xs} />
+                      </IconContainer>
+                      <span>{abnormalCount} откл</span>
+                    </div>
+                  )}
+                  {criticalCount > 0 && (
+                    <div className="flex items-center gap-2">
+                      <IconContainer size="xs" variant="soft-danger" className="bg-red-100/20 text-red-200 border-red-200/30">
+                        <AlertTriangle className={iconSizes.xs} />
+                      </IconContainer>
+                      <span>{criticalCount} крит</span>
+                    </div>
+                  )}
+                </div>
+                <Badge className="bg-white/20 text-white border-white/30 text-xs">
+                  {totalCount} показателей
+                </Badge>
+              </div>
             </div>
+            
+            {/* Декоративные элементы */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
           </div>
         </div>
 
@@ -273,44 +305,75 @@ export default function BloodAnalysisDetailPage() {
             </div>
           </div>
 
-          {/* Маркеры в компактной сетке */}
-          <div className={viewMode === "grid" ? "grid grid-cols-3 gap-2" : "space-y-2"}>
+          {/* EVA Маркеры с современным дизайном */}
+          <div className={viewMode === "grid" ? "grid grid-cols-2 gap-3" : "space-y-3"}>
             {filteredMarkers.map((marker: BloodMarker, index: number) => {
               const { icon: IconComponent, color } = getCategoryData(marker.name);
+              
+              const getMarkerVariant = (status: string) => {
+                switch (status) {
+                  case "normal": return "soft-success";
+                  case "high": 
+                  case "low": return "soft-warning"; 
+                  case "critical": return "soft-danger";
+                  default: return "soft-neutral";
+                }
+              };
+
+              const getStatusIconComponent = (status: string) => {
+                switch (status) {
+                  case "normal": return CheckCircle;
+                  case "high": 
+                  case "low": 
+                  case "critical": return AlertTriangle;
+                  default: return Activity;
+                }
+              };
+
+              const StatusIcon = getStatusIconComponent(marker.status);
+              
               return (
                 <Card
                   key={index}
-                  className={`p-2 cursor-pointer transition-all hover:shadow-md ${
-                    marker.status === 'critical' ? 'ring-1 ring-red-300' : ''
-                  } ${viewMode === "list" ? 'flex items-center gap-3' : ''}`}
+                  className={`eva-mobile-spacing cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] rounded-2xl border-0 shadow-sm ${
+                    marker.status === 'critical' ? 'ring-2 ring-red-200 bg-red-50/50' : 
+                    marker.status === 'normal' ? 'bg-emerald-50/30' : 'bg-amber-50/30'
+                  }`}
                   onClick={() => setSelectedMarker(marker)}
                   data-testid={`marker-card-${index}`}
                 >
                   {viewMode === "grid" ? (
-                    <>
-                      <div className="flex items-center justify-between mb-1">
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${color}`}>
-                          <IconComponent className="w-2.5 h-2.5 text-white" />
-                        </div>
-                        <div className={`w-2 h-2 rounded-full ${getStatusColor(marker.status)}`}></div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <IconContainer size="sm" variant={getMarkerVariant(marker.status)}>
+                          <IconComponent className={iconSizes.sm} />
+                        </IconContainer>
+                        <IconContainer size="xs" variant={getMarkerVariant(marker.status)}>
+                          <StatusIcon className={iconSizes.xs} />
+                        </IconContainer>
                       </div>
-                      <h3 className="font-medium text-[10px] leading-tight mb-1 line-clamp-2">{marker.name}</h3>
-                      <p className="text-xs font-bold">{marker.value}</p>
-                    </>
+                      <div>
+                        <h3 className="font-semibold text-xs leading-tight mb-1 line-clamp-2 text-gray-900">{marker.name}</h3>
+                        <p className="text-sm font-bold text-gray-800">{marker.value}</p>
+                        <p className="text-xs text-gray-500 mt-1">{getStatusText(marker.status)}</p>
+                      </div>
+                    </div>
                   ) : (
-                    <>
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${color} flex-shrink-0`}>
-                        <IconComponent className="w-4 h-4 text-white" />
-                      </div>
+                    <div className="flex items-center gap-3">
+                      <IconContainer size="sm" variant={getMarkerVariant(marker.status)}>
+                        <IconComponent className={iconSizes.sm} />
+                      </IconContainer>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-sm truncate">{marker.name}</h3>
+                        <h3 className="font-semibold text-sm truncate text-gray-900">{marker.name}</h3>
                         <p className="text-xs text-gray-600">{marker.value}</p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className={`w-3 h-3 rounded-full ${getStatusColor(marker.status)}`}></div>
-                        <span className="text-xs text-gray-500">{getStatusText(marker.status)}</span>
+                      <div className="flex flex-col items-end gap-1">
+                        <IconContainer size="xs" variant={getMarkerVariant(marker.status)}>
+                          <StatusIcon className={iconSizes.xs} />
+                        </IconContainer>
+                        <span className="text-xs text-gray-500 eva-mobile-text">{getStatusText(marker.status)}</span>
                       </div>
-                    </>
+                    </div>
                   )}
                 </Card>
               );
@@ -318,113 +381,163 @@ export default function BloodAnalysisDetailPage() {
           </div>
         </div>
 
-        {/* Общие рекомендации и факторы риска */}
+        {/* EVA Рекомендации и факторы риска */}
         {(results?.recommendations?.length > 0 || results?.riskFactors?.length > 0) && (
-          <div className="mt-6 space-y-3">
+          <div className="mt-6 space-y-4">
             {results.recommendations && results.recommendations.length > 0 && (
-              <Card className="p-3 bg-emerald-50 border-emerald-200">
-                <h3 className="font-semibold text-sm mb-2 text-emerald-900 flex items-center gap-1">
-                  🎯 Рекомендации
-                </h3>
-                <ul className="space-y-1">
-                  {results.recommendations.slice(0, 3).map((rec: string, index: number) => (
-                    <li key={index} className="text-xs text-emerald-700 flex items-start gap-2">
-                      <span className="text-emerald-500 mt-0.5 text-[8px]">●</span>
-                      <span className="line-clamp-2">{rec}</span>
-                    </li>
-                  ))}
-                </ul>
-                {results.recommendations.length > 3 && (
-                  <p className="text-xs text-emerald-600 mt-2">+{results.recommendations.length - 3} еще</p>
-                )}
-              </Card>
+              <div className="eva-gradient-success rounded-2xl p-4 text-white">
+                <div className="flex items-start gap-3">
+                  <IconContainer size="sm" className="bg-white/20 text-white border-white/30">
+                    <Sparkles className={iconSizes.sm} />
+                  </IconContainer>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-sm mb-3">Персональные рекомендации</h3>
+                    <div className="space-y-2">
+                      {results.recommendations.slice(0, 3).map((rec: string, index: number) => (
+                        <div key={index} className="bg-white/15 rounded-xl p-3">
+                          <p className="text-sm text-white/90 leading-relaxed">{rec}</p>
+                        </div>
+                      ))}
+                    </div>
+                    {results.recommendations.length > 3 && (
+                      <p className="text-xs text-white/80 mt-3">+{results.recommendations.length - 3} дополнительных рекомендаций</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             )}
 
             {results.riskFactors && results.riskFactors.length > 0 && (
-              <Card className="p-3 bg-amber-50 border-amber-200">
-                <h3 className="font-semibold text-sm mb-2 text-amber-900 flex items-center gap-1">
-                  ⚠️ Факторы риска
-                </h3>
-                <ul className="space-y-1">
-                  {results.riskFactors.slice(0, 2).map((risk: string, index: number) => (
-                    <li key={index} className="text-xs text-amber-700 flex items-start gap-2">
-                      <span className="text-amber-500 mt-0.5 text-[8px]">●</span>
-                      <span className="line-clamp-2">{risk}</span>
-                    </li>
-                  ))}
-                </ul>
-                {results.riskFactors.length > 2 && (
-                  <p className="text-xs text-amber-600 mt-2">+{results.riskFactors.length - 2} еще</p>
-                )}
-              </Card>
+              <div className="eva-gradient-wellness rounded-2xl p-4 text-white">
+                <div className="flex items-start gap-3">
+                  <IconContainer size="sm" className="bg-white/20 text-white border-white/30">
+                    <Stethoscope className={iconSizes.sm} />
+                  </IconContainer>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-sm mb-3">Важные факторы</h3>
+                    <div className="space-y-2">
+                      {results.riskFactors.slice(0, 2).map((risk: string, index: number) => (
+                        <div key={index} className="bg-white/15 rounded-xl p-3">
+                          <p className="text-sm text-white/90 leading-relaxed">{risk}</p>
+                        </div>
+                      ))}
+                    </div>
+                    {results.riskFactors.length > 2 && (
+                      <p className="text-xs text-white/80 mt-3">+{results.riskFactors.length - 2} дополнительных факторов</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         )}
 
-        {/* Действия */}
+        {/* EVA Действия */}
         <div className="mt-6 grid grid-cols-2 gap-3">
           <Link href="/app/chat">
-            <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-xs h-10">
-              💬 Обсудить с ИИ
+            <Button 
+              size="sm" 
+              className="w-full eva-gradient-primary text-white text-xs h-12 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 border-0"
+            >
+              <IconContainer size="xs" className="bg-white/20 text-white border-white/30">
+                <Brain className={iconSizes.xs} />
+              </IconContainer>
+              <span className="font-medium">Обсудить с ИИ</span>
             </Button>
           </Link>
           <Link href="/app/blood-analysis">
-            <Button variant="outline" size="sm" className="w-full text-xs h-10">
-              📷 Новый анализ
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full text-xs h-12 rounded-xl border-2 border-slate-200 hover:border-medical-blue hover:text-medical-blue transition-all duration-200 flex items-center gap-2"
+            >
+              <IconContainer size="xs" variant="soft-primary">
+                <Activity className={iconSizes.xs} />
+              </IconContainer>
+              <span className="font-medium">Новый анализ</span>
             </Button>
           </Link>
         </div>
       </main>
 
-      {/* Модальное окно деталей биомаркера */}
+      {/* EVA Модальное окно деталей биомаркера */}
       {selectedMarker && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setSelectedMarker(null)}>
           <Card 
-            className="w-full max-h-[80vh] overflow-y-auto rounded-t-xl border-0"
+            className="w-full max-h-[80vh] overflow-y-auto rounded-t-3xl border-0 shadow-2xl bg-white"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-4">
-              <div className="flex items-start justify-between mb-4">
+            {/* EVA Header с градиентом */}
+            <div className="eva-gradient-primary p-6 text-white relative overflow-hidden rounded-t-3xl">
+              <div className="flex items-start justify-between mb-4 relative z-10">
                 <div className="flex items-center gap-3">
                   {(() => {
                     const IconComponent = getCategoryData(selectedMarker.name).icon;
+                    const getMarkerVariant = (status: string) => {
+                      switch (status) {
+                        case "normal": return "soft-success";
+                        case "high": 
+                        case "low": return "soft-warning"; 
+                        case "critical": return "soft-danger";
+                        default: return "soft-neutral";
+                      }
+                    };
                     return (
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getCategoryData(selectedMarker.name).color}`}>
-                        <IconComponent className="w-4 h-4 text-white" />
-                      </div>
+                      <IconContainer size="lg" className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+                        <IconComponent className={iconSizes.lg} />
+                      </IconContainer>
                     );
                   })()}
                   <div>
-                    <h2 className="font-semibold text-lg">{selectedMarker.name}</h2>
-                    <p className="text-sm font-bold text-gray-600">{selectedMarker.value}</p>
+                    <h2 className="font-bold text-lg mb-1">{selectedMarker.name}</h2>
+                    <p className="text-2xl font-bold text-white">{selectedMarker.value}</p>
                   </div>
                 </div>
-                <Badge className={`${getStatusColor(selectedMarker.status)} text-white border-0`}>
-                  {getStatusIcon(selectedMarker.status)}
-                  <span className="ml-1">{getStatusText(selectedMarker.status)}</span>
-                </Badge>
+                <div className="bg-white/15 rounded-2xl px-3 py-2 backdrop-blur-sm">
+                  <span className="text-sm font-medium">{getStatusText(selectedMarker.status)}</span>
+                </div>
               </div>
+              
+              {/* Декоративные элементы */}
+              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-12 translate-x-12"></div>
+              <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-8 -translate-x-8"></div>
+            </div>
 
+            <div className="p-6 space-y-4">
               {selectedMarker.education && (
-                <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-                  <h3 className="font-medium text-sm text-blue-900 mb-2">📚 Что это значит</h3>
-                  <p className="text-sm text-blue-700 leading-relaxed">{selectedMarker.education}</p>
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4">
+                  <div className="flex items-start gap-3">
+                    <IconContainer size="sm" variant="soft-info">
+                      <Info className={iconSizes.sm} />
+                    </IconContainer>
+                    <div>
+                      <h3 className="font-bold text-sm text-gray-900 mb-2">Что это значит</h3>
+                      <p className="text-sm text-gray-700 leading-relaxed">{selectedMarker.education}</p>
+                    </div>
+                  </div>
                 </div>
               )}
 
               {selectedMarker.recommendation && (
-                <div className="mb-4 p-3 bg-emerald-50 rounded-lg">
-                  <h3 className="font-medium text-sm text-emerald-900 mb-2">💡 Персональная рекомендация</h3>
-                  <p className="text-sm text-emerald-700 leading-relaxed">{selectedMarker.recommendation}</p>
+                <div className="eva-gradient-success rounded-2xl p-4 text-white">
+                  <div className="flex items-start gap-3">
+                    <IconContainer size="sm" className="bg-white/20 text-white border-white/30">
+                      <Sparkles className={iconSizes.sm} />
+                    </IconContainer>
+                    <div>
+                      <h3 className="font-bold text-sm mb-2">Персональная рекомендация</h3>
+                      <p className="text-sm text-white/90 leading-relaxed">{selectedMarker.recommendation}</p>
+                    </div>
+                  </div>
                 </div>
               )}
 
               <Button 
                 onClick={() => setSelectedMarker(null)}
-                className="w-full mt-4"
+                className="w-full mt-6 h-12 eva-gradient-primary text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border-0"
                 data-testid="button-close-modal"
               >
-                Закрыть
+                <span className="font-medium">Понятно</span>
               </Button>
             </div>
           </Card>
