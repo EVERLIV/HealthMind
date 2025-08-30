@@ -425,6 +425,20 @@ export default function LandingPage() {
                 Уведомления о здоровье
               </div>
             </div>
+            
+            {/* Login Button - Added for user access */}
+            <div className="mt-8 pt-6 border-t border-white/20">
+              <p className="text-white/70 text-sm mb-4">Уже есть аккаунт?</p>
+              <a 
+                href="/login" 
+                className="inline-flex items-center justify-center bg-white/15 backdrop-blur-lg border border-white/30 text-white hover:bg-white/25 font-semibold px-8 py-3 rounded-xl transition-all duration-300 hover:scale-105"
+                data-testid="link-login"
+              >
+                <Users className="w-5 h-5 mr-2" />
+                Войти в аккаунт
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </a>
+            </div>
           </div>
           
         </div>
