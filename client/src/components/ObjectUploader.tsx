@@ -79,6 +79,12 @@ export function ObjectUploader({
       .on("complete", (result) => {
         onComplete?.(result);
       })
+      .on("error", (error) => {
+        console.error("Uppy upload error:", error);
+      })
+      .on("upload-error", (file, error) => {
+        console.error("Upload error for file:", file?.name, error);
+      })
   );
 
   return (
