@@ -14,12 +14,17 @@ try {
   // Create minimal deployment structure
   console.log('📦 Creating deployment structure...');
   
+  // Create both dist/public and server/public for compatibility
   if (!fs.existsSync('dist')) {
     fs.mkdirSync('dist', { recursive: true });
   }
   
   if (!fs.existsSync('dist/public')) {
     fs.mkdirSync('dist/public', { recursive: true });
+  }
+  
+  if (!fs.existsSync('server/public')) {
+    fs.mkdirSync('server/public', { recursive: true });
   }
   
   // Create proper index.html for production deployment
@@ -101,7 +106,9 @@ try {
 </body>
 </html>`;
 
+  // Write to both locations for compatibility
   fs.writeFileSync('dist/public/index.html', html);
+  fs.writeFileSync('server/public/index.html', html);
   
   console.log('✅ Emergency deployment structure created');
   console.log('🔧 This will serve the latest development version');
