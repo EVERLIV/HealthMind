@@ -186,16 +186,16 @@ export default function BloodAnalysisDetailPage() {
       <MobileNav />
       
       <main className="eva-page-content pb-24">
-        {/* EVA Header с градиентом */}
-        <div className="eva-gradient-primary sticky top-16 z-10 -mx-4 text-white overflow-hidden">
-          <div className="p-4 relative">
+        {/* Белый Header */}
+        <div className="bg-white sticky top-16 z-10 -mx-4 border-b border-gray-100 shadow-sm">
+          <div className="p-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <Link href="/app/blood-analyses">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white border-0"
+                    className="h-10 w-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700"
                     data-testid="button-back"
                   >
                     <ArrowLeft className="w-5 h-5" />
@@ -203,56 +203,52 @@ export default function BloodAnalysisDetailPage() {
                 </Link>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <IconContainer size="xs" className="bg-white/20 text-white border-white/30">
+                    <IconContainer size="xs" variant="soft-primary">
                       <Brain className={iconSizes.xs} />
                     </IconContainer>
-                    <h1 className="text-lg font-bold">ИИ Анализ крови</h1>
+                    <h1 className="text-lg font-bold text-gray-900">ИИ Анализ крови</h1>
                   </div>
-                  <p className="text-white/90 text-sm">Результаты готовы</p>
+                  <p className="text-gray-600 text-sm">Результаты готовы</p>
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold">{healthScore}%</div>
-                <div className="text-xs text-white/80">здоровья</div>
+                <div className="text-2xl font-bold text-gray-900">{healthScore}%</div>
+                <div className="text-xs text-gray-500">здоровья</div>
               </div>
             </div>
             
             {/* Компактная статистика */}
-            <div className="bg-white/15 rounded-2xl p-3 backdrop-blur-sm">
+            <div className="bg-gray-50 rounded-2xl p-3">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <IconContainer size="xs" variant="soft-success" className="bg-green-100/20 text-green-200 border-green-200/30">
+                    <IconContainer size="xs" variant="soft-success">
                       <CheckCircle className={iconSizes.xs} />
                     </IconContainer>
-                    <span>{normalCount} норма</span>
+                    <span className="text-gray-700">{normalCount} норма</span>
                   </div>
                   {abnormalCount > 0 && (
                     <div className="flex items-center gap-2">
-                      <IconContainer size="xs" variant="soft-warning" className="bg-amber-100/20 text-amber-200 border-amber-200/30">
+                      <IconContainer size="xs" variant="soft-warning">
                         <AlertTriangle className={iconSizes.xs} />
                       </IconContainer>
-                      <span>{abnormalCount} откл</span>
+                      <span className="text-gray-700">{abnormalCount} откл</span>
                     </div>
                   )}
                   {criticalCount > 0 && (
                     <div className="flex items-center gap-2">
-                      <IconContainer size="xs" variant="soft-danger" className="bg-red-100/20 text-red-200 border-red-200/30">
+                      <IconContainer size="xs" variant="soft-danger">
                         <AlertTriangle className={iconSizes.xs} />
                       </IconContainer>
-                      <span>{criticalCount} крит</span>
+                      <span className="text-gray-700">{criticalCount} крит</span>
                     </div>
                   )}
                 </div>
-                <Badge className="bg-white/20 text-white border-white/30 text-xs">
+                <Badge className="bg-white text-gray-700 border-gray-200 text-xs">
                   {totalCount} показателей
                 </Badge>
               </div>
             </div>
-            
-            {/* Декоративные элементы */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
           </div>
         </div>
 
@@ -381,56 +377,6 @@ export default function BloodAnalysisDetailPage() {
           </div>
         </div>
 
-        {/* EVA Рекомендации и факторы риска */}
-        {(results?.recommendations?.length > 0 || results?.riskFactors?.length > 0) && (
-          <div className="mt-6 space-y-4">
-            {results.recommendations && results.recommendations.length > 0 && (
-              <div className="eva-gradient-success rounded-2xl p-4 text-white">
-                <div className="flex items-start gap-3">
-                  <IconContainer size="sm" className="bg-white/20 text-white border-white/30">
-                    <Sparkles className={iconSizes.sm} />
-                  </IconContainer>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-sm mb-3">Персональные рекомендации</h3>
-                    <div className="space-y-2">
-                      {results.recommendations.slice(0, 3).map((rec: string, index: number) => (
-                        <div key={index} className="bg-white/15 rounded-xl p-3">
-                          <p className="text-sm text-white/90 leading-relaxed">{rec}</p>
-                        </div>
-                      ))}
-                    </div>
-                    {results.recommendations.length > 3 && (
-                      <p className="text-xs text-white/80 mt-3">+{results.recommendations.length - 3} дополнительных рекомендаций</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {results.riskFactors && results.riskFactors.length > 0 && (
-              <div className="eva-gradient-wellness rounded-2xl p-4 text-white">
-                <div className="flex items-start gap-3">
-                  <IconContainer size="sm" className="bg-white/20 text-white border-white/30">
-                    <Stethoscope className={iconSizes.sm} />
-                  </IconContainer>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-sm mb-3">Важные факторы</h3>
-                    <div className="space-y-2">
-                      {results.riskFactors.slice(0, 2).map((risk: string, index: number) => (
-                        <div key={index} className="bg-white/15 rounded-xl p-3">
-                          <p className="text-sm text-white/90 leading-relaxed">{risk}</p>
-                        </div>
-                      ))}
-                    </div>
-                    {results.riskFactors.length > 2 && (
-                      <p className="text-xs text-white/80 mt-3">+{results.riskFactors.length - 2} дополнительных факторов</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
 
         {/* EVA Действия */}
         <div className="mt-6 grid grid-cols-2 gap-3">
