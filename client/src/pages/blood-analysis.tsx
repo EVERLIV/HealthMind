@@ -271,6 +271,20 @@ export default function BloodAnalysisPage() {
   };
 
   const handleComplete = async (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+    console.log("Upload result:", result);
+    
+    // Check for failed uploads
+    if (result.failed && result.failed.length > 0) {
+      console.error("Upload failed:", result.failed);
+      toast({
+        title: "Ошибка загрузки",
+        description: `Не удалось загрузить файл: ${result.failed[0].error || 'Неизвестная ошибка'}`,
+        variant: "destructive",
+      });
+      updateProcessingState('idle', 0, '');
+      return;
+    }
+    
     if (result.successful && result.successful.length > 0) {
       updateProcessingState('uploading', 20, 'Загружаем фото...', 'Подготавливаем файл к обработке');
       
@@ -324,7 +338,20 @@ export default function BloodAnalysisPage() {
       } catch (error) {
         console.error("Error processing upload:", error);
         updateProcessingState('idle', 0, 'Ошибка загрузки');
+        toast({
+          title: "Ошибка",
+          description: error instanceof Error ? error.message : "Не удалось обработать изображение",
+          variant: "destructive",
+        });
       }
+    } else {
+      console.error("No successful uploads found");
+      toast({
+        title: "Ошибка",
+        description: "Файл не был загружен успешно. Проверьте формат и размер файла.",
+        variant: "destructive",
+      });
+      updateProcessingState('idle', 0, '');
     }
   };
 
