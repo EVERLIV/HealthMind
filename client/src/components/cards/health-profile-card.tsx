@@ -44,7 +44,7 @@ export default function HealthProfileCard({ profile }: HealthProfileCardProps) {
           ></div>
         </div>
         
-        <Link href="/profile">
+        <Link href="/app/profile">
           <Button 
             data-testid="button-complete-profile"
             className="w-full justify-between bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all"

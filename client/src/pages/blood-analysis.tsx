@@ -238,7 +238,7 @@ export default function BloodAnalysisPage() {
       setTextInput('');
       // Redirect to biomarkers page after showing success state
       setTimeout(() => {
-        window.location.href = '/biomarkers';
+        window.location.href = '/app/biomarkers';
       }, 3000);
     },
     onError: () => {
@@ -556,14 +556,14 @@ export default function BloodAnalysisPage() {
               </div>
             </div>
             <div className="space-y-3">
-              <Link href="/biomarkers">
+              <Link href="/app/biomarkers">
                 <Button className="w-full" data-testid="button-view-biomarkers">
                   <Activity className="w-4 h-4 mr-2" />
                   Посмотреть биомаркеры
                   <ChevronRight className="w-4 h-4 ml-auto" />
                 </Button>
               </Link>
-              <Link href="/recommendations">
+              <Link href="/app/recommendations">
                 <Button variant="outline" className="w-full" data-testid="button-view-recommendations">
                   <Sparkles className="w-4 h-4 mr-2" />
                   Рекомендации ИИ

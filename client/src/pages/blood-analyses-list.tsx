@@ -103,7 +103,7 @@ export default function BloodAnalysesListPage() {
             {/* Компактные быстрые действия */}
             <div className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
               <div className="grid grid-cols-2 gap-3">
-                <Link href="/blood-analysis">
+                <Link href="/app/blood-analysis">
                   <Card className="group h-20 bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200/50 hover:border-emerald-300 transition-all duration-300 cursor-pointer overflow-hidden">
                     <div className="h-full p-3 flex items-center gap-2 max-w-full">
                       <IconContainer size="sm" variant="success" className="flex-shrink-0">
@@ -120,7 +120,7 @@ export default function BloodAnalysesListPage() {
                   </Card>
                 </Link>
                 
-                <Link href="/biomarkers">
+                <Link href="/app/biomarkers">
                   <Card className="group h-20 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200/50 hover:border-blue-300 transition-all duration-300 cursor-pointer overflow-hidden">
                     <div className="h-full p-3 flex items-center gap-2 max-w-full">
                       <IconContainer size="sm" variant="info" className="flex-shrink-0">
@@ -240,7 +240,7 @@ export default function BloodAnalysesListPage() {
                 </p>
               </div>
               
-              <Link href="/blood-analysis">
+              <Link href="/app/blood-analysis">
                 <Button className="w-full h-12 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold rounded-xl shadow-lg transform hover:scale-105 active:scale-95 transition-all duration-200">
                   <Camera className="w-4 h-4 mr-2" />
                   Сфотографировать анализ
