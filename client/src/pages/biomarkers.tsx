@@ -88,11 +88,22 @@ const MiniChart = ({ values, color = "bg-medical-blue" }: { values: number[]; co
   </div>
 );
 
-const generateTrend = () => ({
-  direction: Math.random() > 0.5 ? 'up' : 'down',
-  percentage: Math.floor(Math.random() * 20) + 1,
-  values: Array.from({length: 6}, () => Math.random() * 100)
-});
+// Stable trend generation based on biomarker ID
+const generateTrend = (biomarkerId: string) => {
+  // Use biomarker ID as seed for consistent trends
+  const seed = biomarkerId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const random = (seed * 9301 + 49297) % 233280;
+  const direction = (random / 233280) > 0.5 ? 'up' : 'down';
+  const percentage = Math.floor((random / 233280) * 20) + 1;
+  
+  // Generate consistent values based on seed
+  const values = Array.from({length: 6}, (_, i) => {
+    const val = ((seed + i * 123) % 1000) / 10;
+    return Math.max(val, 10);
+  });
+  
+  return { direction, percentage, values };
+};
 
 export default function Biomarkers() {
   const [, navigate] = useLocation();
@@ -328,7 +339,7 @@ export default function Biomarkers() {
               const categoryVariant = categoryVariants[biomarker.category as keyof typeof categoryVariants] || "soft-danger";
               const IconComponent = iconMap[biomarker.category as keyof typeof iconMap] || Activity;
               const importanceStyle = importanceVariants[biomarker.importance as keyof typeof importanceVariants] || importanceVariants.low;
-              const trend = generateTrend(); // In real app, this would come from API
+              const trend = generateTrend(biomarker.id); // Stable trend based on ID
 
               return (
                 <Card
@@ -454,146 +465,358 @@ export default function Biomarkers() {
 
       <BottomNav />
 
-      {/* Simplified Modal for Details and History */}
+      {/* EVA Modal for Details and History */}
       <Dialog open={!!selectedBiomarkerId} onOpenChange={() => closeModal()}>
-        <DialogContent className="max-w-sm mx-auto max-h-[85vh] p-0">
-          <ScrollArea className="max-h-[85vh]">
-            <DialogHeader className="p-4 pb-2">
-              <DialogTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+        <DialogContent className="max-w-sm mx-auto max-h-[90vh] p-0 rounded-3xl border-0 shadow-2xl">
+          <ScrollArea className="max-h-[90vh]">
+            {/* EVA Header с градиентом */}
+            <div className="eva-gradient-primary p-6 text-white relative overflow-hidden rounded-t-3xl">
+              <div className="flex items-start justify-between mb-4 relative z-10">
+                <div className="flex items-center gap-3">
                   {!showHistory ? (
                     <>
-                      <Eye className="w-4 h-4 text-medical-blue" />
-                      <span className="text-base">Детали биомаркера</span>
+                      <IconContainer size="sm" className="bg-white/20 text-white border-white/30">
+                        <Eye className={iconSizes.sm} />
+                      </IconContainer>
+                      <div>
+                        <h2 className="font-bold text-lg">Детали биомаркера</h2>
+                        <p className="text-white/90 text-sm">Полная информация</p>
+                      </div>
                     </>
                   ) : (
                     <>
-                      <Calendar className="w-4 h-4 text-medical-blue" />
-                      <span className="text-base">История изменений</span>
+                      <IconContainer size="sm" className="bg-white/20 text-white border-white/30">
+                        <BarChart3 className={iconSizes.sm} />
+                      </IconContainer>
+                      <div>
+                        <h2 className="font-bold text-lg">История трендов</h2>
+                        <p className="text-white/90 text-sm">Динамика показателей</p>
+                      </div>
                     </>
                   )}
                 </div>
-                <Button variant="ghost" size="icon" onClick={closeModal} className="h-6 w-6">
-                  <X className="w-4 h-4" />
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={closeModal} 
+                  className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white border-0"
+                >
+                  <X className="w-5 h-5" />
                 </Button>
-              </DialogTitle>
-            </DialogHeader>
+              </div>
+              
+              {/* Декоративные элементы */}
+              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-12 translate-x-12"></div>
+              <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-8 -translate-x-8"></div>
+            </div>
 
-            <div className="px-4 pb-4">
+            <div className="p-6 space-y-4">
               {selectedBiomarker ? (
                 <div className="space-y-4">
                   {!showHistory ? (
-                    /* Details View */
+                    /* EVA Details View */
                     <>
-                      <div className="text-center">
-                        <h3 className="font-bold text-lg">{(selectedBiomarker as any)?.name}</h3>
-                        <p className="text-sm text-muted-foreground capitalize">
-                          {(selectedBiomarker as any)?.category}
-                        </p>
+                      {/* Биомаркер Header */}
+                      <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-2xl p-4">
+                        <div className="flex items-center gap-3">
+                          {(() => {
+                            const biomarker = selectedBiomarker as any;
+                            const categoryVariant = categoryVariants[biomarker.category as keyof typeof categoryVariants] || "soft-primary";
+                            const IconComponent = iconMap[biomarker.category as keyof typeof iconMap] || Activity;
+                            return (
+                              <IconContainer size="lg" variant={categoryVariant}>
+                                <IconComponent className={iconSizes.lg} />
+                              </IconContainer>
+                            );
+                          })()}
+                          <div className="flex-1">
+                            <h3 className="font-bold text-xl text-gray-900">{(selectedBiomarker as any)?.name}</h3>
+                            <p className="text-sm text-gray-600 capitalize">
+                              {(selectedBiomarker as any)?.category === 'blood' && 'Показатели крови'}
+                              {(selectedBiomarker as any)?.category === 'cardiovascular' && 'Сердечно-сосудистая система'}
+                              {(selectedBiomarker as any)?.category === 'metabolic' && 'Метаболизм'}
+                              {(selectedBiomarker as any)?.category === 'kidney' && 'Почки'}
+                              {(selectedBiomarker as any)?.category === 'liver' && 'Печень'}
+                              {(selectedBiomarker as any)?.category === 'immune' && 'Иммунная система'}
+                              {(selectedBiomarker as any)?.category === 'brain' && 'Нервная система'}
+                            </p>
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                        <h4 className="font-semibold text-sm mb-2">Описание</h4>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {(selectedBiomarker as any)?.description}
-                        </p>
+                      {/* Описание */}
+                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4">
+                        <div className="flex items-start gap-3">
+                          <IconContainer size="sm" variant="soft-info">
+                            <AlertTriangle className={iconSizes.sm} />
+                          </IconContainer>
+                          <div>
+                            <h4 className="font-bold text-sm text-gray-900 mb-2">Что это означает</h4>
+                            <p className="text-sm text-gray-700 leading-relaxed">
+                              {(selectedBiomarker as any)?.description}
+                            </p>
+                          </div>
+                        </div>
                       </div>
 
+                      {/* Нормальные значения */}
                       {(selectedBiomarker as any)?.normalRange && (
-                        <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
-                          <h4 className="font-semibold text-sm mb-2">Нормальные значения</h4>
-                          <div className="text-lg font-bold font-mono text-green-600">
-                            {(selectedBiomarker as any).normalRange.min} - {(selectedBiomarker as any).normalRange.max}
-                            <span className="text-sm font-normal text-muted-foreground ml-2">
-                              {(selectedBiomarker as any).normalRange.unit}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-
-                      {(selectedBiomarker as any)?.recommendations && (selectedBiomarker as any).recommendations.length > 0 && (
-                        <div>
-                          <h4 className="font-semibold text-sm mb-2">Рекомендации</h4>
-                          <div className="space-y-2">
-                            {(selectedBiomarker as any).recommendations.map((rec: string, index: number) => (
-                              <div key={index} className="flex items-start gap-2 p-2 bg-green-50 dark:bg-green-950/20 rounded-lg">
-                                <CheckCircle className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
-                                <span className="text-xs leading-relaxed">{rec}</span>
+                        <div className="eva-gradient-success rounded-2xl p-4 text-white">
+                          <div className="flex items-start gap-3">
+                            <IconContainer size="sm" className="bg-white/20 text-white border-white/30">
+                              <Target className={iconSizes.sm} />
+                            </IconContainer>
+                            <div className="flex-1">
+                              <h4 className="font-bold text-sm mb-2">Нормальные значения</h4>
+                              <div className="bg-white/15 rounded-xl p-3">
+                                <div className="text-xl font-bold font-mono text-white">
+                                  {(selectedBiomarker as any).normalRange.min} - {(selectedBiomarker as any).normalRange.max}
+                                  <span className="text-sm font-normal text-white/80 ml-2">
+                                    {(selectedBiomarker as any).normalRange.unit}
+                                  </span>
+                                </div>
                               </div>
-                            ))}
+                            </div>
                           </div>
                         </div>
                       )}
 
-                      <div className="flex gap-2">
+                      {/* Тренд анализ */}
+                      {(() => {
+                        const trend = generateTrend(selectedBiomarkerId || '');
+                        return (
+                          <div className="eva-gradient-wellness rounded-2xl p-4 text-white">
+                            <div className="flex items-start gap-3">
+                              <IconContainer size="sm" className="bg-white/20 text-white border-white/30">
+                                {trend.direction === 'up' ? 
+                                  <TrendingUp className={iconSizes.sm} /> : 
+                                  <TrendingDown className={iconSizes.sm} />
+                                }
+                              </IconContainer>
+                              <div className="flex-1">
+                                <h4 className="font-bold text-sm mb-2">Анализ тренда</h4>
+                                <div className="bg-white/15 rounded-xl p-3 space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm text-white/90">
+                                      Направление: {trend.direction === 'up' ? 'Растет' : 'Снижается'}
+                                    </span>
+                                    <span className="text-lg font-bold text-white">
+                                      {trend.percentage}%
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-white/80">Динамика:</span>
+                                    <MiniChart 
+                                      values={trend.values} 
+                                      color={trend.direction === 'up' ? 'bg-white/60' : 'bg-white/40'} 
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+
+                      {/* Рекомендации */}
+                      {(selectedBiomarker as any)?.recommendations && (selectedBiomarker as any).recommendations.length > 0 && (
+                        <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-4">
+                          <div className="flex items-start gap-3">
+                            <IconContainer size="sm" variant="soft-warning">
+                              <Sparkles className={iconSizes.sm} />
+                            </IconContainer>
+                            <div className="flex-1">
+                              <h4 className="font-bold text-sm text-gray-900 mb-3">Персональные рекомендации</h4>
+                              <div className="space-y-2">
+                                {(selectedBiomarker as any).recommendations.map((rec: string, index: number) => (
+                                  <div key={index} className="bg-white rounded-xl p-3 shadow-sm">
+                                    <div className="flex items-start gap-2">
+                                      <CheckCircle className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      <span className="text-sm text-gray-700 leading-relaxed">{rec}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* EVA Действия */}
+                      <div className="grid grid-cols-1 gap-3 pt-2">
                         <Button 
-                          variant="outline" 
                           size="sm" 
-                          className="flex-1"
+                          className="eva-gradient-primary text-white rounded-xl h-12 shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 border-0"
                           onClick={() => setShowHistory(true)}
                         >
-                          <Calendar className="w-3 h-3 mr-1" />
-                          История
+                          <IconContainer size="xs" className="bg-white/20 text-white border-white/30">
+                            <BarChart3 className={iconSizes.xs} />
+                          </IconContainer>
+                          <span className="font-medium">Смотреть историю трендов</span>
                         </Button>
                       </div>
                     </>
                   ) : (
-                    /* History View */
+                    /* EVA History View */
                     <>
-                      <div className="text-center">
-                        <h3 className="font-bold text-lg">{(selectedBiomarker as any)?.name}</h3>
-                        <p className="text-sm text-muted-foreground">История результатов</p>
+                      {/* История Header */}
+                      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-4">
+                        <div className="flex items-center gap-3">
+                          <IconContainer size="lg" variant="soft-primary">
+                            <BarChart3 className={iconSizes.lg} />
+                          </IconContainer>
+                          <div className="flex-1">
+                            <h3 className="font-bold text-xl text-gray-900">{(selectedBiomarker as any)?.name}</h3>
+                            <p className="text-sm text-gray-600">История динамики показателей</p>
+                          </div>
+                        </div>
                       </div>
 
                       {biomarkerHistory && Array.isArray(biomarkerHistory) && biomarkerHistory.length > 0 ? (
-                        <div className="space-y-3">
-                          <div className="text-center p-3 bg-medical-blue/10 rounded-lg">
-                            <div className="text-sm font-medium text-medical-blue">
-                              Всего записей: {biomarkerHistory.length}
+                        <div className="space-y-4">
+                          {/* Статистика */}
+                          <div className="eva-gradient-primary rounded-2xl p-4 text-white">
+                            <div className="flex items-center gap-3">
+                              <IconContainer size="sm" className="bg-white/20 text-white border-white/30">
+                                <Target className={iconSizes.sm} />
+                              </IconContainer>
+                              <div className="flex-1">
+                                <h4 className="font-bold text-sm mb-1">Статистика измерений</h4>
+                                <div className="bg-white/15 rounded-xl p-3">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm text-white/90">Всего записей:</span>
+                                    <span className="text-lg font-bold text-white">{biomarkerHistory.length}</span>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           </div>
                           
-                          {biomarkerHistory.slice(0, 5).map((entry: any, index: number) => (
-                            <div key={index} className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                              <div className="flex justify-between items-center mb-1">
-                                <div className="font-mono font-bold">
-                                  {entry.value} {entry.unit}
+                          {/* Записи истории */}
+                          <div className="space-y-3">
+                            {biomarkerHistory.slice(0, 5).map((entry: any, index: number) => {
+                              const getStatusVariant = (status: string) => {
+                                switch (status) {
+                                  case 'normal': return 'soft-success';
+                                  case 'high': 
+                                  case 'critical': return 'soft-danger';
+                                  case 'low': return 'soft-warning';
+                                  default: return 'soft-neutral';
+                                }
+                              };
+
+                              const getStatusIcon = (status: string) => {
+                                switch (status) {
+                                  case 'normal': return CheckCircle;
+                                  case 'high': 
+                                  case 'critical': 
+                                  case 'low': return AlertTriangle;
+                                  default: return Activity;
+                                }
+                              };
+
+                              const StatusIcon = getStatusIcon(entry.status);
+                              
+                              return (
+                                <div key={index} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                                  <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center gap-3">
+                                      <IconContainer size="sm" variant={getStatusVariant(entry.status)}>
+                                        <StatusIcon className={iconSizes.sm} />
+                                      </IconContainer>
+                                      <div>
+                                        <div className="font-mono text-lg font-bold text-gray-900">
+                                          {entry.value} {entry.unit}
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                          {new Date(entry.date).toLocaleDateString('ru-RU', { 
+                                            day: 'numeric', 
+                                            month: 'long', 
+                                            year: 'numeric' 
+                                          })}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <Badge className={
+                                      entry.status === 'normal' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+                                      entry.status === 'high' || entry.status === 'critical' ? 'bg-red-100 text-red-700 border-red-200' :
+                                      entry.status === 'low' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                                      'bg-gray-100 text-gray-700 border-gray-200'
+                                    }>
+                                      {entry.status === 'normal' ? 'Норма' :
+                                       entry.status === 'high' ? 'Высокий' :
+                                       entry.status === 'low' ? 'Низкий' : 'Критичный'}
+                                    </Badge>
+                                  </div>
+                                  
+                                  {/* Мини трендовая информация */}
+                                  {index < biomarkerHistory.length - 1 && (
+                                    <div className="mt-3 p-2 bg-gray-50 rounded-xl">
+                                      <div className="flex items-center justify-between text-xs">
+                                        <span className="text-gray-600">Изменение от предыдущего:</span>
+                                        {(() => {
+                                          const prevValue = biomarkerHistory[index + 1]?.value;
+                                          if (prevValue) {
+                                            const change = entry.value - prevValue;
+                                            const changePercent = ((change / prevValue) * 100).toFixed(1);
+                                            return (
+                                              <div className={`flex items-center gap-1 ${
+                                                change > 0 ? 'text-red-600' : change < 0 ? 'text-green-600' : 'text-gray-600'
+                                              }`}>
+                                                {change > 0 ? <TrendingUp className="w-3 h-3" /> : 
+                                                 change < 0 ? <TrendingDown className="w-3 h-3" /> : 
+                                                 <Minus className="w-3 h-3" />}
+                                                <span className="font-medium">
+                                                  {change > 0 ? '+' : ''}{changePercent}%
+                                                </span>
+                                              </div>
+                                            );
+                                          }
+                                          return <span className="text-gray-500">-</span>;
+                                        })()}
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
-                                <Badge className={
-                                  entry.status === 'normal' ? 'bg-green-100 text-green-700' :
-                                  entry.status === 'high' ? 'bg-red-100 text-red-700' :
-                                  entry.status === 'low' ? 'bg-blue-100 text-blue-700' :
-                                  'bg-yellow-100 text-yellow-700'
-                                }>
-                                  {entry.status === 'normal' ? 'Норма' :
-                                   entry.status === 'high' ? 'Высокий' :
-                                   entry.status === 'low' ? 'Низкий' : 'Критичный'}
-                                </Badge>
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                {new Date(entry.date).toLocaleDateString('ru-RU')}
-                              </div>
+                              );
+                            })}
+                          </div>
+
+                          {biomarkerHistory.length > 5 && (
+                            <div className="text-center p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
+                              <p className="text-sm text-gray-600">
+                                Показано 5 из {biomarkerHistory.length} записей
+                              </p>
                             </div>
-                          ))}
+                          )}
                         </div>
                       ) : (
-                        <div className="text-center p-6">
-                          <Calendar className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                          <p className="text-sm text-muted-foreground">
-                            История результатов пока не доступна
+                        <div className="text-center p-8 bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl">
+                          <IconContainer size="lg" variant="soft-neutral" className="mx-auto mb-4">
+                            <Calendar className={iconSizes.lg} />
+                          </IconContainer>
+                          <h4 className="font-bold text-lg text-gray-900 mb-2">История недоступна</h4>
+                          <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                            Данные о динамике этого биомаркера пока не собраны.<br />
+                            Продолжайте делать анализы для отслеживания трендов.
                           </p>
                         </div>
                       )}
 
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full"
-                        onClick={() => setShowHistory(false)}
-                      >
-                        <Eye className="w-3 h-3 mr-1" />
-                        Назад к деталям
-                      </Button>
+                      {/* EVA Действие назад */}
+                      <div className="pt-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full h-12 rounded-xl border-2 border-slate-200 hover:border-medical-blue hover:text-medical-blue transition-all duration-200 flex items-center gap-2"
+                          onClick={() => setShowHistory(false)}
+                        >
+                          <IconContainer size="xs" variant="soft-info">
+                            <Eye className={iconSizes.xs} />
+                          </IconContainer>
+                          <span className="font-medium">Назад к деталям</span>
+                        </Button>
+                      </div>
                     </>
                   )}
                 </div>
