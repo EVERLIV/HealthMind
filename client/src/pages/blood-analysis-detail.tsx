@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, TrendingUp, TrendingDown, Minus, AlertTriangle, Info, Heart, Shield, Brain, Activity, Droplets, Zap, Filter, Grid3X3, BarChart3, CheckCircle, Sparkles, Stethoscope } from "lucide-react";
+import { ArrowLeft, TrendingUp, TrendingDown, Minus, AlertTriangle, Info, Heart, Shield, Brain, Activity, Droplets, Zap, Filter, Grid3X3, BarChart3, CheckCircle, Sparkles, Stethoscope, X } from "lucide-react";
 import { IconContainer, iconSizes } from "@/components/ui/icon-container";
 import MobileNav from "@/components/layout/mobile-nav";
 import BottomNav from "@/components/layout/bottom-nav";
@@ -413,266 +413,150 @@ export default function BloodAnalysisDetailPage() {
             className="w-full max-h-[80vh] overflow-y-auto rounded-t-3xl border-0 shadow-2xl bg-white"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* EVA Header с градиентом */}
-            <div className="eva-gradient-primary p-6 text-white relative overflow-hidden rounded-t-3xl">
-              <div className="flex items-start justify-between mb-4 relative z-10">
-                <div className="flex items-center gap-3">
-                  {(() => {
-                    const IconComponent = getCategoryData(selectedMarker.name).icon;
-                    const getMarkerVariant = (status: string) => {
-                      switch (status) {
-                        case "normal": return "soft-success";
-                        case "high": 
-                        case "low": return "soft-warning"; 
-                        case "critical": return "soft-danger";
-                        default: return "soft-neutral";
-                      }
-                    };
-                    return (
-                      <IconContainer size="lg" className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
-                        <IconComponent className={iconSizes.lg} />
-                      </IconContainer>
-                    );
-                  })()}
-                  <div>
-                    <h2 className="font-bold text-lg mb-1">{selectedMarker.name}</h2>
-                    <p className="text-2xl font-bold text-white">{selectedMarker.value}</p>
+            {/* Компактный заголовок */}
+            <div className="sticky top-0 bg-white border-b border-gray-100 p-4 z-10 rounded-t-3xl">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">{selectedMarker.name}</h2>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl font-bold text-gray-800">{selectedMarker.value}</span>
+                    <Badge className={
+                      selectedMarker.status === 'normal' ? 'bg-green-100 text-green-700' :
+                      selectedMarker.status === 'critical' ? 'bg-red-100 text-red-700' :
+                      'bg-amber-100 text-amber-700'
+                    }>
+                      {getStatusText(selectedMarker.status)}
+                    </Badge>
                   </div>
                 </div>
-                <div className="bg-white/15 rounded-2xl px-3 py-2 backdrop-blur-sm">
-                  <span className="text-sm font-medium">{getStatusText(selectedMarker.status)}</span>
-                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => setSelectedMarker(null)}
+                  className="h-8 w-8 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
               </div>
-              
-              {/* Декоративные элементы */}
-              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-12 translate-x-12"></div>
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-8 -translate-x-8"></div>
             </div>
 
-            <div className="p-6 space-y-4">
-              {/* Обоснование компонента */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4">
-                <div className="flex items-start gap-3">
-                  <IconContainer size="sm" variant="soft-info">
-                    <Info className={iconSizes.sm} />
-                  </IconContainer>
-                  <div>
-                    <h4 className="font-bold text-sm text-gray-900 mb-2">Что это за показатель</h4>
-                    <p className="text-sm text-gray-700 leading-relaxed mb-3">
-                      {selectedMarker.education || (() => {
-                        const descriptions = {
-                          'Гемоглобин': 'Белок крови, переносящий кислород от легких к тканям организма',
-                          'Общий холестерин': 'Жироподобное вещество, необходимое для синтеза гормонов и клеточных мембран',
-                          'Глюкоза': 'Основной источник энергии для клеток организма',
-                          'Креатинин': 'Продукт обмена веществ, показатель функции почек',
-                          'АЛТ': 'Фермент печени, показатель ее состояния и функциональности',
-                          'Лейкоциты': 'Белые клетки крови, основа иммунной защиты организма',
-                          'Тромбоциты': 'Клетки крови, отвечающие за свертываемость',
-                          'Эритроциты': 'Красные клетки крови, переносящие кислород'
-                        };
-                        return descriptions[selectedMarker.name as keyof typeof descriptions] || 
-                               'Важный показатель для оценки состояния здоровья';
-                      })()}
-                    </p>
-                    <div className="bg-white rounded-xl p-3">
-                      <h5 className="font-semibold text-xs text-gray-800 mb-2">За что отвечает:</h5>
-                      {(() => {
-                        const responsibilities = {
-                          'Гемоглобин': 'Транспорт кислорода по организму, энергетический обмен, профилактика анемии',
-                          'Общий холестерин': 'Синтез гормонов, целостность клеточных мембран, здоровье сердечно-сосудистой системы',
-                          'Глюкоза': 'Энергетический метаболизм, функция поджелудочной железы, профилактика диабета',
-                          'Креатинин': 'Функция почек, фильтрация крови, выведение продуктов обмена веществ',
-                          'АЛТ': 'Здоровье печени, метаболизм белков, детоксикация организма',
-                          'Лейкоциты': 'Иммунная защита, борьба с инфекциями, воспалительные процессы',
-                          'Тромбоциты': 'Свертываемость крови, заживление ран, остановка кровотечений',
-                          'Эритроциты': 'Перенос кислорода и углекислого газа, кислотно-щелочной баланс'
-                        };
-                        const responsibility = responsibilities[selectedMarker.name as keyof typeof responsibilities] || 
-                          'Важный показатель для оценки общего состояния здоровья и работы внутренних органов';
-                        return (
-                          <p className="text-xs text-gray-600 leading-relaxed">{responsibility}</p>
-                        );
-                      })()}
-                    </div>
-                  </div>
+            <div className="p-4 space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Что это показывает</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {selectedMarker.education || (() => {
+                      const descriptions = {
+                        'Гемоглобин': 'Белок крови, переносящий кислород от легких к тканям организма',
+                        'Общий холестерин': 'Жироподобное вещество, необходимое для синтеза гормонов и клеточных мембран',
+                        'Глюкоза': 'Основной источник энергии для клеток организма',
+                        'Креатинин': 'Продукт обмена веществ, показатель функции почек',
+                        'АЛТ': 'Фермент печени, показатель ее состояния и функциональности',
+                        'Лейкоциты': 'Белые клетки крови, основа иммунной защиты организма',
+                        'Тромбоциты': 'Клетки крови, отвечающие за свертываемость',
+                        'Эритроциты': 'Красные клетки крови, переносящие кислород'
+                      };
+                      return descriptions[selectedMarker.name as keyof typeof descriptions] || 
+                             'Важный показатель для оценки состояния здоровья';
+                    })()}
+                  </p>
                 </div>
-              </div>
 
-              {/* Анализ показателя */}
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4">
-                <div className="flex items-start gap-3">
-                  <IconContainer size="sm" variant="soft-primary">
-                    <Brain className={iconSizes.sm} />
-                  </IconContainer>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-sm text-gray-900 mb-3">ИИ Анализ показателя</h4>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Анализ результата</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">
                     {(() => {
+                      const status = selectedMarker.status;
                       const analyses = {
                         'Гемоглобин': {
-                          status: selectedMarker.status === 'normal' ? 
-                            'Показатель в пределах нормы, транспорт кислорода эффективен' :
-                            selectedMarker.status === 'low' ?
-                            'Пониженный уровень может указывать на анемию' :
-                            'Повышенный уровень требует дополнительного обследования',
-                          implications: selectedMarker.status === 'normal' ?
-                            'Хорошая оксигенация тканей, нормальный энергетический обмен' :
-                            selectedMarker.status === 'low' ?
-                            'Возможна железодефицитная анемия, слабость, быстрая утомляемость' :
-                            'Может указывать на обезвоживание или заболевания крови'
+                          symptoms: status === 'low' ? 
+                            'Признаки низкого гемоглобина: слабость, одышка при нагрузке, бледность кожи, ломкость ногтей, странные пищевые пристрастия (лед, крахмал)' :
+                            status === 'high' ?
+                            'При высоком гемоглобине: головные боли, головокружение, нарушения зрения, повышенный риск тромбозов' :
+                            'Показатель в пределах нормы, транспорт кислорода эффективен'
                         },
                         'Общий холестерин': {
-                          status: selectedMarker.status === 'normal' ? 
-                            'Уровень холестерина в норме, сердечно-сосудистый риск минимален' :
-                            selectedMarker.status === 'high' ?
-                            'Повышенный холестерин увеличивает риск атеросклероза' :
-                            'Пониженный уровень встречается редко, возможны нарушения синтеза',
-                          implications: selectedMarker.status === 'normal' ?
-                            'Низкий риск сердечно-сосудистых заболеваний' :
-                            selectedMarker.status === 'high' ?
-                            'Повышенный риск инфаркта, инсульта, атеросклероза' :
-                            'Возможны нарушения гормонального фона'
+                          symptoms: status === 'high' ?
+                            'Признаки высокого холестерина: ксантомы (желтые пятна вокруг глаз), боли в ногах при ходьбе, стенокардия' :
+                            status === 'low' ?
+                            'При низком холестерине: депрессия, снижение либидо, нарушения пищеварения' :
+                            'Уровень холестерина в норме, сердечно-сосудистый риск минимален'
                         },
                         'Глюкоза': {
-                          status: selectedMarker.status === 'normal' ? 
-                            'Нормальный уровень глюкозы, метаболизм углеводов в порядке' :
-                            selectedMarker.status === 'high' ?
-                            'Повышенная глюкоза может указывать на преддиабет или диабет' :
-                            'Пониженная глюкоза может вызывать слабость и головокружение',
-                          implications: selectedMarker.status === 'normal' ?
-                            'Хороший гликемический контроль, низкий риск диабета' :
-                            selectedMarker.status === 'high' ?
-                            'Риск развития сахарного диабета 2 типа' :
-                            'Возможна гипогликемия, требует наблюдения'
+                          symptoms: status === 'high' ?
+                            'Признаки высокой глюкозы: чрезмерная жажда, частое мочеиспускание, размытое зрение, медленное заживление ран, инфекции' :
+                            status === 'low' ?
+                            'При низкой глюкозе: дрожь, потливость, учащенное сердцебиение, раздражительность, голод' :
+                            'Нормальный уровень глюкозы, метаболизм углеводов в порядке'
                         }
                       };
                       
-                      const analysis = analyses[selectedMarker.name as keyof typeof analyses] || {
-                        status: selectedMarker.status === 'normal' ? 
-                          'Показатель в пределах нормы' : 
-                          'Показатель отклоняется от нормальных значений',
-                        implications: 'Требует консультации врача для интерпретации'
+                      const analysis = analyses[selectedMarker.name as keyof typeof analyses];
+                      return analysis?.symptoms || 'Показатель требует интерпретации врача';
+                    })()}
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Добавки и витамины</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {(() => {
+                      const status = selectedMarker.status;
+                      const supplements = {
+                        'Гемоглобин': status === 'low' ?
+                          'Железо (сульфат железа 325мг), Витамин C (1000мг) для усвоения железа, Фолиевая кислота (400мкг), Витамин B12 (1000мкг)' :
+                          'Регулярная сдача крови, контроль потребления железа, избегание добавок железа',
+                        'Общий холестерин': status === 'high' ?
+                          'Омега-3 (2-3г EPA/DHA), Красный дрожжевой рис (600мг), Коэнзим Q10 (100мг), Берберин (500мг 3 раза)' :
+                          'Лецитин (1200мг), Витамин D3 (2000-4000 МЕ), Магний (400мг)',
+                        'Глюкоза': status === 'high' ?
+                          'Хром пиколинат (200мкг), Альфа-липоевая кислота (300мг), Корица (500мг), Берберин (500мг 3 раза)' :
+                          'Хром (200мкг), Витамины группы B, Магний (400мг)',
+                        'Креатинин': status === 'high' ?
+                          'Избегать креатин, НПВП. Корень одуванчика, Листья крапивы, Клюква (36мг PAC)' :
+                          'Креатин моногидрат (3-5г), Протеиновые добавки'
                       };
                       
-                      return (
-                        <div className="space-y-3">
-                          <div className="bg-white rounded-xl p-3">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className={`w-2 h-2 rounded-full ${
-                                selectedMarker.status === 'normal' ? 'bg-green-500' : 
-                                selectedMarker.status === 'critical' ? 'bg-red-500' : 'bg-amber-500'
-                              }`}></div>
-                              <span className="text-xs font-medium text-gray-800">Текущее состояние</span>
-                            </div>
-                            <p className="text-xs text-gray-700">{analysis.status}</p>
-                          </div>
-                          <div className="bg-white rounded-xl p-3">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Brain className="w-3 h-3 text-purple-600" />
-                              <span className="text-xs font-medium text-gray-800">Медицинское значение</span>
-                            </div>
-                            <p className="text-xs text-gray-700">{analysis.implications}</p>
-                          </div>
-                        </div>
-                      );
+                      return supplements[selectedMarker.name as keyof typeof supplements] || 
+                             'Консультация с врачом по поводу дополнительных препаратов';
                     })()}
-                  </div>
+                  </p>
                 </div>
-              </div>
 
-              {/* Персональные рекомендации по улучшению */}
-              <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl p-4">
-                <div className="flex items-start gap-3">
-                  <IconContainer size="sm" variant="soft-success">
-                    <Sparkles className={iconSizes.sm} />
-                  </IconContainer>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-sm text-gray-900 mb-3">
-                      {selectedMarker.recommendation ? 'Персональная рекомендация' : 'Рекомендации по улучшению'}
-                    </h4>
-                    {selectedMarker.recommendation ? (
-                      <div className="bg-white rounded-xl p-3 shadow-sm">
-                        <p className="text-sm text-gray-700 leading-relaxed">{selectedMarker.recommendation}</p>
-                      </div>
-                    ) : (
-                      (() => {
-                        const recommendations = {
-                          'Гемоглобин': {
-                            diet: 'Включите в рацион говядину, печень, гранаты, яблоки, гречку',
-                            lifestyle: 'Регулярные прогулки на свежем воздухе, дыхательные упражнения',
-                            supplements: 'Рассмотрите прием препаратов железа по назначению врача'
-                          },
-                          'Общий холестерин': {
-                            diet: 'Ограничьте жирную пищу, добавьте овсянку, орехи, авокадо',
-                            lifestyle: 'Кардиотренировки 150 минут в неделю, контроль веса',
-                            supplements: 'Омега-3 жирные кислоты, статины по назначению врача'
-                          },
-                          'Глюкоза': {
-                            diet: 'Сократите простые углеводы, увеличьте клетчатку и белок',
-                            lifestyle: 'Регулярные физические нагрузки, контроль порций',
-                            supplements: 'Хром, альфа-липоевая кислота по рекомендации врача'
-                          },
-                          'Креатинин': {
-                            diet: 'Увеличьте потребление воды, ограничьте белок и соль',
-                            lifestyle: 'Избегайте обезвоживания, контролируйте артериальное давление',
-                            supplements: 'Поддержка почек растительными препаратами'
-                          }
-                        };
-                        
-                        const recs = recommendations[selectedMarker.name as keyof typeof recommendations] || {
-                          diet: 'Сбалансированное питание с учетом возрастных потребностей',
-                          lifestyle: 'Регулярная физическая активность и здоровый сон',
-                          supplements: 'Консультация с врачом по поводу дополнительных препаратов'
-                        };
-                        
-                        return (
-                          <div className="space-y-3">
-                            <div className="bg-white rounded-xl p-3 shadow-sm">
-                              <div className="flex items-start gap-2">
-                                <div className="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                  <span className="text-xs">🥗</span>
-                                </div>
-                                <div>
-                                  <h5 className="text-xs font-semibold text-gray-800 mb-1">Питание</h5>
-                                  <p className="text-xs text-gray-700 leading-relaxed">{recs.diet}</p>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="bg-white rounded-xl p-3 shadow-sm">
-                              <div className="flex items-start gap-2">
-                                <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                  <span className="text-xs">🏃</span>
-                                </div>
-                                <div>
-                                  <h5 className="text-xs font-semibold text-gray-800 mb-1">Образ жизни</h5>
-                                  <p className="text-xs text-gray-700 leading-relaxed">{recs.lifestyle}</p>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="bg-white rounded-xl p-3 shadow-sm">
-                              <div className="flex items-start gap-2">
-                                <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                  <span className="text-xs">💊</span>
-                                </div>
-                                <div>
-                                  <h5 className="text-xs font-semibold text-gray-800 mb-1">Дополнительно</h5>
-                                  <p className="text-xs text-gray-700 leading-relaxed">{recs.supplements}</p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })()
-                    )}
-                  </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Питание</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {(() => {
+                      const status = selectedMarker.status;
+                      const foods = {
+                        'Гемоглобин': status === 'low' ?
+                          'Говядина, печень теленка, моллюски, тунец, темная фасоль, шпинат, тыквенные семечки, темный шоколад' :
+                          'Ограничить красное мясо, субпродукты, обогащенные железом каши',
+                        'Общий холестерин': status === 'high' ?
+                          'Овсянка, ячмень, бобовые, яблоки, авокадо, жирная рыба, орехи, оливковое масло' :
+                          'Яйца, авокадо, жирная рыба, оливковое масло, орехи для повышения',
+                        'Глюкоза': status === 'high' ?
+                          'Листовая зелень, брокколи, авокадо, ягоды, орехи, жирная рыба, цельные злаки' :
+                          'Сложные углеводы: овсянка, киноа, сладкий картофель',
+                        'Креатинин': status === 'high' ?
+                          'Ограничить белок до 0.8г/кг, больше воды, клюква, арбуз, огурцы' :
+                          'Нежирное мясо, рыба, молочные продукты для наращивания мышц'
+                      };
+                      
+                      return foods[selectedMarker.name as keyof typeof foods] || 
+                             'Сбалансированное питание с учетом возрастных потребностей';
+                    })()}
+                  </p>
                 </div>
               </div>
 
               <Button 
                 onClick={() => setSelectedMarker(null)}
-                className="w-full mt-6 h-12 eva-gradient-primary text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border-0"
+                className="w-full h-10 text-sm"
+                variant="outline"
                 data-testid="button-close-modal"
               >
-                <span className="font-medium">Понятно</span>
+                Понятно
               </Button>
             </div>
           </Card>

@@ -43,7 +43,8 @@ import {
   Calendar,
   RotateCcw,
   X,
-  Sparkles
+  Sparkles,
+  Minus
 } from "lucide-react";
 
 // Enhanced icon mapping
@@ -469,332 +470,89 @@ export default function Biomarkers() {
       <Dialog open={!!selectedBiomarkerId} onOpenChange={() => closeModal()}>
         <DialogContent className="max-w-sm mx-auto max-h-[90vh] p-0 rounded-3xl border-0 shadow-2xl">
           <ScrollArea className="max-h-[90vh]">
-            {/* EVA Header с градиентом */}
-            <div className="eva-gradient-primary p-6 text-white relative overflow-hidden rounded-t-3xl">
-              <div className="flex items-start justify-between mb-4 relative z-10">
-                <div className="flex items-center gap-3">
-                  {!showHistory ? (
-                    <>
-                      <IconContainer size="sm" className="bg-white/20 text-white border-white/30">
-                        <Eye className={iconSizes.sm} />
-                      </IconContainer>
-                      <div>
-                        <h2 className="font-bold text-lg">Детали биомаркера</h2>
-                        <p className="text-white/90 text-sm">Полная информация</p>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <IconContainer size="sm" className="bg-white/20 text-white border-white/30">
-                        <BarChart3 className={iconSizes.sm} />
-                      </IconContainer>
-                      <div>
-                        <h2 className="font-bold text-lg">История трендов</h2>
-                        <p className="text-white/90 text-sm">Динамика показателей</p>
-                      </div>
-                    </>
-                  )}
+            {/* Минимальный заголовок */}
+            <div className="sticky top-0 bg-white border-b border-gray-100 p-4 z-10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {!showHistory ? (selectedBiomarker as any)?.name : 'История показателя'}
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    {!showHistory ? 'Анализ и рекомендации' : 'Динамика изменений'}
+                  </p>
                 </div>
                 <Button 
                   variant="ghost" 
                   size="icon" 
                   onClick={closeModal} 
-                  className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white border-0"
+                  className="h-8 w-8 text-gray-400 hover:text-gray-600"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </Button>
               </div>
-              
-              {/* Декоративные элементы */}
-              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-12 translate-x-12"></div>
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-8 -translate-x-8"></div>
             </div>
 
-            <div className="p-6 space-y-4">
+            <div className="p-4 space-y-6">
               {selectedBiomarker ? (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {!showHistory ? (
-                    /* EVA Details View */
                     <>
-                      {/* Биомаркер Header */}
-                      <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-2xl p-4">
-                        <div className="flex items-center gap-3">
-                          {(() => {
-                            const biomarker = selectedBiomarker as any;
-                            const categoryVariant = categoryVariants[biomarker.category as keyof typeof categoryVariants] || "soft-primary";
-                            const IconComponent = iconMap[biomarker.category as keyof typeof iconMap] || Activity;
-                            return (
-                              <IconContainer size="lg" variant={categoryVariant}>
-                                <IconComponent className={iconSizes.lg} />
-                              </IconContainer>
-                            );
-                          })()}
-                          <div className="flex-1">
-                            <h3 className="font-bold text-xl text-gray-900">{(selectedBiomarker as any)?.name}</h3>
-                            <p className="text-sm text-gray-600 capitalize">
-                              {(selectedBiomarker as any)?.category === 'blood' && 'Показатели крови'}
-                              {(selectedBiomarker as any)?.category === 'cardiovascular' && 'Сердечно-сосудистая система'}
-                              {(selectedBiomarker as any)?.category === 'metabolic' && 'Метаболизм'}
-                              {(selectedBiomarker as any)?.category === 'kidney' && 'Почки'}
-                              {(selectedBiomarker as any)?.category === 'liver' && 'Печень'}
-                              {(selectedBiomarker as any)?.category === 'immune' && 'Иммунная система'}
-                              {(selectedBiomarker as any)?.category === 'brain' && 'Нервная система'}
-                            </p>
-                          </div>
+                      <div className="space-y-4">
+                        <div>
+                          <h3 className="font-semibold text-gray-900 mb-1">Что это показывает</h3>
+                          <p className="text-sm text-gray-600 leading-relaxed">
+                            {(selectedBiomarker as any)?.description}
+                          </p>
                         </div>
-                      </div>
 
-                      {/* Обоснование компонента */}
-                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4">
-                        <div className="flex items-start gap-3">
-                          <IconContainer size="sm" variant="soft-info">
-                            <AlertTriangle className={iconSizes.sm} />
-                          </IconContainer>
-                          <div>
-                            <h4 className="font-bold text-sm text-gray-900 mb-2">Что это за показатель</h4>
-                            <p className="text-sm text-gray-700 leading-relaxed mb-3">
-                              {(selectedBiomarker as any)?.description}
-                            </p>
-                            <div className="bg-white rounded-xl p-3">
-                              <h5 className="font-semibold text-xs text-gray-800 mb-2">За что отвечает:</h5>
-                              {(() => {
-                                const biomarker = selectedBiomarker as any;
-                                const responsibilities = {
-                                  'Гемоглобин': 'Транспорт кислорода по организму, энергетический обмен, профилактика анемии',
-                                  'Общий холестерин': 'Синтез гормонов, целостность клеточных мембран, здоровье сердечно-сосудистой системы',
-                                  'Глюкоза': 'Энергетический метаболизм, функция поджелудочной железы, профилактика диабета',
-                                  'Креатинин': 'Функция почек, фильтрация крови, выведение продуктов обмена веществ',
-                                  'АЛТ': 'Здоровье печени, метаболизм белков, детоксикация организма',
-                                  'Лейкоциты': 'Иммунная защита, борьба с инфекциями, воспалительные процессы',
-                                  'Тромбоциты': 'Свертываемость крови, заживление ран, остановка кровотечений',
-                                  'Эритроциты': 'Перенос кислорода и углекислого газа, кислотно-щелочной баланс'
-                                };
-                                const responsibility = responsibilities[biomarker?.name as keyof typeof responsibilities] || 
-                                  'Важный показатель для оценки общего состояния здоровья и работы внутренних органов';
-                                return (
-                                  <p className="text-xs text-gray-600 leading-relaxed">{responsibility}</p>
-                                );
-                              })()}
+                        <div>
+                          <h3 className="font-semibold text-gray-900 mb-1">Функция в организме</h3>
+                          <p className="text-sm text-gray-600 leading-relaxed">
+                            {(selectedBiomarker as any)?.name === 'Гемоглобин' && 'Переносит кислород от легких к тканям. Основа энергетического обмена в клетках.'}
+                            {(selectedBiomarker as any)?.name === 'Общий холестерин' && 'Строительный материал для клеточных мембран и гормонов (тестостерон, эстроген, кортизол).'}
+                            {(selectedBiomarker as any)?.name === 'Глюкоза' && 'Главный источник энергии для мозга и мышц. Регулируется инсулином поджелудочной железы.'}
+                            {(selectedBiomarker as any)?.name === 'Креатинин' && 'Продукт распада мышечного креатина. Показатель фильтрационной способности почек.'}
+                          </p>
+                        </div>
+
+                        <div>
+                          <h3 className="font-semibold text-gray-900 mb-1">Добавки и витамины</h3>
+                          <p className="text-sm text-gray-600 leading-relaxed">
+                            {(selectedBiomarker as any)?.name === 'Гемоглобин' && 'Железо (сульфат железа 325мг), Витамин C (1000мг) для усвоения железа, Фолиевая кислота (400мкг), Витамин B12 (1000мкг)'}
+                            {(selectedBiomarker as any)?.name === 'Общий холестерин' && 'Омега-3 (2-3г EPA/DHA), Красный дрожжевой рис (600мг), Коэнзим Q10 (100мг), Берберин (500мг 3 раза)'}
+                            {(selectedBiomarker as any)?.name === 'Глюкоза' && 'Хром пиколинат (200мкг), Альфа-липоевая кислота (300мг), Корица (500мг), Берберин (500мг 3 раза)'}
+                            {(selectedBiomarker as any)?.name === 'Креатинин' && 'Корень одуванчика, Листья крапивы, Клюква (36мг PAC). Избегать креатин и НПВП'}
+                          </p>
+                        </div>
+
+                        <div>
+                          <h3 className="font-semibold text-gray-900 mb-1">Питание</h3>
+                          <p className="text-sm text-gray-600 leading-relaxed">
+                            {(selectedBiomarker as any)?.name === 'Гемоглобин' && 'Говядина, печень теленка, моллюски, тунец, темная фасоль, шпинат, тыквенные семечки, темный шоколад'}
+                            {(selectedBiomarker as any)?.name === 'Общий холестерин' && 'Овсянка, ячмень, бобовые, яблоки, авокадо, жирная рыба, орехи, оливковое масло'}
+                            {(selectedBiomarker as any)?.name === 'Глюкоза' && 'Листовая зелень, брокколи, авокадо, ягоды, орехи, жирная рыба, цельные злаки'}
+                            {(selectedBiomarker as any)?.name === 'Креатинин' && 'Ограничить белок до 0.8г/кг, больше воды, клюква, арбуз, огурцы'}
+                          </p>
+                        </div>
+
+                        {(selectedBiomarker as any)?.normalRange && (
+                          <div className="bg-gray-50 rounded-lg p-3">
+                            <h3 className="font-semibold text-gray-900 mb-1">Нормальный диапазон</h3>
+                            <div className="text-lg font-mono font-semibold text-gray-800">
+                              {(selectedBiomarker as any).normalRange.min} - {(selectedBiomarker as any).normalRange.max} {(selectedBiomarker as any).normalRange.unit}
                             </div>
                           </div>
+                        )}
+
+                        <div className="pt-2">
+                          <Button 
+                            variant="outline" 
+                            className="w-full h-10 text-sm"
+                            onClick={() => setShowHistory(true)}
+                          >
+                            Посмотреть историю показателя
+                          </Button>
                         </div>
-                      </div>
-
-                      {/* Анализ показателя */}
-                      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4">
-                        <div className="flex items-start gap-3">
-                          <IconContainer size="sm" variant="soft-primary">
-                            <Brain className={iconSizes.sm} />
-                          </IconContainer>
-                          <div className="flex-1">
-                            <h4 className="font-bold text-sm text-gray-900 mb-3">ИИ Анализ показателя</h4>
-                            {(() => {
-                              const biomarker = selectedBiomarker as any;
-                              const trend = generateTrend(selectedBiomarkerId || '');
-                              
-                              const analyses = {
-                                'Гемоглобин': {
-                                  status: trend.direction === 'up' ? 'Показатель в пределах нормы с тенденцией к росту' : 'Показатель стабильный, требует наблюдения',
-                                  implications: trend.direction === 'up' ? 
-                                    'Хорошая оксигенация тканей, эффективный транспорт кислорода' : 
-                                    'Возможна скрытая анемия или дефицит железа'
-                                },
-                                'Общий холестерин': {
-                                  status: trend.direction === 'up' ? 'Повышенная тенденция, требует контроля' : 'Благоприятная динамика снижения',
-                                  implications: trend.direction === 'up' ? 
-                                    'Повышенный риск сердечно-сосудистых заболеваний' : 
-                                    'Снижение риска атеросклероза и сердечных патологий'
-                                },
-                                'Глюкоза': {
-                                  status: trend.direction === 'up' ? 'Растущая тенденция, нужен контроль' : 'Стабильные показатели',
-                                  implications: trend.direction === 'up' ? 
-                                    'Риск развития преддиабета или нарушения толерантности к глюкозе' : 
-                                    'Хороший гликемический контроль'
-                                }
-                              };
-                              
-                              const analysis = analyses[biomarker?.name as keyof typeof analyses] || {
-                                status: trend.direction === 'up' ? 'Показатель имеет тенденцию к росту' : 'Показатель в динамике наблюдения',
-                                implications: 'Требует регулярного мониторинга и консультации специалиста'
-                              };
-                              
-                              return (
-                                <div className="space-y-3">
-                                  <div className="bg-white rounded-xl p-3">
-                                    <div className="flex items-center gap-2 mb-2">
-                                      <div className={`w-2 h-2 rounded-full ${trend.direction === 'up' ? 'bg-amber-500' : 'bg-green-500'}`}></div>
-                                      <span className="text-xs font-medium text-gray-800">Текущее состояние</span>
-                                    </div>
-                                    <p className="text-xs text-gray-700">{analysis.status}</p>
-                                  </div>
-                                  <div className="bg-white rounded-xl p-3">
-                                    <div className="flex items-center gap-2 mb-2">
-                                      <Brain className="w-3 h-3 text-purple-600" />
-                                      <span className="text-xs font-medium text-gray-800">Медицинское значение</span>
-                                    </div>
-                                    <p className="text-xs text-gray-700">{analysis.implications}</p>
-                                  </div>
-                                </div>
-                              );
-                            })()}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Нормальные значения */}
-                      {(selectedBiomarker as any)?.normalRange && (
-                        <div className="eva-gradient-success rounded-2xl p-4 text-white">
-                          <div className="flex items-start gap-3">
-                            <IconContainer size="sm" className="bg-white/20 text-white border-white/30">
-                              <Target className={iconSizes.sm} />
-                            </IconContainer>
-                            <div className="flex-1">
-                              <h4 className="font-bold text-sm mb-2">Нормальные значения</h4>
-                              <div className="bg-white/15 rounded-xl p-3">
-                                <div className="text-xl font-bold font-mono text-white">
-                                  {(selectedBiomarker as any).normalRange.min} - {(selectedBiomarker as any).normalRange.max}
-                                  <span className="text-sm font-normal text-white/80 ml-2">
-                                    {(selectedBiomarker as any).normalRange.unit}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Тренд анализ */}
-                      {(() => {
-                        const trend = generateTrend(selectedBiomarkerId || '');
-                        return (
-                          <div className="eva-gradient-wellness rounded-2xl p-4 text-white">
-                            <div className="flex items-start gap-3">
-                              <IconContainer size="sm" className="bg-white/20 text-white border-white/30">
-                                {trend.direction === 'up' ? 
-                                  <TrendingUp className={iconSizes.sm} /> : 
-                                  <TrendingDown className={iconSizes.sm} />
-                                }
-                              </IconContainer>
-                              <div className="flex-1">
-                                <h4 className="font-bold text-sm mb-2">Анализ тренда</h4>
-                                <div className="bg-white/15 rounded-xl p-3 space-y-2">
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-sm text-white/90">
-                                      Направление: {trend.direction === 'up' ? 'Растет' : 'Снижается'}
-                                    </span>
-                                    <span className="text-lg font-bold text-white">
-                                      {trend.percentage}%
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-xs text-white/80">Динамика:</span>
-                                    <MiniChart 
-                                      values={trend.values} 
-                                      color={trend.direction === 'up' ? 'bg-white/60' : 'bg-white/40'} 
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })()}
-
-                      {/* Персональные рекомендации по улучшению */}
-                      <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl p-4">
-                        <div className="flex items-start gap-3">
-                          <IconContainer size="sm" variant="soft-success">
-                            <Sparkles className={iconSizes.sm} />
-                          </IconContainer>
-                          <div className="flex-1">
-                            <h4 className="font-bold text-sm text-gray-900 mb-3">Рекомендации по улучшению</h4>
-                            {(() => {
-                              const biomarker = selectedBiomarker as any;
-                              const trend = generateTrend(selectedBiomarkerId || '');
-                              
-                              const recommendations = {
-                                'Гемоглобин': {
-                                  diet: 'Включите в рацион говядину, печень, гранаты, яблоки, гречку',
-                                  lifestyle: 'Регулярные прогулки на свежем воздухе, дыхательные упражнения',
-                                  supplements: 'Рассмотрите прием препаратов железа по назначению врача'
-                                },
-                                'Общий холестерин': {
-                                  diet: 'Ограничьте жирную пищу, добавьте овсянку, орехи, авокадо',
-                                  lifestyle: 'Кардиотренировки 150 минут в неделю, контроль веса',
-                                  supplements: 'Омега-3 жирные кислоты, статины по назначению врача'
-                                },
-                                'Глюкоза': {
-                                  diet: 'Сократите простые углеводы, увеличьте клетчатку и белок',
-                                  lifestyle: 'Регулярные физические нагрузки, контроль порций',
-                                  supplements: 'Хром, альфа-липоевая кислота по рекомендации врача'
-                                },
-                                'Креатинин': {
-                                  diet: 'Увеличьте потребление воды, ограничьте белок и соль',
-                                  lifestyle: 'Избегайте обезвоживания, контролируйте артериальное давление',
-                                  supplements: 'Поддержка почек растительными препаратами'
-                                }
-                              };
-                              
-                              const recs = recommendations[biomarker?.name as keyof typeof recommendations] || {
-                                diet: 'Сбалансированное питание с учетом возрастных потребностей',
-                                lifestyle: 'Регулярная физическая активность и здоровый сон',
-                                supplements: 'Консультация с врачом по поводу дополнительных препаратов'
-                              };
-                              
-                              return (
-                                <div className="space-y-3">
-                                  <div className="bg-white rounded-xl p-3 shadow-sm">
-                                    <div className="flex items-start gap-2">
-                                      <div className="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                        <span className="text-xs">🥗</span>
-                                      </div>
-                                      <div>
-                                        <h5 className="text-xs font-semibold text-gray-800 mb-1">Питание</h5>
-                                        <p className="text-xs text-gray-700 leading-relaxed">{recs.diet}</p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div className="bg-white rounded-xl p-3 shadow-sm">
-                                    <div className="flex items-start gap-2">
-                                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                        <span className="text-xs">🏃</span>
-                                      </div>
-                                      <div>
-                                        <h5 className="text-xs font-semibold text-gray-800 mb-1">Образ жизни</h5>
-                                        <p className="text-xs text-gray-700 leading-relaxed">{recs.lifestyle}</p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div className="bg-white rounded-xl p-3 shadow-sm">
-                                    <div className="flex items-start gap-2">
-                                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                        <span className="text-xs">💊</span>
-                                      </div>
-                                      <div>
-                                        <h5 className="text-xs font-semibold text-gray-800 mb-1">Дополнительно</h5>
-                                        <p className="text-xs text-gray-700 leading-relaxed">{recs.supplements}</p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })()}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* EVA Действия */}
-                      <div className="grid grid-cols-1 gap-3 pt-2">
-                        <Button 
-                          size="sm" 
-                          className="eva-gradient-primary text-white rounded-xl h-12 shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 border-0"
-                          onClick={() => setShowHistory(true)}
-                        >
-                          <IconContainer size="xs" className="bg-white/20 text-white border-white/30">
-                            <BarChart3 className={iconSizes.xs} />
-                          </IconContainer>
-                          <span className="font-medium">Смотреть историю трендов</span>
-                        </Button>
                       </div>
                     </>
                   ) : (
