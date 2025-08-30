@@ -50,6 +50,10 @@ export async function createSession(userId: string, ipAddress?: string, userAgen
   const token = generateToken(userId);
   const expiresAt = new Date(Date.now() + SESSION_DURATION);
 
+  if (!db) {
+    throw new Error("Database not initialized");
+  }
+
   // Create session in database
   const [session] = await db.insert(sessions).values({
     userId,
@@ -75,6 +79,10 @@ export async function createSession(userId: string, ipAddress?: string, userAgen
 
 // Destroy session
 export async function destroySession(token: string) {
+  if (!db) {
+    throw new Error("Database not initialized");
+  }
+  
   const session = await db.select().from(sessions).where(eq(sessions.token, token)).limit(1);
   
   if (session.length > 0) {
@@ -106,6 +114,11 @@ export async function authenticate(req: AuthenticatedRequest, res: Response, nex
     if (!decoded) {
       console.log('Token verification failed');
       return res.status(401).json({ error: "Invalid token" });
+    }
+
+    if (!db) {
+      console.error('Database not initialized');
+      return res.status(500).json({ error: "Database not available" });
     }
 
     // Check if session exists and is valid
