@@ -295,7 +295,7 @@ export default function AIConsultation() {
             <div className="relative p-5 text-white">
               <div className="flex items-center justify-between mb-4">
                 <button 
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => navigate("/app/dashboard")}
                   className="p-2 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30 shadow-lg transition-all hover:bg-white/30"
                 >
                   <ArrowLeft className="w-5 h-5" />
