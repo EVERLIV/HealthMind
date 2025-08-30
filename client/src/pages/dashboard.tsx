@@ -85,7 +85,7 @@ export default function Dashboard() {
                     <Button 
                       size="sm"
                       onClick={() => navigate("/app/health-profile")}
-                      className="bg-white text-medical-blue hover:bg-white/90 rounded-xl px-3 py-1.5 text-xs font-bold shadow-lg"
+                      className="bg-white hover:bg-white/90 rounded-xl px-3 py-1.5 text-xs font-bold shadow-lg text-[#121111]"
                       data-testid="button-create-profile"
                     >
                       Создать
