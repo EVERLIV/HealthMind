@@ -783,22 +783,3 @@
     @apply gap-2 text-sm;
   }
 }
-
-/* PWA Splash Screen Animations */
-@keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
-
-@keyframes slideInRightProgress {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(0); }
-}
-
-.animate-fadeOut {
-  animation: fadeOut 0.3s ease-out forwards;
-}
-
-.animate-slideInRight {
-  animation: slideInRightProgress 1.5s ease-out;
-}
