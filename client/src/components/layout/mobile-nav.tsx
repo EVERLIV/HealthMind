@@ -14,7 +14,7 @@ export default function MobileNav() {
             </div>
             <div>
               <div className="text-lg font-bold text-card-foreground tracking-wide">EVERLIV HEALTH</div>
-              <div className="text-xs text-muted-foreground font-medium">Get your health in order</div>
+              <div className="text-xs text-muted-foreground font-medium">Приведи своё здоровье в порядок</div>
             </div>
           </div>
           <div className="flex items-center space-x-3">
