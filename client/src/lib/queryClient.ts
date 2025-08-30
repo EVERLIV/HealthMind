@@ -5,9 +5,16 @@ async function throwIfResNotOk(res: Response) {
     let errorData;
     try {
       const text = await res.text();
-      errorData = JSON.parse(text);
-    } catch {
-      errorData = { error: res.statusText };
+      // Check if response is HTML (starts with <!DOCTYPE or <html)
+      if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+        console.error('Server returned HTML instead of JSON:', res.status, res.url);
+        errorData = { error: `Server error ${res.status}: Service temporarily unavailable` };
+      } else {
+        errorData = JSON.parse(text);
+      }
+    } catch (parseError) {
+      console.error('Failed to parse response:', parseError);
+      errorData = { error: res.statusText || 'Unknown error' };
     }
     
     const error = new Error(`${res.status}: ${errorData.error || res.statusText}`);
