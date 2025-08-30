@@ -406,7 +406,7 @@ export default function ArticleDetail() {
                   if (!related) return null;
                   
                   return (
-                    <Link key={relatedId} href={`/article/${relatedId}`}>
+                    <Link key={relatedId} href={`/app/article/${relatedId}`}>
                       <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group">
                         <div className="flex h-32">
                           {/* Изображение статьи */}

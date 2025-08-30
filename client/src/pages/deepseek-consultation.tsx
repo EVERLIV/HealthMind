@@ -589,7 +589,7 @@ export default function AIConsultation() {
                   <Button 
                     size="sm" 
                     variant="outline"
-                    onClick={() => navigate("/health-profile")}
+                    onClick={() => navigate("/app/health-profile")}
                     className="border-amber-300 text-amber-700 hover:bg-amber-100"
                   >
                     Заполнить профиль
@@ -597,7 +597,7 @@ export default function AIConsultation() {
                   <Button 
                     size="sm" 
                     variant="outline"
-                    onClick={() => navigate("/blood-analysis")}
+                    onClick={() => navigate("/app/blood-analysis")}
                     className="border-amber-300 text-amber-700 hover:bg-amber-100"
                   >
                     Загрузить анализы
