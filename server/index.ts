@@ -62,9 +62,15 @@ app.use((req, res, next) => {
     res.status(status).json({ message });
   });
 
-  // Serve static files in production
-  console.log("🗂️  Starting production static file server");
-  serveStatic(app);
+  // Serve files based on environment
+  if (process.env.NODE_ENV === "production") {
+    console.log("🗂️  Starting production static file server");
+    serveStatic(app);
+  } else {
+    console.log("🔥 Starting Vite development server with HMR");
+    const { setupVite } = await import("./vite");
+    await setupVite(app, server);
+  }
 
   const port = parseInt(process.env.PORT || "5000", 10);
   server.listen(port, "0.0.0.0", () => {
