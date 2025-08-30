@@ -837,6 +837,50 @@ ${text}`
           parsedResult.biomarkers = [];
         }
 
+        // Save the analysis results to database
+        const analysisId = req.params.id;
+        
+        // Update blood analysis with AI results
+        await storage.updateBloodAnalysis(analysisId, {
+          status: 'analyzed',
+          results: {
+            summary: parsedResult.summary || 'Анализ завершен',
+            recommendations: parsedResult.recommendations || [],
+            markers: parsedResult.biomarkers, // UI expects "markers" not "biomarkers"
+            biomarkers: parsedResult.biomarkers
+          },
+          analyzedAt: new Date()
+        });
+
+        // Save each biomarker result
+        for (const biomarker of parsedResult.biomarkers) {
+          // First, create or get the biomarker definition
+          let biomarkerDef = (await storage.getBiomarkers()).find(b => b.name === biomarker.name);
+          if (!biomarkerDef) {
+            biomarkerDef = await storage.createBiomarker({
+              name: biomarker.name,
+              description: `${biomarker.name} - показатель анализа крови`,
+              category: biomarker.category || 'Другие показатели',
+              importance: 'medium',
+              normalRange: biomarker.referenceRange ? {
+                min: parseFloat(biomarker.referenceRange.split('-')[0]) || 0,
+                max: parseFloat(biomarker.referenceRange.split('-')[1]) || 100,
+                unit: biomarker.unit
+              } : null,
+              recommendations: []
+            });
+          }
+
+          // Save the biomarker result linked to this analysis
+          await storage.createBiomarkerResult({
+            analysisId: analysisId,
+            biomarkerId: biomarkerDef.id,
+            value: biomarker.value,
+            unit: biomarker.unit,
+            status: biomarker.status || 'normal'
+          });
+        }
+
         res.json({
           biomarkers: parsedResult.biomarkers,
           summary: parsedResult.summary || 'Анализ завершен',
