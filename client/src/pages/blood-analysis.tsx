@@ -254,6 +254,7 @@ export default function BloodAnalysisPage() {
     },
     onError: (error: any) => {
       console.error('Analyze text error:', error);
+      console.error('Error details:', error.response?.data || error.message);
       updateProcessingState('idle', 0, 'Ошибка обработки');
       
       let errorMessage = "Не удалось обработать данные. Попробуйте еще раз.";
@@ -264,6 +265,9 @@ export default function BloodAnalysisPage() {
         setTimeout(() => window.location.href = '/login', 2000);
       } else if (error.message?.includes('Service temporarily unavailable')) {
         errorMessage = "Сервис анализа временно недоступен. Попробуйте позже.";
+      } else if (error.message?.includes('Unexpected token')) {
+        errorMessage = "Ошибка обработки ответа сервера. Попробуйте обновить страницу.";
+        console.error('Response parsing error - got HTML instead of JSON');
       }
       
       toast({
