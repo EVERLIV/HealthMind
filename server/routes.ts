@@ -640,6 +640,17 @@ ${userContext}
     }
   });
 
+  // Biomarkers endpoints
+  app.get("/api/biomarkers", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      const biomarkers = await storage.getBiomarkers();
+      res.json(biomarkers);
+    } catch (error) {
+      console.error("Error fetching biomarkers:", error);
+      res.status(500).json({ error: "Failed to fetch biomarkers" });
+    }
+  });
+
   // Blood analysis endpoints
   
   // Get all blood analyses for a user
