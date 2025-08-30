@@ -544,17 +544,99 @@ export default function Biomarkers() {
                         </div>
                       </div>
 
-                      {/* Описание */}
+                      {/* Обоснование компонента */}
                       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4">
                         <div className="flex items-start gap-3">
                           <IconContainer size="sm" variant="soft-info">
                             <AlertTriangle className={iconSizes.sm} />
                           </IconContainer>
                           <div>
-                            <h4 className="font-bold text-sm text-gray-900 mb-2">Что это означает</h4>
-                            <p className="text-sm text-gray-700 leading-relaxed">
+                            <h4 className="font-bold text-sm text-gray-900 mb-2">Что это за показатель</h4>
+                            <p className="text-sm text-gray-700 leading-relaxed mb-3">
                               {(selectedBiomarker as any)?.description}
                             </p>
+                            <div className="bg-white rounded-xl p-3">
+                              <h5 className="font-semibold text-xs text-gray-800 mb-2">За что отвечает:</h5>
+                              {(() => {
+                                const biomarker = selectedBiomarker as any;
+                                const responsibilities = {
+                                  'Гемоглобин': 'Транспорт кислорода по организму, энергетический обмен, профилактика анемии',
+                                  'Общий холестерин': 'Синтез гормонов, целостность клеточных мембран, здоровье сердечно-сосудистой системы',
+                                  'Глюкоза': 'Энергетический метаболизм, функция поджелудочной железы, профилактика диабета',
+                                  'Креатинин': 'Функция почек, фильтрация крови, выведение продуктов обмена веществ',
+                                  'АЛТ': 'Здоровье печени, метаболизм белков, детоксикация организма',
+                                  'Лейкоциты': 'Иммунная защита, борьба с инфекциями, воспалительные процессы',
+                                  'Тромбоциты': 'Свертываемость крови, заживление ран, остановка кровотечений',
+                                  'Эритроциты': 'Перенос кислорода и углекислого газа, кислотно-щелочной баланс'
+                                };
+                                const responsibility = responsibilities[biomarker?.name as keyof typeof responsibilities] || 
+                                  'Важный показатель для оценки общего состояния здоровья и работы внутренних органов';
+                                return (
+                                  <p className="text-xs text-gray-600 leading-relaxed">{responsibility}</p>
+                                );
+                              })()}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Анализ показателя */}
+                      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4">
+                        <div className="flex items-start gap-3">
+                          <IconContainer size="sm" variant="soft-primary">
+                            <Brain className={iconSizes.sm} />
+                          </IconContainer>
+                          <div className="flex-1">
+                            <h4 className="font-bold text-sm text-gray-900 mb-3">ИИ Анализ показателя</h4>
+                            {(() => {
+                              const biomarker = selectedBiomarker as any;
+                              const trend = generateTrend(selectedBiomarkerId || '');
+                              
+                              const analyses = {
+                                'Гемоглобин': {
+                                  status: trend.direction === 'up' ? 'Показатель в пределах нормы с тенденцией к росту' : 'Показатель стабильный, требует наблюдения',
+                                  implications: trend.direction === 'up' ? 
+                                    'Хорошая оксигенация тканей, эффективный транспорт кислорода' : 
+                                    'Возможна скрытая анемия или дефицит железа'
+                                },
+                                'Общий холестерин': {
+                                  status: trend.direction === 'up' ? 'Повышенная тенденция, требует контроля' : 'Благоприятная динамика снижения',
+                                  implications: trend.direction === 'up' ? 
+                                    'Повышенный риск сердечно-сосудистых заболеваний' : 
+                                    'Снижение риска атеросклероза и сердечных патологий'
+                                },
+                                'Глюкоза': {
+                                  status: trend.direction === 'up' ? 'Растущая тенденция, нужен контроль' : 'Стабильные показатели',
+                                  implications: trend.direction === 'up' ? 
+                                    'Риск развития преддиабета или нарушения толерантности к глюкозе' : 
+                                    'Хороший гликемический контроль'
+                                }
+                              };
+                              
+                              const analysis = analyses[biomarker?.name as keyof typeof analyses] || {
+                                status: trend.direction === 'up' ? 'Показатель имеет тенденцию к росту' : 'Показатель в динамике наблюдения',
+                                implications: 'Требует регулярного мониторинга и консультации специалиста'
+                              };
+                              
+                              return (
+                                <div className="space-y-3">
+                                  <div className="bg-white rounded-xl p-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <div className={`w-2 h-2 rounded-full ${trend.direction === 'up' ? 'bg-amber-500' : 'bg-green-500'}`}></div>
+                                      <span className="text-xs font-medium text-gray-800">Текущее состояние</span>
+                                    </div>
+                                    <p className="text-xs text-gray-700">{analysis.status}</p>
+                                  </div>
+                                  <div className="bg-white rounded-xl p-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <Brain className="w-3 h-3 text-purple-600" />
+                                      <span className="text-xs font-medium text-gray-800">Медицинское значение</span>
+                                    </div>
+                                    <p className="text-xs text-gray-700">{analysis.implications}</p>
+                                  </div>
+                                </div>
+                              );
+                            })()}
                           </div>
                         </div>
                       </div>
@@ -618,29 +700,88 @@ export default function Biomarkers() {
                         );
                       })()}
 
-                      {/* Рекомендации */}
-                      {(selectedBiomarker as any)?.recommendations && (selectedBiomarker as any).recommendations.length > 0 && (
-                        <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-4">
-                          <div className="flex items-start gap-3">
-                            <IconContainer size="sm" variant="soft-warning">
-                              <Sparkles className={iconSizes.sm} />
-                            </IconContainer>
-                            <div className="flex-1">
-                              <h4 className="font-bold text-sm text-gray-900 mb-3">Персональные рекомендации</h4>
-                              <div className="space-y-2">
-                                {(selectedBiomarker as any).recommendations.map((rec: string, index: number) => (
-                                  <div key={index} className="bg-white rounded-xl p-3 shadow-sm">
+                      {/* Персональные рекомендации по улучшению */}
+                      <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl p-4">
+                        <div className="flex items-start gap-3">
+                          <IconContainer size="sm" variant="soft-success">
+                            <Sparkles className={iconSizes.sm} />
+                          </IconContainer>
+                          <div className="flex-1">
+                            <h4 className="font-bold text-sm text-gray-900 mb-3">Рекомендации по улучшению</h4>
+                            {(() => {
+                              const biomarker = selectedBiomarker as any;
+                              const trend = generateTrend(selectedBiomarkerId || '');
+                              
+                              const recommendations = {
+                                'Гемоглобин': {
+                                  diet: 'Включите в рацион говядину, печень, гранаты, яблоки, гречку',
+                                  lifestyle: 'Регулярные прогулки на свежем воздухе, дыхательные упражнения',
+                                  supplements: 'Рассмотрите прием препаратов железа по назначению врача'
+                                },
+                                'Общий холестерин': {
+                                  diet: 'Ограничьте жирную пищу, добавьте овсянку, орехи, авокадо',
+                                  lifestyle: 'Кардиотренировки 150 минут в неделю, контроль веса',
+                                  supplements: 'Омега-3 жирные кислоты, статины по назначению врача'
+                                },
+                                'Глюкоза': {
+                                  diet: 'Сократите простые углеводы, увеличьте клетчатку и белок',
+                                  lifestyle: 'Регулярные физические нагрузки, контроль порций',
+                                  supplements: 'Хром, альфа-липоевая кислота по рекомендации врача'
+                                },
+                                'Креатинин': {
+                                  diet: 'Увеличьте потребление воды, ограничьте белок и соль',
+                                  lifestyle: 'Избегайте обезвоживания, контролируйте артериальное давление',
+                                  supplements: 'Поддержка почек растительными препаратами'
+                                }
+                              };
+                              
+                              const recs = recommendations[biomarker?.name as keyof typeof recommendations] || {
+                                diet: 'Сбалансированное питание с учетом возрастных потребностей',
+                                lifestyle: 'Регулярная физическая активность и здоровый сон',
+                                supplements: 'Консультация с врачом по поводу дополнительных препаратов'
+                              };
+                              
+                              return (
+                                <div className="space-y-3">
+                                  <div className="bg-white rounded-xl p-3 shadow-sm">
                                     <div className="flex items-start gap-2">
-                                      <CheckCircle className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      <span className="text-sm text-gray-700 leading-relaxed">{rec}</span>
+                                      <div className="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span className="text-xs">🥗</span>
+                                      </div>
+                                      <div>
+                                        <h5 className="text-xs font-semibold text-gray-800 mb-1">Питание</h5>
+                                        <p className="text-xs text-gray-700 leading-relaxed">{recs.diet}</p>
+                                      </div>
                                     </div>
                                   </div>
-                                ))}
-                              </div>
-                            </div>
+                                  <div className="bg-white rounded-xl p-3 shadow-sm">
+                                    <div className="flex items-start gap-2">
+                                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span className="text-xs">🏃</span>
+                                      </div>
+                                      <div>
+                                        <h5 className="text-xs font-semibold text-gray-800 mb-1">Образ жизни</h5>
+                                        <p className="text-xs text-gray-700 leading-relaxed">{recs.lifestyle}</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="bg-white rounded-xl p-3 shadow-sm">
+                                    <div className="flex items-start gap-2">
+                                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span className="text-xs">💊</span>
+                                      </div>
+                                      <div>
+                                        <h5 className="text-xs font-semibold text-gray-800 mb-1">Дополнительно</h5>
+                                        <p className="text-xs text-gray-700 leading-relaxed">{recs.supplements}</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })()}
                           </div>
                         </div>
-                      )}
+                      </div>
 
                       {/* EVA Действия */}
                       <div className="grid grid-cols-1 gap-3 pt-2">
