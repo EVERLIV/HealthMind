@@ -169,13 +169,27 @@ export default function BloodAnalysisPage() {
 
   const createAnalysisMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/blood-analyses", {
-        method: "POST",
-        body: JSON.stringify({
-          status: "pending",
-        }),
-      });
+      console.log('Creating blood analysis entry...');
+      try {
+        const response = await apiRequest("/api/blood-analyses", {
+          method: "POST",
+          body: JSON.stringify({
+            status: "pending",
+          }),
+        });
+        console.log('Blood analysis created:', response);
+        return response;
+      } catch (error) {
+        console.error('Failed to create blood analysis:', error);
+        throw error;
+      }
     },
+    onError: (error: any) => {
+      console.error('Create analysis mutation error:', error);
+      if (error.message?.includes('Unexpected token')) {
+        console.error('Got HTML instead of JSON - possible routing issue');
+      }
+    }
   });
 
   const extractTextMutation = useMutation({
