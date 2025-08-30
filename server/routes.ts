@@ -852,33 +852,43 @@ ${text}`
           analyzedAt: new Date()
         });
 
-        // Save each biomarker result
+        // Save each biomarker result with error handling
         for (const biomarker of parsedResult.biomarkers) {
-          // First, create or get the biomarker definition
-          let biomarkerDef = (await storage.getBiomarkers()).find(b => b.name === biomarker.name);
-          if (!biomarkerDef) {
-            biomarkerDef = await storage.createBiomarker({
-              name: biomarker.name,
-              description: `${biomarker.name} - показатель анализа крови`,
-              category: biomarker.category || 'Другие показатели',
-              importance: 'medium',
-              normalRange: biomarker.referenceRange ? {
-                min: parseFloat(biomarker.referenceRange.split('-')[0]) || 0,
-                max: parseFloat(biomarker.referenceRange.split('-')[1]) || 100,
-                unit: biomarker.unit
-              } : null,
-              recommendations: []
-            });
-          }
+          try {
+            // First, create or get the biomarker definition
+            let biomarkerDef = (await storage.getBiomarkers()).find(b => b.name === biomarker.name);
+            if (!biomarkerDef) {
+              biomarkerDef = await storage.createBiomarker({
+                name: biomarker.name,
+                description: `${biomarker.name} - показатель анализа крови`,
+                category: biomarker.category || 'Другие показатели',
+                importance: 'medium',
+                normalRange: biomarker.referenceRange ? {
+                  min: parseFloat(biomarker.referenceRange.split('-')[0]) || 0,
+                  max: parseFloat(biomarker.referenceRange.split('-')[1]) || 100,
+                  unit: biomarker.unit
+                } : null,
+                recommendations: []
+              });
+            }
 
-          // Save the biomarker result linked to this analysis
-          await storage.createBiomarkerResult({
-            analysisId: analysisId,
-            biomarkerId: biomarkerDef.id,
-            value: biomarker.value,
-            unit: biomarker.unit,
-            status: biomarker.status || 'normal'
-          });
+            // Parse numeric value safely for database
+            const numericValue = parseFloat(biomarker.value.toString().replace(/[^\d.,]/g, '').replace(',', '.')) || 0;
+
+            // Save the biomarker result linked to this analysis
+            await storage.createBiomarkerResult({
+              analysisId: analysisId,
+              biomarkerId: biomarkerDef.id,
+              value: numericValue.toString(),
+              unit: biomarker.unit || '',
+              status: biomarker.status || 'normal'
+            });
+            
+            console.log(`Saved biomarker result: ${biomarker.name} = ${numericValue}`);
+          } catch (biomarkerError: any) {
+            console.error(`Failed to save biomarker ${biomarker.name}:`, biomarkerError);
+            // Continue with other biomarkers even if one fails
+          }
         }
 
         res.json({
