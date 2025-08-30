@@ -4,8 +4,9 @@ import { z } from "zod";
 import { storage } from "./storage";
 import OpenAI from "openai";
 import OpenAIVisionService from "./openaiVisionService";
-import DeepSeekVisionService from "./deepSeekVisionService";
+import { DeepSeekVisionService } from "./deepSeekVisionService";
 import { authenticate, createSession, type AuthenticatedRequest } from "./auth";
+import { ObjectStorageService } from "./objectStorage";
 import {
   insertChatSessionSchema,
   insertChatMessageSchema,
@@ -621,6 +622,166 @@ ${userContext}
     } catch (error) {
       console.error("Consultation endpoint error:", error);
       res.status(500).json({ error: "Внутренняя ошибка сервера" });
+    }
+  });
+
+  // Object storage endpoints
+  app.post("/api/objects/upload", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting upload URL:", error);
+      res.status(500).json({ error: "Failed to get upload URL" });
+    }
+  });
+
+  // Blood analysis endpoints
+  app.post("/api/blood-analyses/:id/extract-text", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+
+      const { imageBase64, mimeType } = req.body;
+      if (!imageBase64) {
+        return res.status(400).json({ error: "Image data is required" });
+      }
+
+      console.log('Blood analysis text extraction - MIME type:', mimeType);
+
+      const openaiApiKey = process.env.OPENAI_API_KEY;
+      if (!openaiApiKey) {
+        return res.status(500).json({ 
+          error: "OpenAI API key not configured for text extraction",
+        });
+      }
+
+      try {
+        const openaiService = new OpenAIVisionService(openaiApiKey);
+        const extractedText = await openaiService.extractTextFromImage(imageBase64, mimeType);
+        
+        console.log('Text extracted successfully, length:', extractedText.length);
+        res.json({ extractedText });
+      } catch (error: any) {
+        console.error('OpenAI text extraction failed:', error);
+        res.status(500).json({ 
+          error: "Failed to extract text from image",
+          details: error.message 
+        });
+      }
+    } catch (error) {
+      console.error("Error extracting text from blood analysis:", error);
+      res.status(500).json({ error: "Text extraction failed" });
+    }
+  });
+
+  app.post("/api/blood-analyses/:id/analyze-text", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+
+      const { text } = req.body;
+      if (!text || typeof text !== 'string') {
+        return res.status(400).json({ error: "Text data is required" });
+      }
+
+      console.log('Blood analysis text analysis - text length:', text.length);
+
+      const deepSeekApiKey = process.env.DEEPSEEK_API_KEY;
+      if (!deepSeekApiKey) {
+        return res.status(500).json({ 
+          error: "DeepSeek API key not configured for text analysis",
+        });
+      }
+
+      try {
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${deepSeekApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: "deepseek-chat",
+            messages: [
+              {
+                role: "system",
+                content: `Вы - эксперт по интерпретации лабораторных анализов крови. Проанализируйте предоставленные данные и выделите биомаркеры.
+
+ВАЖНО: Верните ответ СТРОГО в JSON формате:
+{
+  "biomarkers": [
+    {
+      "name": "Название показателя",
+      "value": "Значение",
+      "unit": "Единица измерения",
+      "referenceRange": "Референсные значения",
+      "status": "normal|high|low|critical",
+      "category": "Общий анализ крови|Биохимия|Гормоны|Другие показатели"
+    }
+  ],
+  "summary": "Краткое резюме состояния здоровья",
+  "recommendations": ["Список рекомендаций"]
+}
+
+Статусы определяйте сравнивая значение с референсными диапазонами.
+Категории: "Общий анализ крови", "Биохимия", "Гормоны", "Другие показатели"`
+              },
+              {
+                role: "user",
+                content: `Проанализируйте результаты анализа крови и выделите все биомаркеры:
+
+${text}`
+              }
+            ],
+            max_tokens: 2000,
+            temperature: 0.3,
+            response_format: { type: "json_object" }
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`DeepSeek API error: ${response.status} - ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const analysisResult = data.choices[0]?.message?.content;
+        
+        console.log('DeepSeek analysis completed');
+        
+        // Parse and validate the JSON response
+        let parsedResult;
+        try {
+          parsedResult = JSON.parse(analysisResult);
+        } catch (parseError) {
+          console.error('Failed to parse DeepSeek response:', parseError);
+          return res.status(500).json({ 
+            error: "Failed to parse analysis result",
+            details: "Invalid JSON response from AI service"
+          });
+        }
+
+        // Ensure biomarkers array exists
+        if (!parsedResult.biomarkers || !Array.isArray(parsedResult.biomarkers)) {
+          parsedResult.biomarkers = [];
+        }
+
+        res.json({
+          biomarkers: parsedResult.biomarkers,
+          summary: parsedResult.summary || 'Анализ завершен',
+          recommendations: parsedResult.recommendations || []
+        });
+      } catch (error: any) {
+        console.error('DeepSeek text analysis failed:', error);
+        res.status(500).json({ 
+          error: "Failed to analyze text",
+          details: error.message 
+        });
+      }
+    } catch (error) {
+      console.error("Error analyzing blood analysis text:", error);
+      res.status(500).json({ error: "Text analysis failed" });
     }
   });
 
