@@ -6,6 +6,7 @@ import { randomUUID } from "crypto";
 import OpenAI from "openai";
 import OpenAIVisionService from "./openaiVisionService";
 import { DeepSeekVisionService } from "./deepSeekVisionService";
+import { DeepSeekService } from "./deepseek";
 import { authenticate, createSession, type AuthenticatedRequest } from "./auth";
 import { ObjectStorageService } from "./objectStorage";
 import {
@@ -648,6 +649,85 @@ ${userContext}
     } catch (error) {
       console.error("Error fetching biomarkers:", error);
       res.status(500).json({ error: "Failed to fetch biomarkers" });
+    }
+  });
+
+  // Get specific biomarker
+  app.get("/api/biomarkers/:id", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      const biomarker = await storage.getBiomarker(req.params.id);
+      if (!biomarker) {
+        return res.status(404).json({ error: "Biomarker not found" });
+      }
+      res.json(biomarker);
+    } catch (error) {
+      console.error("Error fetching biomarker:", error);
+      res.status(500).json({ error: "Failed to fetch biomarker" });
+    }
+  });
+
+  // Get biomarker history (mock data for now)
+  app.get("/api/biomarkers/:id/history", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      const biomarker = await storage.getBiomarker(req.params.id);
+      if (!biomarker) {
+        return res.status(404).json({ error: "Biomarker not found" });
+      }
+      
+      // Generate mock history data
+      const history = Array.from({ length: 6 }, (_, i) => ({
+        id: randomUUID(),
+        biomarkerId: req.params.id,
+        value: Math.random() * 100 + 50,
+        unit: biomarker.normalRange?.unit || 'г/л',
+        status: ['normal', 'high', 'low'][Math.floor(Math.random() * 3)],
+        date: new Date(Date.now() - i * 30 * 24 * 60 * 60 * 1000).toISOString(),
+        analysisId: randomUUID()
+      })).reverse();
+      
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching biomarker history:", error);
+      res.status(500).json({ error: "Failed to fetch biomarker history" });
+    }
+  });
+
+  // Generate AI recommendations for biomarker
+  app.post("/api/biomarkers/:id/recommendations", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      const biomarker = await storage.getBiomarker(req.params.id);
+      if (!biomarker) {
+        return res.status(404).json({ error: "Biomarker not found" });
+      }
+
+      const { currentValue, status } = req.body;
+      
+      if (!currentValue || !status) {
+        return res.status(400).json({ error: "Current value and status are required" });
+      }
+
+      // Get user profile for personalization
+      const userProfile = await storage.getHealthProfile(req.user.id);
+      
+      const deepSeekService = new DeepSeekService();
+      const recommendations = await deepSeekService.generateBiomarkerRecommendations({
+        biomarkerName: biomarker.name,
+        currentValue: parseFloat(currentValue),
+        unit: biomarker.normalRange?.unit || '',
+        normalRange: biomarker.normalRange || { min: 0, max: 100, unit: '' },
+        status: status,
+        patientAge: userProfile?.age || undefined,
+        patientGender: userProfile?.profileData ? (userProfile.profileData as any)?.gender : undefined,
+        patientWeight: userProfile?.weight ? parseFloat(userProfile.weight) : undefined,
+        existingConditions: userProfile?.medicalConditions || []
+      });
+
+      res.json(recommendations);
+    } catch (error) {
+      console.error("Error generating biomarker recommendations:", error);
+      res.status(500).json({ error: "Failed to generate recommendations" });
     }
   });
 
