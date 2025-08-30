@@ -252,11 +252,23 @@ export default function BloodAnalysisPage() {
         window.location.href = '/app/biomarkers';
       }, 3000);
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error('Analyze text error:', error);
       updateProcessingState('idle', 0, 'Ошибка обработки');
+      
+      let errorMessage = "Не удалось обработать данные. Попробуйте еще раз.";
+      
+      // Handle auth errors
+      if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+        errorMessage = "Сессия истекла. Войдите в систему заново.";
+        setTimeout(() => window.location.href = '/login', 2000);
+      } else if (error.message?.includes('Service temporarily unavailable')) {
+        errorMessage = "Сервис анализа временно недоступен. Попробуйте позже.";
+      }
+      
       toast({
         title: "Ошибка",
-        description: "Не удалось обработать данные. Попробуйте еще раз.",
+        description: errorMessage,
         variant: "destructive",
       });
     },
@@ -421,10 +433,14 @@ export default function BloodAnalysisPage() {
     }
 
     try {
+      console.log('Confirming biomarkers...', { currentAnalysisId, validBiomarkers: validBiomarkers.length });
+      
       // Конвертируем биомаркеры обратно в текстовый формат для анализа
       const textForAnalysis = validBiomarkers.map(b => {
         return `${b.name}: ${b.value} ${b.unit}`;
       }).join('\n');
+
+      console.log('Text for analysis:', textForAnalysis);
 
       // Закрываем модальное окно и показываем прогресс анализа
       setShowBiomarkerEditor(false);
@@ -435,15 +451,27 @@ export default function BloodAnalysisPage() {
         text: textForAnalysis,
       });
       
+      console.log('Biomarkers analysis completed successfully');
+      
       // Очищаем состояние после успешного анализа (это будет выполнено в onSuccess)
       setBiomarkers([]);
       setCurrentAnalysisId(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Ошибка анализа:', error);
       updateProcessingState('idle', 0, 'Ошибка анализа');
+      
+      let errorMessage = "Не удалось обработать данные. Попробуйте еще раз.";
+      
+      if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+        errorMessage = "Сессия истекла. Войдите в систему заново.";
+        setTimeout(() => window.location.href = '/login', 2000);
+      } else if (error.message?.includes('Service temporarily unavailable')) {
+        errorMessage = "Сервис анализа временно недоступен. Попробуйте позже.";
+      }
+      
       toast({
         title: "Ошибка",
-        description: "Не удалось обработать данные. Попробуйте еще раз.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -487,9 +515,11 @@ export default function BloodAnalysisPage() {
     }
 
     try {
+      console.log('Starting text analysis...');
       updateProcessingState('uploading', 20, 'Создаем запись анализа...', 'Подготавливаем данные к обработке');
       
       const analysisResponse = await createAnalysisMutation.mutateAsync();
+      console.log('Analysis created:', analysisResponse);
       
       updateProcessingState('analyzing', 50, 'Обрабатываем с ИИ...', 'Извлекаем биомаркеры из вашего текста');
       
@@ -499,9 +529,26 @@ export default function BloodAnalysisPage() {
         analysisId: analysisResponse.id,
         text: textInput,
       });
-    } catch (error) {
+      
+      console.log('Text analysis completed successfully');
+    } catch (error: any) {
       console.error('Error analyzing text:', error);
       updateProcessingState('idle', 0, 'Ошибка обработки');
+      
+      let errorMessage = "Не удалось обработать данные. Попробуйте еще раз.";
+      
+      if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+        errorMessage = "Сессия истекла. Войдите в систему заново.";
+        setTimeout(() => window.location.href = '/login', 2000);
+      } else if (error.message?.includes('Service temporarily unavailable')) {
+        errorMessage = "Сервис анализа временно недоступен. Попробуйте позже.";
+      }
+      
+      toast({
+        title: "Ошибка",
+        description: errorMessage,
+        variant: "destructive",
+      });
     }
   };
 
