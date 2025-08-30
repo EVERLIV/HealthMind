@@ -55,7 +55,7 @@
       "name": "Анализ крови с ИИ",
       "short_name": "Анализ",
       "description": "Загрузить фото анализов и получить расшифровку от ИИ",
-      "url": "/analysis",
+      "url": "/app/blood-analysis",
       "icons": [
         {
           "src": "/logo_1756447359961.png",
@@ -67,7 +67,7 @@
       "name": "ИИ Консультация",
       "short_name": "Консультация",
       "description": "Получить медицинскую консультацию от ИИ",
-      "url": "/chat",
+      "url": "/app/chat",
       "icons": [
         {
           "src": "/logo_1756447359961.png",
@@ -79,7 +79,7 @@
       "name": "Профиль здоровья",
       "short_name": "Профиль",
       "description": "Мониторинг биомаркеров и персональные рекомендации",
-      "url": "/profile",
+      "url": "/app/profile",
       "icons": [
         {
           "src": "/logo_1756447359961.png",

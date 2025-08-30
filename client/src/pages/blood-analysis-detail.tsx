@@ -170,7 +170,7 @@ export default function BloodAnalysisDetailPage() {
         <main className="eva-page-content">
           <div className="text-center py-12">
             <p>Анализ не найден</p>
-            <Link href="/blood-analyses">
+            <Link href="/app/blood-analyses">
               <Button className="mt-4">К списку анализов</Button>
             </Link>
           </div>
@@ -189,7 +189,7 @@ export default function BloodAnalysisDetailPage() {
         <div className="bg-white sticky top-0 z-10 -mx-4 px-4 py-3 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Link href="/blood-analyses">
+              <Link href="/app/blood-analyses">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -363,12 +363,12 @@ export default function BloodAnalysisDetailPage() {
 
         {/* Действия */}
         <div className="mt-6 grid grid-cols-2 gap-3">
-          <Link href="/chat">
+          <Link href="/app/chat">
             <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-xs h-10">
               💬 Обсудить с ИИ
             </Button>
           </Link>
-          <Link href="/blood-analysis">
+          <Link href="/app/blood-analysis">
             <Button variant="outline" size="sm" className="w-full text-xs h-10">
               📷 Новый анализ
             </Button>

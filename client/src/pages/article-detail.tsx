@@ -211,7 +211,7 @@ export default function ArticleDetail() {
           <div className="text-center">
             <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-xl font-bold mb-2">Статья не найдена</h2>
-            <Link href="/dashboard">
+            <Link href="/app/dashboard">
               <Button variant="outline">Вернуться на главную</Button>
             </Link>
           </div>
@@ -233,7 +233,7 @@ export default function ArticleDetail() {
       {/* Навигационная панель */}
       <div className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between p-4">
-          <Link href="/dashboard">
+          <Link href="/app/dashboard">
             <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
               <ChevronLeft className="w-6 h-6" />
             </button>

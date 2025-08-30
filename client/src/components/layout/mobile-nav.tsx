@@ -26,7 +26,7 @@ export default function MobileNav() {
             >
               <Bell className="w-5 h-5 text-muted-foreground" />
             </Button>
-            <Link href="/user-settings">
+            <Link href="/app/user-settings">
               <Button 
                 data-testid="button-user-menu"
                 variant="ghost" 
