@@ -94,6 +94,17 @@ export default function LandingPage() {
     
     checkPWARequirements();
     
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+          console.log('Service Worker registered successfully:', registration);
+        })
+        .catch((error) => {
+          console.error('Service Worker registration failed:', error);
+        });
+    }
+    
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
@@ -150,21 +161,26 @@ export default function LandingPage() {
         }
       } catch (error) {
         console.error('Error during PWA install:', error);
+        showManualInstructions();
       }
     } else {
       console.log('No deferred prompt available, showing manual instructions');
-      
-      // Более детальные инструкции в зависимости от браузера и устройства
-      const userAgent = navigator.userAgent.toLowerCase();
-      const isAndroid = /android/.test(userAgent);
-      const isChrome = /chrome/.test(userAgent) && !/edg|opr/.test(userAgent);
-      const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
-      const isDesktop = !isMobile;
-      
-      let instructions = '';
-      
-      if (isAndroid && isChrome) {
-        instructions = `🤖 Установка на Android:
+      showManualInstructions();
+    }
+  };
+
+  const showManualInstructions = () => {
+    // Более детальные инструкции в зависимости от браузера и устройства
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isAndroid = /android/.test(userAgent);
+    const isChrome = /chrome/.test(userAgent) && !/edg|opr/.test(userAgent);
+    const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+    const isDesktop = !isMobile;
+    
+    let instructions = '';
+    
+    if (isAndroid && isChrome) {
+      instructions = `🤖 Установка на Android:
 
 1. Нажмите меню браузера (три точки ⋮ справа вверху)
 2. Выберите "Добавить на главный экран" или "Установить приложение"
@@ -174,24 +190,24 @@ export default function LandingPage() {
 Если не видите опцию установки, убедитесь что:
 • Вы используете Chrome или другой современный браузер
 • Сайт открыт по HTTPS (безопасное соединение)`;
-      } else if (isDesktop && isChrome) {
-        instructions = `💻 Установка на компьютер:
+    } else if (isDesktop && isChrome) {
+      instructions = `💻 Установка на компьютер:
 
 1. Найдите иконку установки в адресной строке (справа)
 2. Нажмите на неё и выберите "Установить"
 3. Или используйте меню Chrome ⋮ → "Установить EVERLIV HEALTH..."
 
 После установки приложение будет доступно как обычная программа!`;
-      } else if (isMobile) {
-        instructions = `📱 Добавление на главный экран:
+    } else if (isMobile) {
+      instructions = `📱 Добавление на главный экран:
 
 1. Откройте меню браузера
 2. Найдите "Добавить на главный экран" или "Add to Home Screen"
 3. Нажмите "Добавить"
 
 Для лучшей работы рекомендуем использовать Chrome или Safari.`;
-      } else {
-        instructions = `🌐 Для установки приложения:
+    } else {
+      instructions = `🌐 Для установки приложения:
 
 • Chrome: найдите иконку установки в адресной строке
 • Firefox: добавьте в закладки для быстрого доступа
@@ -199,10 +215,9 @@ export default function LandingPage() {
 • Edge: найдите "Установить это приложение" в меню
 
 Современные браузеры поддерживают установку веб-приложений как обычных программ!`;
-      }
-      
-      alert(instructions);
     }
+    
+    alert(instructions);
   };
 
   const handleIOSInstall = () => {
@@ -366,7 +381,7 @@ export default function LandingPage() {
                     <div className="absolute -top-2 -right-2 w-4 h-4 bg-yellow-400 rounded-full animate-pulse"></div>
                   )}
                   <Download className="w-6 h-6 mr-4 group-hover:translate-y-1 transition-transform duration-300" />
-                  {deferredPrompt ? 'Установить приложение' : 'Скачать для Android'}
+                  {deferredPrompt ? 'Установить приложение' : 'Установить на устройство'}
                   <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform duration-300" />
                 </Button>
                 
