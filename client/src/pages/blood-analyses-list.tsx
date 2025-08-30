@@ -157,7 +157,7 @@ export default function BloodAnalysesListPage() {
               
               <div className="divide-y divide-gray-100">
                 {typedAnalyses.map((analysis: any, index: number) => (
-                  <Link key={analysis.id} href={`/blood-analyses/${analysis.id}`}>
+                  <Link key={analysis.id} href={`/app/blood-analyses/${analysis.id}`}>
                     <div className="group p-4 hover:bg-gray-50 transition-colors cursor-pointer">
                       <div className="flex items-center gap-3">
                         {/* Компактная иконка */}
