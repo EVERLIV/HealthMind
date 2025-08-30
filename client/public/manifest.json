@@ -1,7 +1,7 @@
 {
-  "name": "EVERLIV HEALTH - AI-Powered Health Analysis",
-  "short_name": "EVERLIV HEALTH",
-  "description": "Революционная платформа с искусственным интеллектом для анализа здоровья. Получайте профессиональные медицинские рекомендации и персональные планы оздоровления.",
+  "name": "EVERLIV HEALTH - AI Анализ Здоровья",
+  "short_name": "EVERLIV",
+  "description": "Революционная платформа с искусственным интеллектом для анализа здоровья и медицинских рекомендаций",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#065f46",
@@ -9,75 +9,95 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "ru",
-  "categories": ["health", "medical", "lifestyle"],
+  "dir": "ltr",
+  "categories": ["health", "medical", "lifestyle", "productivity"],
+  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/logo-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/logo-512.png", 
+      "src": "/logo_1756447359961.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshot-narrow.png",
-      "sizes": "640x1136",
-      "type": "image/png",
-      "form_factor": "narrow"
     },
     {
-      "src": "/screenshot-wide.png", 
-      "sizes": "1024x768",
+      "src": "/logo_1756447359961.png",
+      "sizes": "192x192",
       "type": "image/png",
-      "form_factor": "wide"
+      "purpose": "any"
+    },
+    {
+      "src": "/logo_1756447359961.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo_1756447359961.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo_1756447359961.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo_1756447359961.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "shortcuts": [
     {
-      "name": "Анализ крови",
+      "name": "Анализ крови с ИИ",
       "short_name": "Анализ",
-      "description": "Загрузить и проанализировать результаты анализов",
+      "description": "Загрузить фото анализов и получить расшифровку от ИИ",
       "url": "/analysis",
       "icons": [
         {
-          "src": "/logo-192.png",
-          "sizes": "192x192"
+          "src": "/logo_1756447359961.png",
+          "sizes": "96x96"
         }
       ]
     },
     {
-      "name": "Консультация с ИИ",
-      "short_name": "Консультация", 
+      "name": "ИИ Консультация",
+      "short_name": "Консультация",
       "description": "Получить медицинскую консультацию от ИИ",
       "url": "/chat",
       "icons": [
         {
-          "src": "/logo-192.png",
-          "sizes": "192x192"
+          "src": "/logo_1756447359961.png",
+          "sizes": "96x96"
         }
       ]
     },
     {
       "name": "Профиль здоровья",
       "short_name": "Профиль",
-      "description": "Просмотреть профиль и историю здоровья",
+      "description": "Мониторинг биомаркеров и персональные рекомендации",
       "url": "/profile",
       "icons": [
         {
-          "src": "/logo-192.png",
-          "sizes": "192x192"
+          "src": "/logo_1756447359961.png",
+          "sizes": "96x96"
         }
       ]
     }
   ],
+  "screenshots": [
+    {
+      "src": "/logo_1756447359961.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "EVERLIV HEALTH - Главная страница"
+    }
+  ],
   "related_applications": [],
-  "prefer_related_applications": false,
   "edge_side_panel": {
     "preferred_width": 400
   },
