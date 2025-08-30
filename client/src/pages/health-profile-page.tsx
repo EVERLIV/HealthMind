@@ -52,7 +52,7 @@ export default function HealthProfilePage() {
   const handleComplete = () => {
     setShowWizard(false);
     // Redirect to beautiful profile page with new design
-    navigate('/profile');
+    navigate('/app/profile');
   };
   
   // Calculate profile completion percentage

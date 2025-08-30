@@ -152,7 +152,7 @@ export default function UserSettingsPage() {
           <div className="flex items-center justify-between mb-4">
             <Button
               variant="ghost"
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/app/dashboard")}
               className="p-2 hover:bg-accent rounded-xl"
               data-testid="button-back"
             >
