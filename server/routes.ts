@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { z } from "zod";
 import { storage } from "./storage";
+import { randomUUID } from "crypto";
 import OpenAI from "openai";
 import OpenAIVisionService from "./openaiVisionService";
 import { DeepSeekVisionService } from "./deepSeekVisionService";
@@ -640,6 +641,75 @@ ${userContext}
   });
 
   // Blood analysis endpoints
+  
+  // Get all blood analyses for a user
+  app.get("/api/blood-analyses", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      const analyses = await storage.getBloodAnalyses(req.user.id);
+      res.json(analyses);
+    } catch (error) {
+      console.error("Error fetching blood analyses:", error);
+      res.status(500).json({ error: "Failed to fetch blood analyses" });
+    }
+  });
+
+  // Create a new blood analysis
+  app.post("/api/blood-analyses", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      const analysisData = {
+        id: randomUUID(),
+        userId: req.user.id,
+        status: req.body.status || "pending",
+        aiAnalysis: req.body.aiAnalysis,
+        imageUrl: req.body.imageUrl,
+      };
+      
+      const analysis = await storage.createBloodAnalysis(analysisData);
+      res.json(analysis);
+    } catch (error) {
+      console.error("Error creating blood analysis:", error);
+      res.status(500).json({ error: "Failed to create blood analysis" });
+    }
+  });
+  
+  // Get a specific blood analysis
+  app.get("/api/blood-analyses/:id", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      const analysis = await storage.getBloodAnalysis(req.params.id);
+      
+      if (!analysis || analysis.userId !== req.user.id) {
+        return res.status(404).json({ error: "Analysis not found" });
+      }
+      
+      res.json(analysis);
+    } catch (error) {
+      console.error("Error fetching blood analysis:", error);
+      res.status(500).json({ error: "Failed to fetch blood analysis" });
+    }
+  });
+  
+  // Update a blood analysis
+  app.put("/api/blood-analyses/:id", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      const analysis = await storage.getBloodAnalysis(req.params.id);
+      if (!analysis || analysis.userId !== req.user.id) {
+        return res.status(404).json({ error: "Analysis not found" });
+      }
+      
+      const updated = await storage.updateBloodAnalysis(req.params.id, req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating blood analysis:", error);
+      res.status(500).json({ error: "Failed to update blood analysis" });
+    }
+  });
+
   app.post("/api/blood-analyses/:id/extract-text", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.user) return res.status(401).json({ error: "Unauthorized" });
