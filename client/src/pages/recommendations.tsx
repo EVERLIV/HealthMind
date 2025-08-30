@@ -304,7 +304,7 @@ export default function RecommendationsPage() {
                   Чтобы получить персональные рекомендации с добавками и протоколами, укажите ваши цели в профиле здоровья
                 </p>
                 <Button
-                  onClick={() => navigate("/health-profile")}
+                  onClick={() => navigate("/app/health-profile")}
                   size="sm"
                   className="bg-gradient-to-r from-medical-blue to-trust-green hover:from-medical-blue/90 hover:to-trust-green/90 text-white border-0"
                 >
