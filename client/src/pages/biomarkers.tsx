@@ -136,6 +136,12 @@ export default function Biomarkers() {
     queryKey: ["/api/biomarkers"],
   });
 
+  // Query for latest biomarker values
+  const { data: latestValues } = useQuery({
+    queryKey: ["/api/biomarkers/latest-values"],
+    enabled: !!biomarkers?.length,
+  });
+
   const { data: selectedBiomarker, isLoading: isLoadingSelected } = useQuery({
     queryKey: ["/api/biomarkers", selectedBiomarkerId],
     enabled: !!selectedBiomarkerId,
@@ -460,7 +466,7 @@ export default function Biomarkers() {
                       {biomarker.normalRange && (
                         <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
                           <div className="flex items-center justify-between">
-                            <div>
+                            <div className="flex-1">
                               <div className="text-xs text-muted-foreground mb-1">Норма</div>
                               <div className="font-mono text-sm font-bold">
                                 {biomarker.normalRange.min}-{biomarker.normalRange.max}
@@ -468,6 +474,27 @@ export default function Biomarkers() {
                                   {biomarker.normalRange.unit}
                                 </span>
                               </div>
+                              {/* Show current value if available */}
+                              {latestValues?.[biomarker.id] && (
+                                <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-600">
+                                  <div className="text-xs text-muted-foreground mb-1">Ваш результат</div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-mono text-sm font-bold">
+                                      {latestValues[biomarker.id].value}
+                                    </span>
+                                    <Badge className={`text-xs px-2 py-0.5 ${
+                                      latestValues[biomarker.id].status === 'normal' ? 'bg-green-100 text-green-700 border-green-200' :
+                                      latestValues[biomarker.id].status === 'high' ? 'bg-red-100 text-red-700 border-red-200' :
+                                      latestValues[biomarker.id].status === 'low' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                                      'bg-yellow-100 text-yellow-700 border-yellow-200'
+                                    }`}>
+                                      {latestValues[biomarker.id].status === 'normal' ? 'Норма' :
+                                       latestValues[biomarker.id].status === 'high' ? 'Выс' :
+                                       latestValues[biomarker.id].status === 'low' ? 'Низк' : 'Крит'}
+                                    </Badge>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                             <div className="flex items-center gap-2">
                               <div className="text-right">

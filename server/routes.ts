@@ -652,6 +652,52 @@ ${userContext}
     }
   });
 
+  // Get latest values for all biomarkers for the current user
+  app.get("/api/biomarkers/latest-values", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      const biomarkers = await storage.getBiomarkers();
+      const latestValues: Record<string, any> = {};
+      
+      // Get the latest value for each biomarker
+      for (const biomarker of biomarkers) {
+        const history = await storage.getBiomarkerHistory(biomarker.id, req.user.id);
+        if (history && history.length > 0) {
+          // Sort by date and get the most recent
+          const sortedHistory = history.sort((a: any, b: any) => 
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+          );
+          const latest = sortedHistory[0];
+          
+          // Determine status based on normal range
+          let status = 'normal';
+          const value = parseFloat(latest.value);
+          
+          if (biomarker.normalRange) {
+            if (value > biomarker.normalRange.max) {
+              status = 'high';
+            } else if (value < biomarker.normalRange.min) {
+              status = 'low';
+            }
+          }
+          
+          latestValues[biomarker.id] = {
+            value: latest.value,
+            unit: latest.unit,
+            status: status,
+            date: latest.date
+          };
+        }
+      }
+      
+      res.json(latestValues);
+    } catch (error) {
+      console.error("Error fetching latest biomarker values:", error);
+      res.status(500).json({ error: "Failed to fetch latest values" });
+    }
+  });
+
   // Get specific biomarker
   app.get("/api/biomarkers/:id", authenticate, async (req: AuthenticatedRequest, res) => {
     try {

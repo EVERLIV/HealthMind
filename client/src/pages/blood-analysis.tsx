@@ -808,7 +808,7 @@ export default function BloodAnalysisPage() {
                         type="date"
                         value={analysisDate}
                         onChange={(e) => setAnalysisDate(e.target.value)}
-                        className="bg-white border-blue-200 focus:border-blue-400"
+                        className="bg-white border-blue-200 focus:border-blue-400 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-2"
                         data-testid="input-analysis-date"
                       />
                     </div>
@@ -844,7 +844,7 @@ export default function BloodAnalysisPage() {
                           Выберите фото анализа
                         </p>
                         <p className="text-sm text-muted-foreground mb-3">
-                          или перетащите файл в эту область
+                          сфотографируйте камерой или перетащите файл в эту область
                         </p>
                         <div className="inline-flex items-center px-3 py-1 rounded-full bg-trust-green/10 text-trust-green text-xs font-medium">
                           <Sparkles className="w-3 h-3 mr-1" />

@@ -108,6 +108,14 @@ export function ObjectUploader({
         open={showModal}
         onRequestClose={() => setShowModal(false)}
         proudlyDisplayPoweredByUppy={false}
+        plugins={['Camera']}
+        note="Для доступа к камере разрешите использование камеры в браузере"
+        fileManagerSelectionType="files"
+        showProgressDetails={true}
+        hideRetryButton={false}
+        hideUploadButton={false}
+        hideCancelButton={false}
+        hidePauseResumeButton={false}
       />
     </div>
   );
