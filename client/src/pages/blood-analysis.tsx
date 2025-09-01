@@ -808,7 +808,7 @@ export default function BloodAnalysisPage() {
                         type="date"
                         value={analysisDate}
                         onChange={(e) => setAnalysisDate(e.target.value)}
-                        className="bg-white border-blue-200 focus:border-blue-400 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-2"
+                        className="bg-white border-blue-200 focus:border-blue-400 pr-10 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-3 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                         data-testid="input-analysis-date"
                       />
                     </div>
