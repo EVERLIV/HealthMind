@@ -2,8 +2,10 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import Uppy from "@uppy/core";
 import { DashboardModal } from "@uppy/react";
+import Webcam from "@uppy/webcam";
 import "@uppy/core/dist/style.min.css";
 import "@uppy/dashboard/dist/style.min.css";
+import "@uppy/webcam/dist/style.min.css";
 import AwsS3 from "@uppy/aws-s3";
 import type { UploadResult } from "@uppy/core";
 import { Button } from "@/components/ui/button";
@@ -72,6 +74,29 @@ export function ObjectUploader({
       },
       autoProceed: false,
     })
+      .use(Webcam, {
+        countdown: 3,
+        modes: ['photo'],
+        mirror: true,
+        facingMode: 'environment', // Use back camera by default
+        showViewfinder: true,
+        showRecordingLength: false,
+        preferredVideoMimeType: 'video/mp4',
+        locale: {
+          strings: {
+            smile: 'Улыбнитесь!',
+            takePicture: 'Сделать фото',
+            startRecording: 'Начать запись',
+            stopRecording: 'Остановить запись',
+            allowAccessTitle: 'Разрешите доступ к камере',
+            allowAccessDescription: 'Чтобы делать снимки, разрешите доступ к камере в браузере',
+            noCameraTitle: 'Камера недоступна',
+            noCameraDescription: 'Для съемки фото необходима камера',
+            recordingStoppedMaxSize: 'Запись остановлена: превышен максимальный размер файла',
+            submitRecordedFile: 'Отправить видео',
+          },
+        },
+      })
       .use(AwsS3, {
         shouldUseMultipart: false,
         getUploadParameters: onGetUploadParameters,
@@ -116,6 +141,69 @@ export function ObjectUploader({
         hideUploadButton={false}
         hideCancelButton={false}
         hidePauseResumeButton={false}
+        locale={{
+          strings: {
+            // Core strings
+            dropHereOr: 'Перетащите файлы сюда или %{browse}',
+            browse: 'выберите',
+            browseFiles: 'выберите файлы',
+            uploadComplete: 'Загрузка завершена',
+            uploadPaused: 'Загрузка приостановлена',
+            resumeUpload: 'Продолжить загрузку',
+            pauseUpload: 'Приостановить загрузку',
+            retryUpload: 'Повторить загрузку',
+            cancelUpload: 'Отменить загрузку',
+            xFilesSelected: {
+              0: '%{smart_count} файл выбран',
+              1: '%{smart_count} файла выбрано',
+              2: '%{smart_count} файлов выбрано'
+            },
+            uploadingXFiles: {
+              0: 'Загружается %{smart_count} файл',
+              1: 'Загружается %{smart_count} файла',
+              2: 'Загружается %{smart_count} файлов'
+            },
+            processingXFiles: {
+              0: 'Обрабатывается %{smart_count} файл',
+              1: 'Обрабатывается %{smart_count} файла',
+              2: 'Обрабатывается %{smart_count} файлов'
+            },
+            uploading: 'Загрузка',
+            complete: 'Завершено',
+            uploadFailed: 'Ошибка загрузки',
+            paused: 'Приостановлено',
+            retry: 'Повторить',
+            cancel: 'Отменить',
+            done: 'Готово',
+            removeFile: 'Удалить файл',
+            editFile: 'Редактировать файл',
+            editing: 'Редактирование %{file}',
+            finishEditingFile: 'Завершить редактирование',
+            save: 'Сохранить',
+            
+            // Camera strings
+            smile: 'Улыбнитесь!',
+            takePicture: 'Сделать фото',
+            startRecording: 'Начать запись',
+            stopRecording: 'Остановить запись',
+            allowAccessTitle: 'Разрешите доступ к камере',
+            allowAccessDescription: 'Чтобы делать снимки, разрешите доступ к камере в браузере',
+            noCameraTitle: 'Камера недоступна',
+            noCameraDescription: 'Для съемки фото необходима камера',
+            recordingStoppedMaxSize: 'Запись остановлена: превышен максимальный размер файла',
+            submitRecordedFile: 'Отправить видео',
+            
+            // File validation
+            youCanOnlyUploadX: {
+              0: 'Можно загрузить только %{fileTypes}',
+              1: 'Можно загрузить только %{fileTypes}',
+              2: 'Можно загрузить только %{fileTypes}'
+            },
+            exceedsSize: 'Файл превышает максимальный размер %{size}',
+            youCanOnlyUploadFileTypes: 'Можно загружать только: %{types}',
+            companionError: 'Ошибка подключения'
+          }
+        }}
       />
     </div>
   );
