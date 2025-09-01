@@ -64,88 +64,50 @@ app.use((req, res, next) => {
 
   // Serve files based on environment
   if (process.env.NODE_ENV === "production") {
-    console.log("🗂️  Checking for static files...");
+    console.log("🚀 Starting PRODUCTION mode with same functionality as development");
+    
+    // In production, run exactly like development but without HMR
+    // This ensures 100% compatibility with what user sees in preview
     try {
-      // Try to serve static files if they exist
+      const { setupVite } = await import("./vite");
+      console.log("✅ Using Vite for production (same as development)");
+      await setupVite(app, server);
+    } catch (error) {
+      console.error("❌ Vite setup failed in production:", error);
+      
+      // Fallback: serve the client template directly
+      console.log("📱 Using fallback client serving");
       const fs = await import("fs");
       const path = await import("path");
-      const distPath = path.resolve(import.meta.dirname, "public");
       
-      if (fs.existsSync(distPath)) {
-        console.log("✅ Static files found, serving them");
-        serveStatic(app);
-      } else {
-        console.log("⚠️ No static files found, serving fallback");
-        // Serve fallback response that redirects to development
-        app.use("*", (req, res) => {
-          if (req.path.startsWith('/api/')) {
-            // Let API routes be handled by the routes
-            return;
-          }
-          
-          res.send(`
-            <!DOCTYPE html>
-            <html lang="ru">
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>EVERLIV HEALTH - AI Анализ Здоровья</title>
-              <meta name="theme-color" content="#059669">
-              <style>
-                body {
-                  margin: 0;
-                  font-family: system-ui, -apple-system, sans-serif;
-                  background: linear-gradient(135deg, #059669 0%, #34D399 100%);
-                  color: white;
-                  display: flex;
-                  flex-direction: column;
-                  justify-content: center;
-                  align-items: center;
-                  min-height: 100vh;
-                  text-align: center;
-                }
-                .logo { font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem; }
-                .loading { font-size: 1.2rem; margin-bottom: 2rem; }
-                .spinner {
-                  width: 40px; height: 40px;
-                  border: 4px solid rgba(255,255,255,0.3);
-                  border-top: 4px solid white;
-                  border-radius: 50%;
-                  animation: spin 1s linear infinite;
-                  margin: 1rem auto;
-                }
-                @keyframes spin {
-                  0% { transform: rotate(0deg); }
-                  100% { transform: rotate(360deg); }
-                }
-              </style>
-            </head>
-            <body>
-              <div class="logo">🩺 EVERLIV HEALTH</div>
-              <div class="loading">Запуск приложения...</div>
-              <div class="spinner"></div>
-              <script>
-                setTimeout(() => {
-                  window.location.href = 'https://${req.hostname.replace('.replit.app', '-5000.replit.app')}';
-                }, 1000);
-              </script>
-            </body>
-            </html>
-          `);
-        });
-      }
-    } catch (error) {
-      console.error("❌ Production static setup failed:", error);
-      // Fallback to minimal server
-      app.use("*", (req, res) => {
+      app.use("*", async (req, res) => {
         if (req.path.startsWith('/api/')) {
-          return;
+          return; // Let API routes be handled
         }
-        res.json({ 
-          status: "production", 
-          message: "API ready, redirecting to development UI",
-          redirect: `https://${req.hostname.replace('.replit.app', '-5000.replit.app')}`
-        });
+        
+        try {
+          const clientTemplate = path.resolve(
+            import.meta.dirname,
+            "..",
+            "client",
+            "index.html",
+          );
+          
+          let template = await fs.promises.readFile(clientTemplate, "utf-8");
+          
+          // Add production optimizations to template
+          template = template.replace(
+            '<head>',
+            `<head>
+            <meta name="description" content="EVERLIV HEALTH - AI-powered health analysis platform">
+            <meta name="theme-color" content="#059669">`
+          );
+          
+          res.status(200).set({ "Content-Type": "text/html" }).end(template);
+        } catch (e) {
+          console.error("❌ Template serving failed:", e);
+          res.status(500).send("Server Error");
+        }
       });
     }
   } else {
