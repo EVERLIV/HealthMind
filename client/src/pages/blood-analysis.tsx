@@ -804,13 +804,18 @@ export default function BloodAnalysisPage() {
                       <label className="text-sm font-medium text-blue-900 block mb-2">
                         Дата анализа
                       </label>
-                      <Input
-                        type="date"
-                        value={analysisDate}
-                        onChange={(e) => setAnalysisDate(e.target.value)}
-                        className="bg-white border-blue-200 focus:border-blue-400 pr-10 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-3 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-                        data-testid="input-analysis-date"
-                      />
+                      <div className="relative">
+                        <Input
+                          type="date"
+                          value={analysisDate}
+                          onChange={(e) => setAnalysisDate(e.target.value)}
+                          className="bg-white border-blue-200 focus:border-blue-400 pr-4 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-2 [&::-webkit-calendar-picker-indicator]:top-1/2 [&::-webkit-calendar-picker-indicator]:transform [&::-webkit-calendar-picker-indicator]:-translate-y-1/2 [&::-webkit-calendar-picker-indicator]:w-4 [&::-webkit-calendar-picker-indicator]:h-4 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-60"
+                          data-testid="input-analysis-date"
+                          style={{
+                            colorScheme: 'light'
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                   <p className="text-xs text-blue-600 mt-2 ml-11">
