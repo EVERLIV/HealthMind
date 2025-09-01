@@ -154,6 +154,7 @@ export default function BloodAnalysisPage() {
   const [showBiomarkerEditor, setShowBiomarkerEditor] = useState(false);
   const [biomarkers, setBiomarkers] = useState<BiomarkerField[]>([]);
   const [currentAnalysisId, setCurrentAnalysisId] = useState<string | null>(null);
+  const [analysisDate, setAnalysisDate] = useState<string>(new Date().toISOString().split('T')[0]); // Default to today
   const [processingState, setProcessingState] = useState<ProcessingState>({
     stage: 'idle',
     progress: 0,
@@ -175,6 +176,7 @@ export default function BloodAnalysisPage() {
           method: "POST",
           body: JSON.stringify({
             status: "pending",
+            analysisDate: new Date(analysisDate).toISOString(),
           }),
         });
         console.log('Blood analysis created:', response);
@@ -767,27 +769,55 @@ export default function BloodAnalysisPage() {
 
           {/* Mode Toggle - only shown when idle */}
           {processingState.stage === 'idle' && (
-            <div className="flex mb-8 bg-gray-100 rounded-full p-1">
-              <Button
-                data-testid="button-photo-mode"
-                variant={analysisMode === 'photo' ? 'default' : 'ghost'}
-                size="sm"
-                className={`flex-1 rounded-full ${analysisMode === 'photo' ? 'shadow-md' : ''}`}
-                onClick={() => setAnalysisMode('photo')}
-              >
-                <Camera className="w-4 h-4 mr-2" />
-                Фото анализа
-              </Button>
-              <Button
-                data-testid="button-text-mode"
-                variant={analysisMode === 'text' ? 'default' : 'ghost'}
-                size="sm"
-                className={`flex-1 rounded-full ${analysisMode === 'text' ? 'shadow-md' : ''}`}
-                onClick={() => setAnalysisMode('text')}
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                Ввести вручную
-              </Button>
+            <div className="space-y-6 mb-8">
+              <div className="flex bg-gray-100 rounded-full p-1">
+                <Button
+                  data-testid="button-photo-mode"
+                  variant={analysisMode === 'photo' ? 'default' : 'ghost'}
+                  size="sm"
+                  className={`flex-1 rounded-full ${analysisMode === 'photo' ? 'shadow-md' : ''}`}
+                  onClick={() => setAnalysisMode('photo')}
+                >
+                  <Camera className="w-4 h-4 mr-2" />
+                  Фото анализа
+                </Button>
+                <Button
+                  data-testid="button-text-mode"
+                  variant={analysisMode === 'text' ? 'default' : 'ghost'}
+                  size="sm"
+                  className={`flex-1 rounded-full ${analysisMode === 'text' ? 'shadow-md' : ''}`}
+                  onClick={() => setAnalysisMode('text')}
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Ввести вручную
+                </Button>
+              </div>
+              
+              {/* Analysis Date Field */}
+              <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Calendar className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <label className="text-sm font-medium text-blue-900 block mb-2">
+                        Дата анализа
+                      </label>
+                      <Input
+                        type="date"
+                        value={analysisDate}
+                        onChange={(e) => setAnalysisDate(e.target.value)}
+                        className="bg-white border-blue-200 focus:border-blue-400"
+                        data-testid="input-analysis-date"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-blue-600 mt-2 ml-11">
+                    Укажите дату прохождения анализа для точного отслеживания истории
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           )}
 
