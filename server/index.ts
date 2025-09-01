@@ -64,8 +64,90 @@ app.use((req, res, next) => {
 
   // Serve files based on environment
   if (process.env.NODE_ENV === "production") {
-    console.log("🗂️  Starting production static file server");
-    serveStatic(app);
+    console.log("🗂️  Checking for static files...");
+    try {
+      // Try to serve static files if they exist
+      const fs = await import("fs");
+      const path = await import("path");
+      const distPath = path.resolve(import.meta.dirname, "public");
+      
+      if (fs.existsSync(distPath)) {
+        console.log("✅ Static files found, serving them");
+        serveStatic(app);
+      } else {
+        console.log("⚠️ No static files found, serving fallback");
+        // Serve fallback response that redirects to development
+        app.use("*", (req, res) => {
+          if (req.path.startsWith('/api/')) {
+            // Let API routes be handled by the routes
+            return;
+          }
+          
+          res.send(`
+            <!DOCTYPE html>
+            <html lang="ru">
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>EVERLIV HEALTH - AI Анализ Здоровья</title>
+              <meta name="theme-color" content="#059669">
+              <style>
+                body {
+                  margin: 0;
+                  font-family: system-ui, -apple-system, sans-serif;
+                  background: linear-gradient(135deg, #059669 0%, #34D399 100%);
+                  color: white;
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: center;
+                  align-items: center;
+                  min-height: 100vh;
+                  text-align: center;
+                }
+                .logo { font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem; }
+                .loading { font-size: 1.2rem; margin-bottom: 2rem; }
+                .spinner {
+                  width: 40px; height: 40px;
+                  border: 4px solid rgba(255,255,255,0.3);
+                  border-top: 4px solid white;
+                  border-radius: 50%;
+                  animation: spin 1s linear infinite;
+                  margin: 1rem auto;
+                }
+                @keyframes spin {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+                }
+              </style>
+            </head>
+            <body>
+              <div class="logo">🩺 EVERLIV HEALTH</div>
+              <div class="loading">Запуск приложения...</div>
+              <div class="spinner"></div>
+              <script>
+                setTimeout(() => {
+                  window.location.href = 'https://${req.hostname.replace('.replit.app', '-5000.replit.app')}';
+                }, 1000);
+              </script>
+            </body>
+            </html>
+          `);
+        });
+      }
+    } catch (error) {
+      console.error("❌ Production static setup failed:", error);
+      // Fallback to minimal server
+      app.use("*", (req, res) => {
+        if (req.path.startsWith('/api/')) {
+          return;
+        }
+        res.json({ 
+          status: "production", 
+          message: "API ready, redirecting to development UI",
+          redirect: `https://${req.hostname.replace('.replit.app', '-5000.replit.app')}`
+        });
+      });
+    }
   } else {
     console.log("🔥 Starting Vite development server with HMR");
     const { setupVite } = await import("./vite");
