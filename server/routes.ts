@@ -666,7 +666,7 @@ ${userContext}
     }
   });
 
-  // Get biomarker history (mock data for now)
+  // Get biomarker history with real data
   app.get("/api/biomarkers/:id/history", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
       const biomarker = await storage.getBiomarker(req.params.id);
@@ -674,18 +674,21 @@ ${userContext}
         return res.status(404).json({ error: "Biomarker not found" });
       }
       
-      // Generate mock history data
-      const history = Array.from({ length: 6 }, (_, i) => ({
-        id: randomUUID(),
-        biomarkerId: req.params.id,
-        value: Math.random() * 100 + 50,
-        unit: biomarker.normalRange?.unit || 'г/л',
-        status: ['normal', 'high', 'low'][Math.floor(Math.random() * 3)],
-        date: new Date(Date.now() - i * 30 * 24 * 60 * 60 * 1000).toISOString(),
-        analysisId: randomUUID()
-      })).reverse();
+      // Get real history data from biomarkerResults joined with bloodAnalyses
+      const history = await storage.getBiomarkerHistory(req.params.id);
       
-      res.json(history);
+      // Transform the data to match the expected format for the frontend
+      const formattedHistory = history.map(result => ({
+        id: result.id,
+        biomarkerId: result.biomarkerId,
+        value: parseFloat(result.value),
+        unit: result.unit,
+        status: result.status,
+        date: result.analysisDate ? result.analysisDate.toISOString() : new Date().toISOString(),
+        analysisId: result.analysisId
+      }));
+      
+      res.json(formattedHistory);
     } catch (error) {
       console.error("Error fetching biomarker history:", error);
       res.status(500).json({ error: "Failed to fetch biomarker history" });

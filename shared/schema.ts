@@ -41,7 +41,8 @@ export const bloodAnalyses = pgTable("blood_analyses", {
   imageUrl: text("image_url"),
   results: json("results"),
   status: text("status").notNull().default("pending"), // pending, analyzed, error
-  analyzedAt: timestamp("analyzed_at"),
+  analysisDate: timestamp("analysis_date"), // User-specified date of the analysis
+  analyzedAt: timestamp("analyzed_at"), // System timestamp when analysis was completed
   createdAt: timestamp("created_at").defaultNow(),
 });
 

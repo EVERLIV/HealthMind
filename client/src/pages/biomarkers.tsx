@@ -90,19 +90,36 @@ const MiniChart = ({ values, color = "bg-medical-blue" }: { values: number[]; co
   </div>
 );
 
-// Stable trend generation based on biomarker ID
-const generateTrend = (biomarkerId: string) => {
-  // Use biomarker ID as seed for consistent trends
-  const seed = biomarkerId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const random = (seed * 9301 + 49297) % 233280;
-  const direction = (random / 233280) > 0.5 ? 'up' : 'down';
-  const percentage = Math.floor((random / 233280) * 20) + 1;
+// Calculate real trend from biomarker history data
+const calculateTrendFromHistory = (history: any[]) => {
+  if (!Array.isArray(history) || history.length < 2) {
+    return { 
+      direction: 'up' as const, 
+      percentage: 0, 
+      values: [50, 55, 52, 58, 60, 62] // Default values when no history
+    };
+  }
   
-  // Generate consistent values based on seed
-  const values = Array.from({length: 6}, (_, i) => {
-    const val = ((seed + i * 123) % 1000) / 10;
-    return Math.max(val, 10);
+  // Sort by date to ensure chronological order
+  const sortedHistory = [...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  
+  // Calculate direction based on first and last values
+  const firstValue = parseFloat(sortedHistory[0]?.value || '0');
+  const lastValue = parseFloat(sortedHistory[sortedHistory.length - 1]?.value || '0');
+  
+  const direction = lastValue >= firstValue ? 'up' : 'down';
+  const percentage = firstValue > 0 ? Math.round(Math.abs((lastValue - firstValue) / firstValue) * 100) : 0;
+  
+  // Extract values for the mini chart (last 6 values or pad with current value)
+  const values = sortedHistory.slice(-6).map(h => {
+    const val = parseFloat(h.value);
+    return isNaN(val) ? 50 : Math.max(val, 10); // Ensure minimum height for chart
   });
+  
+  // Pad with the last value if we don't have 6 data points
+  while (values.length < 6) {
+    values.unshift(values[0] || 50);
+  }
   
   return { direction, percentage, values };
 };
@@ -128,6 +145,19 @@ export default function Biomarkers() {
     queryKey: ["/api/biomarkers", selectedBiomarkerId, "history"],
     enabled: !!selectedBiomarkerId,
   });
+
+  // Cache biomarker histories for all biomarkers to show trends in the list
+  const biomarkerHistories = useMemo(() => {
+    const historyMap: Record<string, any[]> = {};
+    if (Array.isArray(biomarkers)) {
+      biomarkers.forEach(biomarker => {
+        // Use React Query's cache to get history data if available
+        // For now, we'll load this on-demand when the modal opens
+        historyMap[biomarker.id] = [];
+      });
+    }
+    return historyMap;
+  }, [biomarkers]);
 
   // State for AI recommendations
   const [aiRecommendations, setAiRecommendations] = useState<any>(null);
@@ -391,7 +421,9 @@ export default function Biomarkers() {
               const categoryVariant = categoryVariants[biomarker.category as keyof typeof categoryVariants] || "soft-danger";
               const IconComponent = iconMap[biomarker.category as keyof typeof iconMap] || Activity;
               const importanceStyle = importanceVariants[biomarker.importance as keyof typeof importanceVariants] || importanceVariants.low;
-              const trend = generateTrend(biomarker.id); // Stable trend based on ID
+              // For now, use default trend since we don't load all histories at once
+              // In the future, we could optimize this by loading summaries
+              const trend = calculateTrendFromHistory([]);
 
               return (
                 <Card

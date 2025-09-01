@@ -29,6 +29,7 @@ export interface IStorage {
   
   // Biomarker Results
   getBiomarkerResults(analysisId: string): Promise<BiomarkerResult[]>;
+  getBiomarkerHistory(biomarkerId: string): Promise<Array<BiomarkerResult & { analysisDate: Date | null; }>>; 
   createBiomarkerResult(result: InsertBiomarkerResult): Promise<BiomarkerResult>;
   
   // Chat Sessions
@@ -270,6 +271,25 @@ export class MemStorage implements IStorage {
     return Array.from(this.biomarkerResults.values()).filter(result => result.analysisId === analysisId);
   }
 
+  async getBiomarkerHistory(biomarkerId: string): Promise<Array<BiomarkerResult & { analysisDate: Date | null; }>> {
+    const results = Array.from(this.biomarkerResults.values())
+      .filter(result => result.biomarkerId === biomarkerId)
+      .map(result => {
+        const analysis = this.bloodAnalyses.get(result.analysisId);
+        return {
+          ...result,
+          analysisDate: analysis?.analysisDate ?? null,
+        };
+      })
+      .sort((a, b) => {
+        const dateA = a.analysisDate?.getTime() ?? 0;
+        const dateB = b.analysisDate?.getTime() ?? 0;
+        return dateB - dateA; // Sort by most recent first
+      });
+    
+    return results;
+  }
+
   async createBiomarkerResult(insertResult: InsertBiomarkerResult): Promise<BiomarkerResult> {
     const id = randomUUID();
     const result: BiomarkerResult = { 
@@ -459,6 +479,28 @@ export class DatabaseStorage implements IStorage {
   // Biomarker Results
   async getBiomarkerResults(analysisId: string): Promise<BiomarkerResult[]> {
     return db.select().from(biomarkerResults).where(eq(biomarkerResults.analysisId, analysisId));
+  }
+
+  async getBiomarkerHistory(biomarkerId: string): Promise<Array<BiomarkerResult & { analysisDate: Date | null; }>> {
+    if (!db) throw new Error("Database not available");
+    
+    const results = await db
+      .select({
+        id: biomarkerResults.id,
+        analysisId: biomarkerResults.analysisId,
+        biomarkerId: biomarkerResults.biomarkerId,
+        value: biomarkerResults.value,
+        unit: biomarkerResults.unit,
+        status: biomarkerResults.status,
+        createdAt: biomarkerResults.createdAt,
+        analysisDate: bloodAnalyses.analysisDate,
+      })
+      .from(biomarkerResults)
+      .innerJoin(bloodAnalyses, eq(biomarkerResults.analysisId, bloodAnalyses.id))
+      .where(eq(biomarkerResults.biomarkerId, biomarkerId))
+      .orderBy(desc(bloodAnalyses.analysisDate));
+      
+    return results;
   }
 
   async createBiomarkerResult(insertResult: InsertBiomarkerResult): Promise<BiomarkerResult> {
