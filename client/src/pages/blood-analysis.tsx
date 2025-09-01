@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { ArrowLeft, Camera, Upload, FileText, Activity, Clock, CheckCircle, Brain, FileImage, Stethoscope, Database, Sparkles, ChevronRight, X, AlertCircle, Shield, Heart, ChevronLeft, Edit3, Save, Trash2, Plus } from "lucide-react";
+import { ArrowLeft, Camera, Upload, FileText, Activity, Clock, CheckCircle, Brain, FileImage, Stethoscope, Database, Sparkles, ChevronRight, X, AlertCircle, Shield, Heart, ChevronLeft, Edit3, Save, Trash2, Plus, Calendar } from "lucide-react";
 import { IconContainer, iconSizes } from "@/components/ui/icon-container";
 import { ObjectUploader } from "@/components/ObjectUploader";
 import type { UploadResult } from "@uppy/core";
