@@ -809,12 +809,13 @@ export default function BloodAnalysisPage() {
                           type="date"
                           value={analysisDate}
                           onChange={(e) => setAnalysisDate(e.target.value)}
-                          className="bg-white border-blue-200 focus:border-blue-400 pr-4 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-2 [&::-webkit-calendar-picker-indicator]:top-1/2 [&::-webkit-calendar-picker-indicator]:transform [&::-webkit-calendar-picker-indicator]:-translate-y-1/2 [&::-webkit-calendar-picker-indicator]:w-4 [&::-webkit-calendar-picker-indicator]:h-4 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-60"
+                          className="bg-white border-blue-200 focus:border-blue-400 pr-10 text-left [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-2 [&::-webkit-calendar-picker-indicator]:w-5 [&::-webkit-calendar-picker-indicator]:h-5 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                           data-testid="input-analysis-date"
                           style={{
                             colorScheme: 'light'
                           }}
                         />
+                        <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-blue-600 pointer-events-none" />
                       </div>
                     </div>
                   </div>

@@ -24,7 +24,7 @@ export default function NotFound() {
           <div className="space-y-3">
             <Button
               onClick={() => navigate("/")}
-              className="eva-btn-primary eva-btn-lg w-full"
+              className="eva-btn eva-btn-primary eva-btn-lg w-full"
             >
               <Home className="w-5 h-5 mr-2" />
               На главную
@@ -33,7 +33,7 @@ export default function NotFound() {
             <Button
               onClick={() => window.history.back()}
               variant="outline"
-              className="eva-btn-secondary eva-btn-lg w-full"
+              className="eva-btn eva-btn-secondary eva-btn-lg w-full"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Назад

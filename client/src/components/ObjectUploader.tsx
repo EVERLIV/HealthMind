@@ -75,25 +75,30 @@ export function ObjectUploader({
       autoProceed: false,
     })
       .use(Webcam, {
-        countdown: 3,
+        countdown: false,
         modes: ['photo'],
-        mirror: true,
+        mirror: false,
         facingMode: 'environment', // Use back camera by default
         showViewfinder: true,
         showRecordingLength: false,
         preferredVideoMimeType: 'video/mp4',
+        videoConstraints: {
+          facingMode: 'environment',
+          width: { min: 720, ideal: 1280, max: 1920 },
+          height: { min: 480, ideal: 720, max: 1080 }
+        },
         locale: {
           strings: {
-            smile: 'Улыбнитесь!',
+            smile: 'Наведите на анализ',
             takePicture: 'Сделать фото',
             startRecording: 'Начать запись',
             stopRecording: 'Остановить запись',
             allowAccessTitle: 'Разрешите доступ к камере',
-            allowAccessDescription: 'Чтобы делать снимки, разрешите доступ к камере в браузере',
+            allowAccessDescription: 'Для съемки анализа крови нужен доступ к камере',
             noCameraTitle: 'Камера недоступна',
-            noCameraDescription: 'Для съемки фото необходима камера',
+            noCameraDescription: 'Для фотографирования анализа необходима камера',
             recordingStoppedMaxSize: 'Запись остановлена: превышен максимальный размер файла',
-            submitRecordedFile: 'Отправить видео',
+            submitRecordedFile: 'Использовать фото',
           },
         },
       })
@@ -134,19 +139,25 @@ export function ObjectUploader({
         onRequestClose={() => setShowModal(false)}
         proudlyDisplayPoweredByUppy={false}
         plugins={['Camera']}
-        note="Для доступа к камере разрешите использование камеры в браузере"
+        note="Сфотографируйте анализ крови или выберите файл с устройства"
         fileManagerSelectionType="files"
         showProgressDetails={true}
         hideRetryButton={false}
         hideUploadButton={false}
         hideCancelButton={false}
         hidePauseResumeButton={false}
+        showSelectedFiles={true}
+        showRemoveButtonAfterComplete={false}
+        disableStatusBar={false}
+        disableInformer={false}
+        width="100%"
+        height={350}
         locale={{
           strings: {
             // Core strings
-            dropHereOr: 'Перетащите файлы сюда или %{browse}',
+            dropHereOr: 'Перетащите файл сюда или %{browse}',
             browse: 'выберите',
-            browseFiles: 'выберите файлы',
+            browseFiles: 'выберите файл',
             uploadComplete: 'Загрузка завершена',
             uploadPaused: 'Загрузка приостановлена',
             resumeUpload: 'Продолжить загрузку',
@@ -182,16 +193,35 @@ export function ObjectUploader({
             save: 'Сохранить',
             
             // Camera strings
-            smile: 'Улыбнитесь!',
+            smile: 'Наведите камеру на анализ',
             takePicture: 'Сделать фото',
             startRecording: 'Начать запись',
             stopRecording: 'Остановить запись',
             allowAccessTitle: 'Разрешите доступ к камере',
-            allowAccessDescription: 'Чтобы делать снимки, разрешите доступ к камере в браузере',
+            allowAccessDescription: 'Для фотографирования анализа крови нужен доступ к камере',
             noCameraTitle: 'Камера недоступна',
-            noCameraDescription: 'Для съемки фото необходима камера',
+            noCameraDescription: 'Для фотографирования анализа необходима камера',
             recordingStoppedMaxSize: 'Запись остановлена: превышен максимальный размер файла',
-            submitRecordedFile: 'Отправить видео',
+            submitRecordedFile: 'Использовать фото',
+            
+            // Additional interface strings
+            dropFiles: 'Перетащите файл анализа',
+            addMore: 'Добавить еще',
+            importFrom: 'Импорт из:',
+            myDevice: 'Мое устройство',
+            camera: 'Камера',
+            addMoreFiles: 'Добавить файлы',
+            addingMoreFiles: 'Добавление файлов',
+            dashboardWindowTitle: 'Загрузка анализа крови',
+            dashboardTitle: 'Загрузка анализа',
+            pluginNameCamera: 'Камера',
+            back: 'Назад',
+            close: 'Закрыть',
+            save: 'Сохранить',
+            edit: 'Редактировать',
+            cancel: 'Отменить',
+            proceed: 'Продолжить',
+            upload: 'Загрузить',
             
             // File validation
             youCanOnlyUploadX: {
