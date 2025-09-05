@@ -662,11 +662,11 @@ ${userContext}
       
       // Get the latest value for each biomarker
       for (const biomarker of biomarkers) {
-        const history = await storage.getBiomarkerHistory(biomarker.id, req.user.id);
+        const history = await storage.getBiomarkerHistory(biomarker.id);
         if (history && history.length > 0) {
           // Sort by date and get the most recent
           const sortedHistory = history.sort((a: any, b: any) => 
-            new Date(b.date).getTime() - new Date(a.date).getTime()
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
           const latest = sortedHistory[0];
           
@@ -686,7 +686,7 @@ ${userContext}
             value: latest.value,
             unit: latest.unit,
             status: status,
-            date: latest.date
+            date: latest.createdAt
           };
         }
       }
@@ -861,7 +861,7 @@ ${userContext}
         return res.status(404).json({ error: "Analysis not found" });
       }
       
-      await storage.deleteBloodAnalysis(req.params.id);
+      await storage.updateBloodAnalysis(req.params.id, { status: 'deleted' });
       res.json({ message: "Analysis deleted successfully" });
     } catch (error) {
       console.error("Error deleting blood analysis:", error);
@@ -1040,7 +1040,9 @@ ${text}`
               biomarkerId: biomarkerDef.id,
               value: numericValue.toString(),
               unit: biomarker.unit || '',
-              status: biomarker.status || 'normal'
+              status: biomarker.status || 'normal',
+              education: biomarker.education || null,
+              recommendation: biomarker.recommendation || null
             });
             
             console.log(`Saved biomarker result: ${biomarker.name} = ${numericValue}`);
