@@ -999,6 +999,8 @@ ${text}`
         // Save the analysis results to database
         const analysisId = req.params.id;
         
+        console.log('Сохраняем результаты анализа. Первый маркер:', JSON.stringify(parsedResult.biomarkers[0], null, 2));
+        
         // Update blood analysis with AI results
         await storage.updateBloodAnalysis(analysisId, {
           status: 'analyzed',
@@ -1046,6 +1048,8 @@ ${text}`
             });
             
             console.log(`Saved biomarker result: ${biomarker.name} = ${numericValue}`);
+            console.log(`Education: ${biomarker.education || 'ОТСУТСТВУЕТ'}`);
+            console.log(`Recommendation: ${biomarker.recommendation || 'ОТСУТСТВУЕТ'}`);
           } catch (biomarkerError: any) {
             console.error(`Failed to save biomarker ${biomarker.name}:`, biomarkerError);
             // Continue with other biomarkers even if one fails
