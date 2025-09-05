@@ -722,23 +722,22 @@ export default function Biomarkers() {
                       {biomarkerHistory && Array.isArray(biomarkerHistory) && biomarkerHistory.length > 0 ? (
                         <div className="space-y-4">
                           {/* Интерактивный график динамики */}
-                          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                            <div className="flex items-center gap-3 mb-4">
+                          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                            <div className="flex items-center gap-2 mb-3">
                               <IconContainer size="sm" variant="soft-primary">
                                 <BarChart3 className={iconSizes.sm} />
                               </IconContainer>
-                              <h4 className="font-bold text-lg">Динамика изменений</h4>
-                              <Badge variant="secondary" className="ml-auto">
-                                {biomarkerHistory.length} измерений
+                              <h4 className="font-bold text-base">Динамика</h4>
+                              <Badge variant="secondary" className="ml-auto text-xs">
+                                {biomarkerHistory.length}
                               </Badge>
                             </div>
                             
-                            <div className="h-64 mb-4">
+                            <div className="h-40 mb-3">
                               <Bar
                                 data={{
-                                  labels: biomarkerHistory.slice().reverse().map((item: any) => {
-                                    const date = new Date(item.analysisDate || item.date);
-                                    return `${date.getDate()}.${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
+                                  labels: biomarkerHistory.slice().reverse().map((item: any, index: number) => {
+                                    return `#${index + 1}`;
                                   }),
                                   datasets: [
                                     {
@@ -763,7 +762,7 @@ export default function Biomarkers() {
                                         }
                                       }),
                                       borderWidth: 2,
-                                      borderRadius: 6,
+                                      borderRadius: 4,
                                       borderSkipped: false,
                                     }
                                   ]
@@ -771,6 +770,14 @@ export default function Biomarkers() {
                                 options={{
                                   responsive: true,
                                   maintainAspectRatio: false,
+                                  layout: {
+                                    padding: {
+                                      top: 5,
+                                      bottom: 5,
+                                      left: 5,
+                                      right: 5
+                                    }
+                                  },
                                   interaction: {
                                     intersect: false,
                                     mode: 'index'
@@ -785,13 +792,21 @@ export default function Biomarkers() {
                                       bodyColor: '#f8fafc',
                                       borderColor: '#334155',
                                       borderWidth: 1,
-                                      cornerRadius: 8,
+                                      cornerRadius: 6,
+                                      padding: 8,
+                                      titleFont: {
+                                        size: 12,
+                                        weight: 'bold'
+                                      },
+                                      bodyFont: {
+                                        size: 11
+                                      },
                                       callbacks: {
                                         title: (context) => {
                                           const index = context[0].dataIndex;
                                           const item = biomarkerHistory.slice().reverse()[index];
                                           const date = new Date(item.analysisDate || item.date);
-                                          return `${date.getDate()} ${['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'][date.getMonth()]} ${date.getFullYear()}`;
+                                          return `📅 ${date.getDate()} ${['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'][date.getMonth()]} ${date.getFullYear()}`;
                                         },
                                         label: (context) => {
                                           const item = biomarkerHistory.slice().reverse()[context.dataIndex];
@@ -800,7 +815,7 @@ export default function Biomarkers() {
                                                            item.status === 'high' ? 'Высокий' :
                                                            item.status === 'low' ? 'Низкий' :
                                                            item.status === 'critical' ? 'Критичный' : 'Неопределен';
-                                          return [`Значение: ${context.parsed.y} ${unit}`, `Статус: ${statusText}`];
+                                          return [`💊 ${context.parsed.y} ${unit}`, `📊 ${statusText}`];
                                         }
                                       }
                                     }
@@ -813,20 +828,23 @@ export default function Biomarkers() {
                                       ticks: {
                                         color: '#64748b',
                                         font: {
-                                          size: 11
-                                        }
+                                          size: 10
+                                        },
+                                        maxRotation: 0
                                       }
                                     },
                                     y: {
                                       beginAtZero: false,
                                       grid: {
-                                        color: 'rgba(148, 163, 184, 0.1)'
+                                        color: 'rgba(148, 163, 184, 0.1)',
+                                        lineWidth: 1
                                       },
                                       ticks: {
                                         color: '#64748b',
                                         font: {
-                                          size: 11
+                                          size: 10
                                         },
+                                        maxTicksLimit: 4,
                                         callback: function(value) {
                                           const item = biomarkerHistory[0];
                                           const unit = item?.unit || '';
@@ -839,23 +857,19 @@ export default function Biomarkers() {
                               />
                             </div>
                             
-                            {/* Легенда с индикаторами */}
-                            <div className="flex items-center justify-center gap-6 text-sm bg-slate-50 rounded-lg p-3">
-                              <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 bg-green-500 rounded-sm"></div>
-                                <span className="text-muted-foreground">Нормальный</span>
+                            {/* Компактная легенда */}
+                            <div className="flex items-center justify-center gap-3 text-xs bg-slate-50 rounded-lg p-2">
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span>Норма</span>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
-                                <span className="text-muted-foreground">Высокий</span>
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                <span>Высокий</span>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 bg-blue-500 rounded-sm"></div>
-                                <span className="text-muted-foreground">Низкий</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 bg-yellow-500 rounded-sm"></div>
-                                <span className="text-muted-foreground">Критичный</span>
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span>Низкий</span>
                               </div>
                             </div>
                           </div>
