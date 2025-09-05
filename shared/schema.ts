@@ -63,6 +63,8 @@ export const biomarkerResults = pgTable("biomarker_results", {
   value: decimal("value", { precision: 10, scale: 3 }).notNull(),
   unit: text("unit").notNull(),
   status: text("status").notNull(), // normal, high, low, critical
+  education: text("education"), // AI-generated educational content for this specific result
+  recommendation: text("recommendation"), // AI-generated recommendation for this specific result
   createdAt: timestamp("created_at").defaultNow(),
 });
 
