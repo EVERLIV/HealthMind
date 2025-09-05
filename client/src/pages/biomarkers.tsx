@@ -139,8 +139,8 @@ export default function Biomarkers() {
   // Query for latest biomarker values
   const { data: latestValues } = useQuery({
     queryKey: ["/api/biomarkers/latest-values"],
-    enabled: !!biomarkers?.length,
-  });
+    enabled: !!biomarkers && Array.isArray(biomarkers) && biomarkers.length > 0,
+  }) as { data: Record<string, { value: string; status: string; unit?: string }> | undefined };
 
   const { data: selectedBiomarker, isLoading: isLoadingSelected } = useQuery({
     queryKey: ["/api/biomarkers", selectedBiomarkerId],
@@ -178,7 +178,7 @@ export default function Biomarkers() {
       const matchesCategory = selectedCategory === "all" || biomarker.category === selectedCategory;
       
       // Get current status from latest values
-      const currentStatus = latestValues?.[biomarker.id]?.status || 'normal';
+      const currentStatus = (latestValues && latestValues[biomarker.id]) ? latestValues[biomarker.id].status : 'normal';
       const matchesStatus = selectedStatus === "all" || currentStatus === selectedStatus;
       
       return matchesSearch && matchesCategory && matchesStatus;
@@ -197,7 +197,7 @@ export default function Biomarkers() {
     if (!Array.isArray(biomarkers) || !latestValues) return { total: 0, low: 0, normal: 0, high: 0 };
     
     const statusCounts = biomarkers.reduce((acc, biomarker) => {
-      const status = latestValues[biomarker.id]?.status || 'normal';
+      const status = (latestValues && latestValues[biomarker.id]) ? latestValues[biomarker.id].status : 'normal';
       acc[status] = (acc[status] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
@@ -222,9 +222,10 @@ export default function Biomarkers() {
     
     setIsLoadingRecommendations(true);
     try {
-      // Get current value and status from latest history or generate mock data
-      const currentValue = Math.random() * 100 + 50;
-      const status = ['normal', 'high', 'low'][Math.floor(Math.random() * 3)];
+      // Get current value and status from latest values
+      const latestValue = (latestValues && latestValues[biomarker.id]) ? latestValues[biomarker.id] : null;
+      const currentValue = latestValue?.value ? parseFloat(latestValue.value) : null;
+      const status = latestValue?.status || 'normal';
       
       const recommendations = await apiRequest(`/api/biomarkers/${biomarker.id}/recommendations`, {
         method: 'POST',
@@ -436,9 +437,6 @@ export default function Biomarkers() {
               const categoryVariant = categoryVariants[biomarker.category as keyof typeof categoryVariants] || "soft-danger";
               const IconComponent = iconMap[biomarker.category as keyof typeof iconMap] || Activity;
               const importanceStyle = importanceVariants[biomarker.importance as keyof typeof importanceVariants] || importanceVariants.low;
-              // For now, use default trend since we don't load all histories at once
-              // In the future, we could optimize this by loading summaries
-              const trend = calculateTrendFromHistory([]);
 
               return (
                 <Card
@@ -484,7 +482,7 @@ export default function Biomarkers() {
                                 </span>
                               </div>
                               {/* Show current value if available */}
-                              {latestValues?.[biomarker.id] && (
+                              {latestValues && latestValues[biomarker.id] && (
                                 <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-600">
                                   <div className="text-xs text-muted-foreground mb-1">Ваш результат</div>
                                   <div className="flex items-center gap-2">
@@ -504,24 +502,6 @@ export default function Biomarkers() {
                                   </div>
                                 </div>
                               )}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="text-right">
-                                <div className="flex items-center gap-1 mb-1">
-                                  {trend.direction === 'up' ? (
-                                    <TrendingUp className="w-3 h-3 text-green-600" />
-                                  ) : (
-                                    <TrendingDown className="w-3 h-3 text-red-600" />
-                                  )}
-                                  <span className={`text-xs font-medium ${trend.direction === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                                    {trend.percentage}%
-                                  </span>
-                                </div>
-                                <MiniChart 
-                                  values={trend.values} 
-                                  color={trend.direction === 'up' ? 'bg-green-500' : 'bg-red-500'} 
-                                />
-                              </div>
                             </div>
                           </div>
                         </div>
