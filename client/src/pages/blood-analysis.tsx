@@ -379,7 +379,7 @@ export default function BloodAnalysisPage() {
               return;
             }
             
-            updateProcessingState('recognizing', 65, 'Распознаем текст...', 'OpenAI Vision извлекает данные из изображения');
+            updateProcessingState('recognizing', 65, 'Анализируем изображение...', 'ИИ-система распознает медицинские показатели');
             
             // Extract text from image
             setCurrentAnalysisId(analysis.id);

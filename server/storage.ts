@@ -21,6 +21,7 @@ export interface IStorage {
   getBloodAnalyses(userId: string): Promise<BloodAnalysis[]>;
   createBloodAnalysis(analysis: InsertBloodAnalysis): Promise<BloodAnalysis>;
   updateBloodAnalysis(id: string, analysis: Partial<InsertBloodAnalysis>): Promise<BloodAnalysis>;
+  deleteBloodAnalysis(id: string): Promise<void>;
   
   // Biomarkers
   getBiomarkers(): Promise<Biomarker[]>;
@@ -456,6 +457,14 @@ export class DatabaseStorage implements IStorage {
       .returning();
     if (!analysis) throw new Error("Blood analysis not found");
     return analysis;
+  }
+
+  async deleteBloodAnalysis(id: string): Promise<void> {
+    // First delete all related biomarker results
+    await db.delete(biomarkerResults).where(eq(biomarkerResults.analysisId, id));
+    
+    // Then delete the blood analysis
+    await db.delete(bloodAnalyses).where(eq(bloodAnalyses.id, id));
   }
 
   // Biomarkers

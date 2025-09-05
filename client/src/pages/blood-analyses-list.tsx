@@ -1,17 +1,54 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { IconContainer, iconSizes } from "@/components/ui/icon-container";
-import { FileText, Calendar, Activity, Plus, Sparkles, TrendingUp, AlertTriangle, CheckCircle, Camera, BarChart3 } from "lucide-react";
+import { FileText, Calendar, Activity, Plus, Sparkles, TrendingUp, AlertTriangle, CheckCircle, Camera, BarChart3, Trash2 } from "lucide-react";
 import BottomNav from "@/components/layout/bottom-nav";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function BloodAnalysesListPage() {
   const { data: analyses = [], isLoading } = useQuery({
     queryKey: ["/api/blood-analyses"],
   });
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const deleteAnalysisMutation = useMutation({
+    mutationFn: async (analysisId: string) => {
+      return await apiRequest(`/api/blood-analyses/${analysisId}`, {
+        method: "DELETE",
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/blood-analyses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/biomarkers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/biomarkers/latest-values"] });
+      toast({
+        title: "Анализ удален",
+        description: "Анализ и связанные биомаркеры успешно удалены",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Ошибка",
+        description: error.message || "Не удалось удалить анализ",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteAnalysis = (analysisId: string, event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (confirm("Вы уверены, что хотите удалить этот анализ? Это действие нельзя отменить.")) {
+      deleteAnalysisMutation.mutate(analysisId);
+    }
+  };
 
   // Типизированные анализы
   const typedAnalyses = analyses as any[];
@@ -176,7 +213,7 @@ export default function BloodAnalysesListPage() {
                             </h3>
                             <span className="text-xs text-gray-500 flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
-                              {format(new Date(analysis.createdAt), "d MMM", { locale: ru })}
+                              {format(new Date(analysis.analysisDate || analysis.createdAt), "d MMM", { locale: ru })}
                             </span>
                           </div>
                           
@@ -210,11 +247,23 @@ export default function BloodAnalysesListPage() {
                           )}
                         </div>
                         
-                        {/* Компактная стрелка */}
-                        <div className="w-6 h-6 rounded-full bg-gray-100 group-hover:bg-gray-200 flex items-center justify-center transition-colors">
-                          <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
+                        {/* Кнопки действий */}
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => handleDeleteAnalysis(analysis.id, e)}
+                            disabled={deleteAnalysisMutation.isPending}
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50 w-8 h-8 p-0 rounded-full"
+                            data-testid={`button-delete-analysis-${analysis.id}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                          <div className="w-6 h-6 rounded-full bg-gray-100 group-hover:bg-gray-200 flex items-center justify-center transition-colors">
+                            <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>
                         </div>
                       </div>
                     </div>
