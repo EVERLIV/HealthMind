@@ -117,7 +117,124 @@ export class MemStorage implements IStorage {
       this.biomarkers.set(biomarker.id, biomarker);
     });
 
-    // No sample data for production
+    // Create sample user and test data for development
+    const testUser: User = {
+      id: "user-1",
+      email: "test@test.com",
+      name: "Test User",
+      passwordHash: "",
+      role: "user",
+      subscriptionType: "premium",
+      subscriptionExpiresAt: null,
+      isEmailVerified: 1,
+      emailVerificationToken: null,
+      resetPasswordToken: null,
+      resetPasswordExpires: null,
+      lastLoginAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.users.set("user-1", testUser);
+
+    // Create sample blood analysis
+    const sampleAnalysis: BloodAnalysis = {
+      id: "analysis-1",
+      userId: "user-1",
+      status: "completed",
+      analysisDate: new Date('2024-01-15'),
+      aiAnalysis: "Тестовый анализ крови",
+      imageUrl: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.bloodAnalyses.set("analysis-1", sampleAnalysis);
+
+    const sampleAnalysis2: BloodAnalysis = {
+      id: "analysis-2", 
+      userId: "user-1",
+      status: "completed",
+      analysisDate: new Date('2024-02-15'),
+      aiAnalysis: "Второй тестовый анализ",
+      imageUrl: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.bloodAnalyses.set("analysis-2", sampleAnalysis2);
+
+    const sampleAnalysis3: BloodAnalysis = {
+      id: "analysis-3",
+      userId: "user-1", 
+      status: "completed",
+      analysisDate: new Date('2024-03-15'),
+      aiAnalysis: "Третий тестовый анализ",
+      imageUrl: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.bloodAnalyses.set("analysis-3", sampleAnalysis3);
+
+    // Create sample biomarker results for Hemoglobin
+    const sampleResults: BiomarkerResult[] = [
+      {
+        id: "result-1",
+        analysisId: "analysis-1",
+        biomarkerId: "bio-1",
+        value: 135,
+        unit: "г/л", 
+        status: "normal",
+        createdAt: new Date(),
+      },
+      {
+        id: "result-2",
+        analysisId: "analysis-2", 
+        biomarkerId: "bio-1",
+        value: 142,
+        unit: "г/л",
+        status: "normal", 
+        createdAt: new Date(),
+      },
+      {
+        id: "result-3",
+        analysisId: "analysis-3",
+        biomarkerId: "bio-1", 
+        value: 128,
+        unit: "г/л",
+        status: "normal",
+        createdAt: new Date(),
+      },
+      // Results for Cholesterol
+      {
+        id: "result-4",
+        analysisId: "analysis-1",
+        biomarkerId: "bio-2",
+        value: 4.8,
+        unit: "ммоль/л",
+        status: "normal",
+        createdAt: new Date(),
+      },
+      {
+        id: "result-5", 
+        analysisId: "analysis-2",
+        biomarkerId: "bio-2",
+        value: 5.4,
+        unit: "ммоль/л",
+        status: "high",
+        createdAt: new Date(),
+      },
+      {
+        id: "result-6",
+        analysisId: "analysis-3",
+        biomarkerId: "bio-2",
+        value: 5.0,
+        unit: "ммоль/л", 
+        status: "normal",
+        createdAt: new Date(),
+      },
+    ];
+
+    sampleResults.forEach(result => {
+      this.biomarkerResults.set(result.id, result);
+    });
   }
 
   // Users
