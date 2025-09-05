@@ -373,9 +373,14 @@ ${text}`;
         if (jsonMatch) {
           markers = JSON.parse(jsonMatch[0]);
           console.log('Парсинг успешен, получены маркеры:', markers.length);
+          console.log('Первый маркер с education и recommendation:', JSON.stringify(markers[0], null, 2));
+        } else {
+          console.log('JSON массив не найден в ответе, используем fallback');
+          markers = this.parseTextManually(text);
         }
       } catch (parseError) {
         console.error('Ошибка парсинга JSON:', parseError);
+        console.log('Используем fallback parseTextManually');
         // Fallback: parse manually
         markers = this.parseTextManually(text);
       }
