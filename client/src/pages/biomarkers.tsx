@@ -47,6 +47,25 @@ import {
   Sparkles,
   Minus
 } from "lucide-react";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 // Enhanced icon mapping
 const iconMap = {
@@ -702,20 +721,141 @@ export default function Biomarkers() {
 
                       {biomarkerHistory && Array.isArray(biomarkerHistory) && biomarkerHistory.length > 0 ? (
                         <div className="space-y-4">
-                          {/* Статистика */}
-                          <div className="eva-gradient-primary rounded-2xl p-4 text-white">
-                            <div className="flex items-center gap-3">
-                              <IconContainer size="sm" className="bg-white/20 text-white border-white/30">
-                                <Target className={iconSizes.sm} />
+                          {/* Интерактивный график динамики */}
+                          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                            <div className="flex items-center gap-3 mb-4">
+                              <IconContainer size="sm" variant="soft-primary">
+                                <BarChart3 className={iconSizes.sm} />
                               </IconContainer>
-                              <div className="flex-1">
-                                <h4 className="font-bold text-sm mb-1">Статистика измерений</h4>
-                                <div className="bg-white/15 rounded-xl p-3">
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-sm text-white/90">Всего записей:</span>
-                                    <span className="text-lg font-bold text-white">{biomarkerHistory.length}</span>
-                                  </div>
-                                </div>
+                              <h4 className="font-bold text-lg">Динамика изменений</h4>
+                              <Badge variant="secondary" className="ml-auto">
+                                {biomarkerHistory.length} измерений
+                              </Badge>
+                            </div>
+                            
+                            <div className="h-64 mb-4">
+                              <Bar
+                                data={{
+                                  labels: biomarkerHistory.slice().reverse().map((item: any) => {
+                                    const date = new Date(item.analysisDate || item.date);
+                                    return `${date.getDate()}.${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
+                                  }),
+                                  datasets: [
+                                    {
+                                      label: (selectedBiomarker as any)?.name || 'Значение',
+                                      data: biomarkerHistory.slice().reverse().map((item: any) => item.value),
+                                      backgroundColor: biomarkerHistory.slice().reverse().map((item: any) => {
+                                        switch (item.status) {
+                                          case 'normal': return 'rgba(34, 197, 94, 0.8)';
+                                          case 'high': return 'rgba(239, 68, 68, 0.8)';
+                                          case 'low': return 'rgba(59, 130, 246, 0.8)';
+                                          case 'critical': return 'rgba(245, 158, 11, 0.8)';
+                                          default: return 'rgba(156, 163, 175, 0.8)';
+                                        }
+                                      }),
+                                      borderColor: biomarkerHistory.slice().reverse().map((item: any) => {
+                                        switch (item.status) {
+                                          case 'normal': return 'rgb(34, 197, 94)';
+                                          case 'high': return 'rgb(239, 68, 68)';
+                                          case 'low': return 'rgb(59, 130, 246)';
+                                          case 'critical': return 'rgb(245, 158, 11)';
+                                          default: return 'rgb(156, 163, 175)';
+                                        }
+                                      }),
+                                      borderWidth: 2,
+                                      borderRadius: 6,
+                                      borderSkipped: false,
+                                    }
+                                  ]
+                                }}
+                                options={{
+                                  responsive: true,
+                                  maintainAspectRatio: false,
+                                  interaction: {
+                                    intersect: false,
+                                    mode: 'index'
+                                  },
+                                  plugins: {
+                                    legend: {
+                                      display: false
+                                    },
+                                    tooltip: {
+                                      backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                                      titleColor: '#f8fafc',
+                                      bodyColor: '#f8fafc',
+                                      borderColor: '#334155',
+                                      borderWidth: 1,
+                                      cornerRadius: 8,
+                                      callbacks: {
+                                        title: (context) => {
+                                          const index = context[0].dataIndex;
+                                          const item = biomarkerHistory.slice().reverse()[index];
+                                          const date = new Date(item.analysisDate || item.date);
+                                          return `${date.getDate()} ${['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'][date.getMonth()]} ${date.getFullYear()}`;
+                                        },
+                                        label: (context) => {
+                                          const item = biomarkerHistory.slice().reverse()[context.dataIndex];
+                                          const unit = item.unit || '';
+                                          const statusText = item.status === 'normal' ? 'Норма' :
+                                                           item.status === 'high' ? 'Высокий' :
+                                                           item.status === 'low' ? 'Низкий' :
+                                                           item.status === 'critical' ? 'Критичный' : 'Неопределен';
+                                          return [`Значение: ${context.parsed.y} ${unit}`, `Статус: ${statusText}`];
+                                        }
+                                      }
+                                    }
+                                  },
+                                  scales: {
+                                    x: {
+                                      grid: {
+                                        display: false
+                                      },
+                                      ticks: {
+                                        color: '#64748b',
+                                        font: {
+                                          size: 11
+                                        }
+                                      }
+                                    },
+                                    y: {
+                                      beginAtZero: false,
+                                      grid: {
+                                        color: 'rgba(148, 163, 184, 0.1)'
+                                      },
+                                      ticks: {
+                                        color: '#64748b',
+                                        font: {
+                                          size: 11
+                                        },
+                                        callback: function(value) {
+                                          const item = biomarkerHistory[0];
+                                          const unit = item?.unit || '';
+                                          return `${value} ${unit}`;
+                                        }
+                                      }
+                                    }
+                                  }
+                                }}
+                              />
+                            </div>
+                            
+                            {/* Легенда с индикаторами */}
+                            <div className="flex items-center justify-center gap-6 text-sm bg-slate-50 rounded-lg p-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 bg-green-500 rounded-sm"></div>
+                                <span className="text-muted-foreground">Нормальный</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
+                                <span className="text-muted-foreground">Высокий</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 bg-blue-500 rounded-sm"></div>
+                                <span className="text-muted-foreground">Низкий</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 bg-yellow-500 rounded-sm"></div>
+                                <span className="text-muted-foreground">Критичный</span>
                               </div>
                             </div>
                           </div>
