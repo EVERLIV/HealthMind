@@ -153,6 +153,76 @@ export default function BloodAnalysisDetailPage() {
     }
   };
 
+  const getMarkerDescription = (name: string) => {
+    const lowerName = name.toLowerCase();
+    if (lowerName.includes('гемоглобин')) {
+      return 'Белок в красных кровяных клетках, который переносит кислород от легких к тканям организма';
+    }
+    if (lowerName.includes('эритроциты')) {
+      return 'Красные кровяные клетки, которые доставляют кислород во все органы и ткани';
+    }
+    if (lowerName.includes('лейкоциты')) {
+      return 'Белые кровяные клетки, которые защищают организм от инфекций и болезней';
+    }
+    if (lowerName.includes('тромбоциты')) {
+      return 'Клетки крови, отвечающие за свертываемость и остановку кровотечений';
+    }
+    if (lowerName.includes('гематокрит')) {
+      return 'Доля красных кровяных клеток в общем объеме крови';
+    }
+    if (lowerName.includes('холестерин')) {
+      return 'Жироподобное вещество, необходимое для строительства клеток и выработки гормонов';
+    }
+    if (lowerName.includes('глюкоз')) {
+      return 'Сахар в крови, основной источник энергии для всех клеток организма';
+    }
+    if (lowerName.includes('креатинин')) {
+      return 'Продукт распада мышечного белка, показатель работы почек';
+    }
+    if (lowerName.includes('алт') || lowerName.includes('аст')) {
+      return 'Ферменты печени, показывающие состояние и работу печеночных клеток';
+    }
+    if (lowerName.includes('мочевин')) {
+      return 'Продукт обмена белков, который выводится почками из организма';
+    }
+    return 'Важный показатель здоровья, отражающий состояние организма';
+  };
+
+  const getMarkerInfluence = (name: string) => {
+    const lowerName = name.toLowerCase();
+    if (lowerName.includes('гемоглобин')) {
+      return 'Влияет на снабжение органов кислородом, уровень энергии, работоспособность и общее самочувствие';
+    }
+    if (lowerName.includes('эритроциты')) {
+      return 'Влияет на дыхание, выносливость, цвет кожи и работу всех органов';
+    }
+    if (lowerName.includes('лейкоциты')) {
+      return 'Влияет на иммунитет, способность бороться с инфекциями и восстановление после болезней';
+    }
+    if (lowerName.includes('тромбоциты')) {
+      return 'Влияет на заживление ран, склонность к синякам и риск кровотечений';
+    }
+    if (lowerName.includes('гематокрит')) {
+      return 'Влияет на густоту крови, кровообращение и доставку кислорода к тканям';
+    }
+    if (lowerName.includes('холестерин')) {
+      return 'Влияет на здоровье сердца и сосудов, риск атеросклероза и инфарктов';
+    }
+    if (lowerName.includes('глюкоз')) {
+      return 'Влияет на энергетический обмен, работу мозга и риск развития диабета';
+    }
+    if (lowerName.includes('креатинин')) {
+      return 'Влияет на работу почек, выведение токсинов и водно-солевой баланс';
+    }
+    if (lowerName.includes('алт') || lowerName.includes('аст')) {
+      return 'Влияет на работу печени, обмен веществ и детоксикацию организма';
+    }
+    if (lowerName.includes('мочевин')) {
+      return 'Влияет на работу почек и выведение продуктов белкового обмена';
+    }
+    return 'Влияет на общее состояние здоровья и работу различных систем организма';
+  };
+
   if (isLoading) {
     return (
       <div className="eva-page">
@@ -444,16 +514,16 @@ export default function BloodAnalysisDetailPage() {
             <div className="p-4 space-y-6">
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Что это показывает</h3>
+                  <h3 className="font-semibold text-gray-900 mb-1">За что отвечает</h3>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    {selectedMarker.education || 'Важный показатель для оценки состояния здоровья'}
+                    {getMarkerDescription(selectedMarker.name)}
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Рекомендации</h3>
+                  <h3 className="font-semibold text-gray-900 mb-1">На что влияет</h3>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    {selectedMarker.recommendation || 'Обратитесь к врачу для получения персональных рекомендаций по этому показателю'}
+                    {getMarkerInfluence(selectedMarker.name)}
                   </p>
                 </div>
               </div>

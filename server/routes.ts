@@ -787,7 +787,9 @@ ${userContext}
     try {
       if (!req.user) return res.status(401).json({ error: "Unauthorized" });
       const analyses = await storage.getBloodAnalyses(req.user.id);
-      res.json(analyses);
+      // Exclude deleted analyses
+      const activeAnalyses = analyses.filter(analysis => analysis.status !== 'deleted');
+      res.json(activeAnalyses);
     } catch (error) {
       console.error("Error fetching blood analyses:", error);
       res.status(500).json({ error: "Failed to fetch blood analyses" });
