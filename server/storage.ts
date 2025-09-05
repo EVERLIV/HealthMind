@@ -111,6 +111,15 @@ export class MemStorage implements IStorage {
         importance: "medium",
         recommendations: ["Поддерживать адекватную гидратацию", "Избегать чрезмерных физических нагрузок"] as string[],
       },
+      {
+        id: "bio-5",
+        name: "Эритроциты",
+        description: "Красные кровяные клетки, переносящие кислород по организму",
+        normalRange: { min: 4.0, max: 5.5, unit: "×10¹²/л" },
+        category: "blood",
+        importance: "high",
+        recommendations: ["Обеспечить достаточное питание", "Контролировать уровень железа"] as string[],
+      },
     ];
 
     sampleBiomarkers.forEach(biomarker => {
@@ -227,6 +236,34 @@ export class MemStorage implements IStorage {
         biomarkerId: "bio-2",
         value: 5.0,
         unit: "ммоль/л", 
+        status: "normal",
+        createdAt: new Date(),
+      },
+      // Results for Erythrocytes
+      {
+        id: "result-7",
+        analysisId: "analysis-1",
+        biomarkerId: "bio-5",
+        value: 4.5,
+        unit: "×10¹²/л",
+        status: "normal",
+        createdAt: new Date(),
+      },
+      {
+        id: "result-8", 
+        analysisId: "analysis-2",
+        biomarkerId: "bio-5",
+        value: 5.7,
+        unit: "×10¹²/л",
+        status: "high",
+        createdAt: new Date(),
+      },
+      {
+        id: "result-9",
+        analysisId: "analysis-3",
+        biomarkerId: "bio-5",
+        value: 4.8,
+        unit: "×10¹²/л", 
         status: "normal",
         createdAt: new Date(),
       },
