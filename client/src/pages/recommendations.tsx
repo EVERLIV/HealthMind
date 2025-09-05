@@ -275,7 +275,7 @@ export default function RecommendationsPage() {
                   {/* Кнопка для консультации ИИ */}
                   <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
                     <Button
-                      onClick={() => navigate("/ai-consultation")}
+                      onClick={() => navigate("/app/ai-consultation")}
                       variant="outline"
                       size="sm"
                       className="w-full h-8 text-xs bg-gradient-to-r from-medical-blue/5 to-trust-green/5 hover:from-medical-blue/10 hover:to-trust-green/10 border-medical-blue/20 text-medical-blue"
