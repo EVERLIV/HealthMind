@@ -16,6 +16,25 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface BiomarkerHistoryModalProps {
   biomarkerId: string | null;
@@ -121,89 +140,146 @@ export default function BiomarkerHistoryModal({
               </Card>
             ) : (
               <>
-                {/* Summary Stats */}
-                <div className="grid grid-cols-3 gap-3 mb-6">
-                  <Card>
-                    <CardContent className="p-3 text-center">
-                      <div className="text-lg font-bold text-medical-blue">
-                        {history.length}
-                      </div>
-                      <div className="text-xs text-muted-foreground">Анализов</div>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-3 text-center">
-                      <div className="text-lg font-bold">
-                        {history[0]?.value}
-                      </div>
-                      <div className="text-xs text-muted-foreground">Последний</div>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-3 text-center">
-                      <div className="text-lg font-bold">
-                        {biomarker?.normalRange 
-                          ? `${biomarker.normalRange.min}-${biomarker.normalRange.max}`
-                          : '—'
-                        }
-                      </div>
-                      <div className="text-xs text-muted-foreground">Норма</div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Visual Chart */}
-                {history.length > 1 && (
+                {/* Chart with Trend Analysis */}
+                {history.length > 0 && (
                   <Card className="mb-6">
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold mb-3 flex items-center gap-2">
-                        <BarChart3 className="w-4 h-4 text-medical-blue" />
-                        График изменений
-                      </h3>
-                      
-                      <div className="flex items-end justify-between gap-1 h-24 mb-3">
-                        {history.slice().reverse().map((point: any, index: number) => {
-                          const maxValue = Math.max(...history.map((h: any) => h.value));
-                          const minValue = Math.min(...history.map((h: any) => h.value));
-                          const range = maxValue - minValue;
-                          const height = range > 0 ? ((point.value - minValue) / range) * 100 : 50;
-                          
-                          return (
-                            <div key={index} className="flex flex-col items-center flex-1">
-                              <div
-                                className={`w-full max-w-3 rounded-sm transition-all duration-300 ${
-                                  point.status === 'normal' ? 'bg-green-500' :
-                                  point.status === 'high' ? 'bg-red-500' :
-                                  point.status === 'low' ? 'bg-blue-500' :
-                                  'bg-yellow-500'
-                                }`}
-                                style={{ height: `${Math.max(height, 10)}%` }}
-                              />
-                              <div className="text-xs text-muted-foreground mt-1 writing-mode-vertical-rl text-orientation-mixed">
-                                {new Date(point.date).getDate()}/{new Date(point.date).getMonth() + 1}
-                              </div>
-                            </div>
-                          );
-                        })}
+                    <CardContent className="p-5">
+                      <div className="flex items-center gap-2 mb-4">
+                        <BarChart3 className="w-5 h-5 text-medical-blue" />
+                        <h3 className="font-semibold text-lg">Динамика изменений</h3>
+                        <Badge variant="secondary" className="ml-auto">
+                          {history.length} измерений
+                        </Badge>
                       </div>
                       
-                      <div className="flex items-center justify-center gap-4 text-xs">
-                        <div className="flex items-center gap-1">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                          <span>Норма</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                          <span>Высокий</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                          <span>Низкий</span>
-                        </div>
+                      <div className="h-64 mb-4">
+                        <Bar
+                          data={{
+                            labels: history.slice().reverse().map((item: any) => {
+                              const date = new Date(item.analysisDate || item.date);
+                              return `${date.getDate()}.${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
+                            }),
+                            datasets: [
+                              {
+                                label: biomarker?.name || 'Значение',
+                                data: history.slice().reverse().map((item: any) => item.value),
+                                backgroundColor: history.slice().reverse().map((item: any) => {
+                                  switch (item.status) {
+                                    case 'normal': return 'rgba(34, 197, 94, 0.8)';
+                                    case 'high': return 'rgba(239, 68, 68, 0.8)';
+                                    case 'low': return 'rgba(59, 130, 246, 0.8)';
+                                    case 'critical': return 'rgba(245, 158, 11, 0.8)';
+                                    default: return 'rgba(156, 163, 175, 0.8)';
+                                  }
+                                }),
+                                borderColor: history.slice().reverse().map((item: any) => {
+                                  switch (item.status) {
+                                    case 'normal': return 'rgb(34, 197, 94)';
+                                    case 'high': return 'rgb(239, 68, 68)';
+                                    case 'low': return 'rgb(59, 130, 246)';
+                                    case 'critical': return 'rgb(245, 158, 11)';
+                                    default: return 'rgb(156, 163, 175)';
+                                  }
+                                }),
+                                borderWidth: 2,
+                                borderRadius: 4,
+                                borderSkipped: false,
+                              }
+                            ]
+                          }}
+                          options={{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: {
+                              intersect: false,
+                              mode: 'index'
+                            },
+                            plugins: {
+                              legend: {
+                                display: false
+                              },
+                              tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                                titleColor: '#f8fafc',
+                                bodyColor: '#f8fafc',
+                                borderColor: '#334155',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                callbacks: {
+                                  title: (context) => {
+                                    const index = context[0].dataIndex;
+                                    const item = history.slice().reverse()[index];
+                                    const date = new Date(item.analysisDate || item.date);
+                                    return `${date.getDate()} ${['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'][date.getMonth()]} ${date.getFullYear()}`;
+                                  },
+                                  label: (context) => {
+                                    const item = history.slice().reverse()[context.dataIndex];
+                                    const unit = biomarker?.normalRange?.unit || '';
+                                    const statusText = item.status === 'normal' ? 'Норма' :
+                                                     item.status === 'high' ? 'Высокий' :
+                                                     item.status === 'low' ? 'Низкий' :
+                                                     item.status === 'critical' ? 'Критичный' : 'Неопределен';
+                                    return [`Значение: ${context.parsed.y} ${unit}`, `Статус: ${statusText}`];
+                                  }
+                                }
+                              }
+                            },
+                            scales: {
+                              x: {
+                                grid: {
+                                  display: false
+                                },
+                                ticks: {
+                                  color: '#64748b',
+                                  font: {
+                                    size: 11
+                                  }
+                                }
+                              },
+                              y: {
+                                beginAtZero: false,
+                                grid: {
+                                  color: 'rgba(148, 163, 184, 0.1)'
+                                },
+                                ticks: {
+                                  color: '#64748b',
+                                  font: {
+                                    size: 11
+                                  },
+                                  callback: function(value) {
+                                    const unit = biomarker?.normalRange?.unit || '';
+                                    return `${value} ${unit}`;
+                                  }
+                                }
+                              }
+                            }
+                          }}
+                        />
                       </div>
+                      
+                      {/* Reference Range Indicator */}
+                      {biomarker?.normalRange && (
+                        <div className="flex items-center justify-center gap-6 text-sm bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-slate-300 rounded-sm"></div>
+                            <span className="text-muted-foreground">
+                              Норма: {biomarker.normalRange.min}-{biomarker.normalRange.max} {biomarker.normalRange.unit}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-green-500 rounded-sm"></div>
+                            <span className="text-muted-foreground">Нормальный</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
+                            <span className="text-muted-foreground">Отклонение</span>
+                          </div>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 )}
+
 
                 {/* Timeline */}
                 <div className="space-y-3">
