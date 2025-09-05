@@ -214,7 +214,7 @@ export default function Dashboard() {
                   <p className="text-sm text-muted-foreground leading-relaxed mb-3">
                     💧 Пейте больше воды! Рекомендуем 8-10 стаканов в день для поддержания оптимального уровня гидратации.
                   </p>
-                  <Link href="/app/recommendations">
+                  <Link to="/app/recommendations">
                     <Button size="sm" className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:opacity-90 text-white rounded-xl">
                       <Target className="w-4 h-4 mr-1" />
                       Все рекомендации

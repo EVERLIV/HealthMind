@@ -678,14 +678,14 @@ export default function BloodAnalysisPage() {
               </div>
             </div>
             <div className="space-y-3">
-              <Link href="/app/biomarkers">
+              <Link to="/app/biomarkers">
                 <Button className="w-full" data-testid="button-view-biomarkers">
                   <Activity className="w-4 h-4 mr-2" />
                   Посмотреть биомаркеры
                   <ChevronRight className="w-4 h-4 ml-auto" />
                 </Button>
               </Link>
-              <Link href="/app/recommendations">
+              <Link to="/app/recommendations">
                 <Button variant="outline" className="w-full" data-testid="button-view-recommendations">
                   <Sparkles className="w-4 h-4 mr-2" />
                   Рекомендации ИИ
