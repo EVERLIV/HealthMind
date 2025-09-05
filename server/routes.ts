@@ -850,6 +850,24 @@ ${userContext}
     }
   });
 
+  // Delete a blood analysis
+  app.delete("/api/blood-analyses/:id", authenticate, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      
+      const analysis = await storage.getBloodAnalysis(req.params.id);
+      if (!analysis || analysis.userId !== req.user.id) {
+        return res.status(404).json({ error: "Analysis not found" });
+      }
+      
+      await storage.deleteBloodAnalysis(req.params.id);
+      res.json({ message: "Analysis deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting blood analysis:", error);
+      res.status(500).json({ error: "Failed to delete blood analysis" });
+    }
+  });
+
   app.post("/api/blood-analyses/:id/extract-text", authenticate, async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.user) return res.status(401).json({ error: "Unauthorized" });
