@@ -805,6 +805,7 @@ ${userContext}
         status: req.body.status || "pending",
         aiAnalysis: req.body.aiAnalysis,
         imageUrl: req.body.imageUrl,
+        analysisDate: req.body.analysisDate ? new Date(req.body.analysisDate) : null,
       };
       
       const analysis = await storage.createBloodAnalysis(analysisData);
