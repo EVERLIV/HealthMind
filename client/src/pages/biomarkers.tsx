@@ -128,7 +128,7 @@ export default function Biomarkers() {
   const [, navigate] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedImportance, setSelectedImportance] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedBiomarkerId, setSelectedBiomarkerId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
 
@@ -176,9 +176,12 @@ export default function Biomarkers() {
     let filtered = biomarkers.filter((biomarker: any) => {
       const matchesSearch = biomarker.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === "all" || biomarker.category === selectedCategory;
-      const matchesImportance = selectedImportance === "all" || biomarker.importance === selectedImportance;
       
-      return matchesSearch && matchesCategory && matchesImportance;
+      // Get current status from latest values
+      const currentStatus = latestValues?.[biomarker.id]?.status || 'normal';
+      const matchesStatus = selectedStatus === "all" || currentStatus === selectedStatus;
+      
+      return matchesSearch && matchesCategory && matchesStatus;
     });
 
     // Sort by importance for mobile
@@ -187,19 +190,25 @@ export default function Biomarkers() {
       return importanceOrder[b.importance as keyof typeof importanceOrder] - 
              importanceOrder[a.importance as keyof typeof importanceOrder];
     });
-  }, [biomarkers, searchTerm, selectedCategory, selectedImportance]);
+  }, [biomarkers, searchTerm, selectedCategory, selectedStatus, latestValues]);
 
-  // Statistics
+  // Statistics based on status
   const stats = useMemo(() => {
-    if (!Array.isArray(biomarkers)) return { total: 0, high: 0, medium: 0, low: 0 };
+    if (!Array.isArray(biomarkers) || !latestValues) return { total: 0, low: 0, normal: 0, high: 0 };
+    
+    const statusCounts = biomarkers.reduce((acc, biomarker) => {
+      const status = latestValues[biomarker.id]?.status || 'normal';
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
     
     return {
       total: biomarkers.length,
-      high: biomarkers.filter((b: any) => b.importance === 'high').length,
-      medium: biomarkers.filter((b: any) => b.importance === 'medium').length,
-      low: biomarkers.filter((b: any) => b.importance === 'low').length,
+      low: statusCounts.low || 0,
+      normal: statusCounts.normal || 0,
+      high: statusCounts.high || 0,
     };
-  }, [biomarkers]);
+  }, [biomarkers, latestValues]);
 
   const openDetails = (biomarkerId: string) => {
     setSelectedBiomarkerId(biomarkerId);
@@ -315,16 +324,16 @@ export default function Biomarkers() {
                   <div className="text-xs text-white/80">Всего</div>
                 </div>
                 <div className="bg-white/15 rounded-lg p-2 backdrop-blur-sm text-center">
+                  <div className="text-sm font-bold text-blue-200">{stats.low}</div>
+                  <div className="text-xs text-white/80">Понижен</div>
+                </div>
+                <div className="bg-white/15 rounded-lg p-2 backdrop-blur-sm text-center">
+                  <div className="text-sm font-bold text-green-200">{stats.normal}</div>
+                  <div className="text-xs text-white/80">Норма</div>
+                </div>
+                <div className="bg-white/15 rounded-lg p-2 backdrop-blur-sm text-center">
                   <div className="text-sm font-bold text-red-200">{stats.high}</div>
-                  <div className="text-xs text-white/80">Критич</div>
-                </div>
-                <div className="bg-white/15 rounded-lg p-2 backdrop-blur-sm text-center">
-                  <div className="text-sm font-bold text-yellow-200">{stats.medium}</div>
-                  <div className="text-xs text-white/80">Важных</div>
-                </div>
-                <div className="bg-white/15 rounded-lg p-2 backdrop-blur-sm text-center">
-                  <div className="text-sm font-bold">{stats.low}</div>
-                  <div className="text-xs text-white/80">Обычн</div>
+                  <div className="text-xs text-white/80">Высокий</div>
                 </div>
               </div>
             </div>
@@ -366,27 +375,27 @@ export default function Biomarkers() {
                 </Select>
 
                 <div className="flex gap-2">
-                  <Select value={selectedImportance} onValueChange={setSelectedImportance}>
+                  <Select value={selectedStatus} onValueChange={setSelectedStatus}>
                     <SelectTrigger className="flex-1 rounded-lg border-2 h-10">
-                      <AlertTriangle className="w-4 h-4 mr-1" />
-                      <SelectValue placeholder="Важность" />
+                      <BarChart3 className="w-4 h-4 mr-1" />
+                      <SelectValue placeholder="Статус" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Все уровни</SelectItem>
-                      <SelectItem value="high">Критичные</SelectItem>
-                      <SelectItem value="medium">Важные</SelectItem>
-                      <SelectItem value="low">Обычные</SelectItem>
+                      <SelectItem value="all">Все показатели</SelectItem>
+                      <SelectItem value="low">Понижен</SelectItem>
+                      <SelectItem value="normal">Норма</SelectItem>
+                      <SelectItem value="high">Высокий</SelectItem>
                     </SelectContent>
                   </Select>
 
-                  {(searchTerm || selectedCategory !== "all" || selectedImportance !== "all") && (
+                  {(searchTerm || selectedCategory !== "all" || selectedStatus !== "all") && (
                     <Button
                       variant="outline"
                       size="icon"
                       onClick={() => {
                         setSearchTerm("");
                         setSelectedCategory("all");
-                        setSelectedImportance("all");
+                        setSelectedStatus("all");
                       }}
                       className="rounded-lg h-10 w-10 flex-shrink-0"
                     >
@@ -400,7 +409,7 @@ export default function Biomarkers() {
         </Card>
 
         {/* Results Count */}
-        {(searchTerm || selectedCategory !== "all" || selectedImportance !== "all") && (
+        {(searchTerm || selectedCategory !== "all" || selectedStatus !== "all") && (
           <div className="mb-4">
             <Badge className="bg-medical-blue/10 text-medical-blue border-medical-blue/20 text-sm px-3 py-1">
               Найдено: {filteredBiomarkers.length} из {stats.total}
