@@ -49,12 +49,12 @@ export default function BiomarkerHistoryModal({
   open,
   onOpenChange,
 }: BiomarkerHistoryModalProps) {
-  const { data: history, isLoading } = useQuery({
+  const { data: history, isLoading } = useQuery<any[]>({
     queryKey: ["/api/biomarkers", biomarkerId, "history"],
     enabled: !!biomarkerId && open,
   });
 
-  const { data: biomarker } = useQuery({
+  const { data: biomarker } = useQuery<any>({
     queryKey: ["/api/biomarkers", biomarkerId],
     enabled: !!biomarkerId && open,
   });
