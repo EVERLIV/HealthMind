@@ -61,7 +61,7 @@ console.log("🗂️  Starting production static file server");
 console.log("Current working directory:", process.cwd());
 console.log("__dirname equivalent:", import.meta.url);
 
-// Check if dist directory exists
+// Check if dist directory exists and serve static files
 const possibleDistPaths = [
   path.resolve(process.cwd(), "dist", "public"),
   path.resolve(process.cwd(), "..", "dist", "public"),
@@ -83,23 +83,6 @@ console.log("Found dist at:", distPath);
 
 if (distPath && fs.existsSync(distPath)) {
   console.log("Dist contents:", fs.readdirSync(distPath));
-}
-
-// Serve static files
-const possibleDistPaths = [
-  path.resolve(process.cwd(), "dist", "public"),
-  path.resolve(process.cwd(), "..", "dist", "public"),
-  path.resolve("/vercel/path0", "dist", "public"),
-  path.resolve("/vercel/path0", "..", "dist", "public"),
-  path.resolve("/vercel/path0", "..", "..", "dist", "public")
-];
-
-let distPath = null;
-for (const possiblePath of possibleDistPaths) {
-  if (fs.existsSync(possiblePath)) {
-    distPath = possiblePath;
-    break;
-  }
 }
 
 if (distPath) {
