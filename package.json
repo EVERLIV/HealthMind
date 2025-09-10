@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index-dev.ts",
     "start": "NODE_ENV=production tsx server/index-dev.ts",
-    "build": "npm run build:client && npm run build:server",
-    "build:client": "vite build --outDir dist/public",
-    "build:server": "tsx server/index.ts"
+    "build": "npm run build:client",
+    "build:client": "vite build",
+    "build:server": "tsx server/index.ts",
+    "vercel-build": "npm run build:client"
   },
   "dependencies": {
     "@google-cloud/storage": "^7.17.0",

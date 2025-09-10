@@ -68,13 +68,35 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
+  // Try multiple possible paths for different deployment environments
+  const possiblePaths = [
+    path.resolve(import.meta.dirname, "..", "dist", "public"),
+    path.resolve(import.meta.dirname, "..", "..", "dist", "public"),
+    path.resolve(process.cwd(), "dist", "public"),
+    path.resolve(process.cwd(), "..", "dist", "public"),
+    path.resolve("/vercel/path0", "dist", "public"),
+    path.resolve("/vercel/path0", "..", "dist", "public"),
+    path.resolve("/vercel/path0", "..", "..", "dist", "public")
+  ];
 
-  if (!fs.existsSync(distPath)) {
+  let distPath = null;
+  for (const possiblePath of possiblePaths) {
+    if (fs.existsSync(possiblePath)) {
+      distPath = possiblePath;
+      break;
+    }
+  }
+
+  if (!distPath) {
+    console.log("Available paths checked:", possiblePaths);
+    console.log("Current working directory:", process.cwd());
+    console.log("Import meta dirname:", import.meta.dirname);
     throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
+      `Could not find the build directory. Checked paths: ${possiblePaths.join(", ")}, make sure to build the client first`,
     );
   }
+
+  console.log(`Serving static files from: ${distPath}`);
 
   app.use(express.static(distPath));
 
