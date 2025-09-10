@@ -1,7 +1,4 @@
-import { createServer } from "http";
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "../server/routes";
-import { serveStatic } from "../server/vite";
 import path from "path";
 import fs from "fs";
 
@@ -52,12 +49,12 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   res.status(status).json({ message });
 });
 
-// Register API routes
-registerRoutes(app).then(() => {
-  console.log("✅ API routes registered successfully");
-}).catch((error) => {
-  console.error("❌ Routes registration failed:", error);
+// Basic API routes
+app.get("/api/test", (_req, res) => {
+  res.json({ message: "API is working!", timestamp: new Date().toISOString() });
 });
+
+console.log("✅ Basic API routes registered successfully");
 
 // Serve static files in production
 console.log("🗂️  Starting production static file server");
@@ -88,6 +85,46 @@ if (distPath && fs.existsSync(distPath)) {
   console.log("Dist contents:", fs.readdirSync(distPath));
 }
 
-serveStatic(app);
+// Serve static files
+const possibleDistPaths = [
+  path.resolve(process.cwd(), "dist", "public"),
+  path.resolve(process.cwd(), "..", "dist", "public"),
+  path.resolve("/vercel/path0", "dist", "public"),
+  path.resolve("/vercel/path0", "..", "dist", "public"),
+  path.resolve("/vercel/path0", "..", "..", "dist", "public")
+];
+
+let distPath = null;
+for (const possiblePath of possibleDistPaths) {
+  if (fs.existsSync(possiblePath)) {
+    distPath = possiblePath;
+    break;
+  }
+}
+
+if (distPath) {
+  console.log(`Serving static files from: ${distPath}`);
+  app.use(express.static(distPath));
+  
+  // fall through to index.html if the file doesn't exist
+  app.use("*", (_req, res) => {
+    res.sendFile(path.resolve(distPath, "index.html"));
+  });
+} else {
+  console.log("Static files not found, serving basic response");
+  app.use("*", (_req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+        <head><title>EVERLIV HEALTH</title></head>
+        <body>
+          <h1>EVERLIV HEALTH</h1>
+          <p>API is working! Static files not found.</p>
+          <p>Current directory: ${process.cwd()}</p>
+        </body>
+      </html>
+    `);
+  });
+}
 
 export default app;
