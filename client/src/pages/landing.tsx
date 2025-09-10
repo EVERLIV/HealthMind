@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import Header from "@/components/layout/header";
 import { 
   Smartphone, 
   Download, 
@@ -24,7 +26,9 @@ import {
   Sparkles,
   PlayCircle,
   Monitor,
-  Plus
+  Plus,
+  LogIn,
+  UserPlus
 } from "lucide-react";
 import aiBloodImage from '@assets/generated_images/AI_blood_analysis_a3b7806b.png';
 import healthMonitoringImage from '@assets/generated_images/Health_monitoring_scene_e2ffcf2b.png';
@@ -305,8 +309,11 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+      {/* Header */}
+      <Header />
+      
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
         {/* Clean Gradient Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-900 via-green-800 to-teal-900"></div>
         
@@ -358,8 +365,30 @@ export default function LandingPage() {
             Получайте профессиональные медицинские рекомендации и персональные планы оздоровления.
           </p>
           
-          {/* PWA Install Section */}
+          {/* Auth Buttons */}
           <div className="animate-fadeInUp hero-buttons space-y-6">
+            {/* Auth Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+              <Link href="/login">
+                <Button
+                  size="lg"
+                  className="group bg-white/10 text-white border-2 border-white/30 hover:bg-white/20 font-bold h-14 px-8 rounded-2xl backdrop-blur-lg min-w-[200px] transform hover:scale-105 transition-all duration-300"
+                >
+                  <LogIn className="w-5 h-5 mr-3 group-hover:translate-y-1 transition-transform duration-300" />
+                  Войти в аккаунт
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button
+                  size="lg"
+                  className="group bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold h-14 px-8 rounded-2xl shadow-2xl min-w-[200px] transform hover:scale-105 transition-all duration-300"
+                >
+                  <UserPlus className="w-5 h-5 mr-3 group-hover:translate-y-1 transition-transform duration-300" />
+                  Создать аккаунт
+                </Button>
+              </Link>
+            </div>
+            
             {/* Install to Home Screen Badge */}
             <div className="flex justify-center">
               <div className="inline-flex items-center bg-white/10 backdrop-blur-lg border border-white/20 text-white px-6 py-3 rounded-full font-semibold shadow-lg">
