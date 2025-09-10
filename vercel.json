@@ -4,7 +4,8 @@
   "outputDirectory": "dist/public",
   "functions": {
     "api/[...].ts": {
-      "maxDuration": 30
+      "maxDuration": 30,
+      "includeFiles": ["server/**", "shared/**"]
     }
   },
   "routes": [
@@ -15,11 +16,5 @@
   ],
   "env": {
     "NODE_ENV": "production"
-  },
-  "builds": [
-    {
-      "src": "api/[...].ts",
-      "use": "@vercel/node"
-    }
-  ]
+  }
 }
