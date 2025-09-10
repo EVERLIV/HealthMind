@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
 import fs from "fs";
+import supabaseRoutes from "../server/supabaseRoutes";
 
 const app = express();
 
@@ -54,7 +55,10 @@ app.get("/api/test", (_req, res) => {
   res.json({ message: "API is working!", timestamp: new Date().toISOString() });
 });
 
-console.log("✅ Basic API routes registered successfully");
+// Supabase API routes
+app.use(supabaseRoutes);
+
+console.log("✅ API routes registered successfully");
 
 // Serve static files in production
 console.log("🗂️  Starting production static file server");
