@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthMind API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .loading { background-color: #fff3cd; border-color: #ffeaa7; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>HealthMind API Test</h1>
+    
+    <div class="test">
+        <h3>Test 1: Basic Health Check</h3>
+        <button onclick="testHealth()">Test Health</button>
+        <div id="health-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 2: Supabase Health Check</h3>
+        <button onclick="testSupabaseHealth()">Test Supabase</button>
+        <div id="supabase-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 3: API Test Endpoint</h3>
+        <button onclick="testAPI()">Test API</button>
+        <div id="api-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 4: Biomarkers Endpoint</h3>
+        <button onclick="testBiomarkers()">Test Biomarkers</button>
+        <div id="biomarkers-result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://everliv.vercel.app';
+        
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                
+                const data = await response.json();
+                return { success: response.ok, status: response.status, data };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+        
+        function showResult(elementId, result) {
+            const element = document.getElementById(elementId);
+            element.className = result.success ? 'success' : 'error';
+            element.innerHTML = `
+                <strong>Status: ${result.success ? 'SUCCESS' : 'ERROR'}</strong>
+                <pre>${JSON.stringify(result, null, 2)}</pre>
+            `;
+        }
+        
+        async function testHealth() {
+            const result = await makeRequest(`${API_BASE}/health`);
+            showResult('health-result', result);
+        }
+        
+        async function testSupabaseHealth() {
+            const result = await makeRequest(`${API_BASE}/api/health/supabase`);
+            showResult('supabase-result', result);
+        }
+        
+        async function testAPI() {
+            const result = await makeRequest(`${API_BASE}/api/test`);
+            showResult('api-result', result);
+        }
+        
+        async function testBiomarkers() {
+            const result = await makeRequest(`${API_BASE}/api/biomarkers`);
+            showResult('biomarkers-result', result);
+        }
+        
+        // Auto-run basic tests on load
+        window.onload = function() {
+            testHealth();
+            testSupabaseHealth();
+        };
+    </script>
+</body>
+</html>
