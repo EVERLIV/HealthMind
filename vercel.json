@@ -13,6 +13,26 @@
       "dest": "/api/[...].ts"
     },
     {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "/manifest.json"
+    },
+    {
+      "src": "/logo-192.png",
+      "dest": "/logo-192.png"
+    },
+    {
+      "src": "/logo-512.png",
+      "dest": "/logo-512.png"
+    },
+    {
+      "src": "/sw.js",
+      "dest": "/sw.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
