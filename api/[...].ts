@@ -107,9 +107,12 @@ app.post("/api/auth/register", async (req, res) => {
 
     // Create user
     console.log("Creating user in database...");
+    const fullName = `${firstName || ''} ${lastName || ''}`.trim() || email.split('@')[0];
+    const username = email.split('@')[0];
+    
     const result = await pool.query(
-      'INSERT INTO users (email, password_hash, first_name, last_name, created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING id, email, first_name, last_name',
-      [email, hashedPassword, firstName || '', lastName || '']
+      'INSERT INTO users (email, username, password_hash, name, created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING id, email, username, name',
+      [email, username, hashedPassword, fullName]
     );
 
     console.log("User created successfully:", result.rows[0]);
@@ -121,8 +124,8 @@ app.post("/api/auth/register", async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        firstName: user.first_name,
-        lastName: user.last_name
+        username: user.username,
+        name: user.name
       },
       token
     });
@@ -146,7 +149,7 @@ app.post("/api/auth/login", async (req, res) => {
 
     // Find user
     const result = await pool.query(
-      'SELECT id, email, password_hash, first_name, last_name FROM users WHERE email = $1',
+      'SELECT id, email, username, password_hash, name FROM users WHERE email = $1',
       [email]
     );
 
@@ -170,8 +173,8 @@ app.post("/api/auth/login", async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        firstName: user.first_name,
-        lastName: user.last_name
+        username: user.username,
+        name: user.name
       },
       token
     });
