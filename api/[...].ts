@@ -79,31 +79,40 @@ app.use((req, res, next) => {
 // API Routes
 app.post("/api/auth/register", async (req, res) => {
   try {
+    console.log("Registration attempt:", { email: req.body.email, hasPassword: !!req.body.password });
+    
     const { email, password, firstName, lastName } = req.body;
 
     if (!email || !password) {
+      console.log("Missing email or password");
       return res.status(400).json({ error: "Email and password are required" });
     }
 
     // Check if user already exists
+    console.log("Checking if user exists...");
     const existingUser = await pool.query(
       'SELECT id FROM users WHERE email = $1',
       [email]
     );
 
     if (existingUser.rows.length > 0) {
+      console.log("User already exists");
       return res.status(400).json({ error: "User already exists" });
     }
 
     // Hash password
+    console.log("Hashing password...");
     const hashedPassword = await hashPassword(password);
+    console.log("Password hashed successfully");
 
     // Create user
+    console.log("Creating user in database...");
     const result = await pool.query(
       'INSERT INTO users (email, password_hash, first_name, last_name, created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING id, email, first_name, last_name',
       [email, hashedPassword, firstName || '', lastName || '']
     );
 
+    console.log("User created successfully:", result.rows[0]);
     const user = result.rows[0];
     const token = generateToken(user.id);
 
@@ -120,7 +129,10 @@ app.post("/api/auth/register", async (req, res) => {
 
   } catch (error) {
     console.error("Registration error:", error);
-    res.status(500).json({ error: "Failed to create user" });
+    res.status(500).json({ 
+      error: "Failed to create user",
+      details: error instanceof Error ? error.message : "Unknown error"
+    });
   }
 });
 
