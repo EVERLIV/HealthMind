@@ -64,7 +64,7 @@ export default function LoginPage() {
               EVERLIV HEALTH
             </h1>
             <p className="text-lg text-gray-600 font-medium">
-              Get Your Health in order
+              Приведи свое здоровье в порядок
             </p>
           </div>
 

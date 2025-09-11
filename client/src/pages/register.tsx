@@ -79,7 +79,7 @@ export default function RegisterPage() {
               EVERLIV HEALTH
             </h1>
             <p className="text-lg text-gray-600 font-medium mb-8">
-              Get Your Health in order
+              Приведи свое здоровье в порядок
             </p>
             <h2 className="text-2xl font-semibold text-gray-800 mb-2">Регистрация</h2>
             <p className="text-gray-600 mb-8">Создайте аккаунт для доступа к платформе</p>
