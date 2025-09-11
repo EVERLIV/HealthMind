@@ -241,7 +241,7 @@ export default function Profile() {
                     🏥 Создайте персональный медицинский профиль для получения точных рекомендаций по здоровью и персонализированного анализа результатов
                   </p>
                   <Button 
-                    onClick={() => navigate("/health-profile")}
+                    onClick={() => navigate("/app/health-profile")}
                     className="bg-gradient-to-r from-medical-blue to-trust-green hover:opacity-90 text-white rounded-xl shadow-lg"
                     data-testid="button-create-profile"
                   >
@@ -291,7 +291,7 @@ export default function Profile() {
                   data-testid="button-edit-profile"
                   variant="outline"
                   size="sm"
-                  onClick={() => navigate("/health-profile?edit=true")}
+                  onClick={() => navigate("/app/health-profile?edit=true")}
                   className="rounded-xl border-2 hover:shadow-md transition-all duration-200"
                 >
                   <Edit className="w-4 h-4 mr-1" />
