@@ -3,14 +3,21 @@
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "dist/public",
   "functions": {
-    "api/index.ts": {
+    "api/hello.ts": {
+      "maxDuration": 30
+    },
+    "api/auth.ts": {
       "maxDuration": 30
     }
   },
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/index.ts"
+      "src": "/api/hello",
+      "dest": "/api/hello.ts"
+    },
+    {
+      "src": "/api/auth/(.*)",
+      "dest": "/api/auth.ts"
     },
     {
       "src": "/(.*)",
