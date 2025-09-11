@@ -202,6 +202,60 @@ app.get("/api/debug/env", async (req, res) => {
   });
 });
 
+// Check if users table exists
+app.get("/api/debug/tables", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+      AND table_name = 'users'
+    `);
+    
+    res.json({
+      users_table_exists: result.rows.length > 0,
+      tables: result.rows,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error("Table check error:", error);
+    res.status(500).json({
+      error: "Failed to check tables",
+      message: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Create users table if it doesn't exist
+app.post("/api/debug/create-table", async (req, res) => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        first_name VARCHAR(100),
+        last_name VARCHAR(100),
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    
+    res.json({
+      message: "Users table created successfully",
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error("Table creation error:", error);
+    res.status(500).json({
+      error: "Failed to create table",
+      message: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Serve static files in production
 console.log("🗂️  Starting production static file server");
 console.log("Current working directory:", process.cwd());
