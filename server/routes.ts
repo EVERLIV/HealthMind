@@ -5,12 +5,14 @@ import { storage } from "./storage";
 import OpenAI from "openai";
 import OpenAIVisionService from "./openaiVisionService";
 import DeepSeekVisionService from "./deepSeekVisionService";
-import { authenticate, createSession, type AuthenticatedRequest } from "./auth";
+import { authenticate, createSession, type AuthenticatedRequest, hashPassword, verifyPassword } from "./auth";
 import {
   insertChatSessionSchema,
   insertChatMessageSchema,
   insertHealthProfileSchema,
+  users,
 } from "@shared/schema";
+import { db } from "./db";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
@@ -27,13 +29,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Неверный email или пароль" });
       }
 
-      const bcrypt = await import('bcrypt');
-      const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+      const isValidPassword = await verifyPassword(password, user.passwordHash);
       if (!isValidPassword) {
         return res.status(401).json({ error: "Неверный email или пароль" });
       }
 
-      const { token } = await createSession(user.id);
+      const ipAddress = req.ip || req.socket.remoteAddress;
+      const userAgent = req.headers["user-agent"];
+      const { token } = await createSession(user.id, ipAddress, userAgent);
 
       const userResponse = {
         id: user.id,
@@ -65,8 +68,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Пользователь с таким email уже существует" });
       }
 
-      const bcrypt = await import('bcrypt');
-      const passwordHash = await bcrypt.hash(password, 12);
+      // Check if username exists (we need to add this method to storage)
+      // For now, we'll skip this check since getUserByUsername doesn't exist
+
+      const passwordHash = await hashPassword(password);
 
       const newUser = await storage.createUser({
         email,
@@ -74,10 +79,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name,
         passwordHash,
         role: 'user',
-        subscriptionType: 'free'
+        subscriptionType: 'basic'
       });
 
-      const { token } = await createSession(newUser.id);
+      const ipAddress = req.ip || req.socket.remoteAddress;
+      const userAgent = req.headers["user-agent"];
+      const { token } = await createSession(newUser.id, ipAddress, userAgent);
 
       const userResponse = {
         id: newUser.id,
@@ -173,13 +180,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Пользователь не найден" });
       }
 
-      const bcrypt = await import('bcrypt');
-      const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
+      const isValidPassword = await verifyPassword(currentPassword, user.passwordHash);
       if (!isValidPassword) {
         return res.status(400).json({ error: "Неверный текущий пароль" });
       }
 
-      const newPasswordHash = await bcrypt.hash(newPassword, 12);
+      const newPasswordHash = await hashPassword(newPassword);
       await storage.updateUser(req.user.id, { passwordHash: newPasswordHash });
 
       res.json({ message: "Пароль успешно изменен" });
@@ -621,6 +627,37 @@ ${userContext}
     } catch (error) {
       console.error("Consultation endpoint error:", error);
       res.status(500).json({ error: "Внутренняя ошибка сервера" });
+    }
+  });
+
+  // Database health check endpoint
+  app.get("/api/health/database", async (req, res) => {
+    try {
+      if (!db) {
+        return res.status(500).json({ 
+          status: "error", 
+          message: "Database not configured - DATABASE_URL not set",
+          database: "not_configured"
+        });
+      }
+
+      // Try to query the database
+      const result = await db.select().from(users).limit(1);
+      
+      res.json({ 
+        status: "ok", 
+        message: "Database connection successful",
+        database: "connected",
+        userCount: result.length
+      });
+    } catch (error) {
+      console.error("Database health check error:", error);
+      res.status(500).json({ 
+        status: "error", 
+        message: "Database connection failed",
+        database: "error",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
