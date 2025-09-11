@@ -27,6 +27,9 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      external: ['chart.js', 'react-chartjs-2']
+    }
   },
   server: {
     fs: {
