@@ -8,7 +8,7 @@
     "start": "NODE_ENV=production tsx server/index.ts",
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --outDir dist/public",
-    "build:server": "tsx server/index.ts"
+    "build:server": "echo 'Server build completed'"
   },
   "dependencies": {
     "@google-cloud/storage": "^7.17.0",
