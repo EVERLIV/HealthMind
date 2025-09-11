@@ -1,14 +1,30 @@
 import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
 import fs from "fs";
-import { createClient } from '@supabase/supabase-js';
+import { Pool } from '@neondatabase/serverless';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 
-// Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
-const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+// Database connection
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+// Helper functions
+const hashPassword = async (password: string): Promise<string> => {
+  return await bcrypt.hash(password, 10);
+};
+
+const verifyPassword = async (password: string, hash: string): Promise<boolean> => {
+  return await bcrypt.compare(password, hash);
+};
+
+const generateToken = (userId: string): string => {
+  const secret = process.env.JWT_SECRET || 'fallback-secret';
+  return jwt.sign({ userId }, secret, { expiresIn: '7d' });
+};
 
 // PRIORITY: Health check endpoints for deployment - MUST be first
 app.get("/health", (_req, res) => {
@@ -20,8 +36,7 @@ app.get("/api/health", (_req, res) => {
     status: "ok",
     service: "EVERLIV HEALTH",
     timestamp: new Date().toISOString(),
-    database: supabase ? "connected" : "not configured",
-    supabase: supabase ? "connected" : "disconnected"
+    database: process.env.DATABASE_URL ? "connected" : "not configured"
   });
 });
 
@@ -48,227 +63,144 @@ app.use((req, res, next) => {
   next();
 });
 
-// Error handling middleware
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  const status = err.status || err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
-  console.error("Server error:", err);
-  res.status(status).json({ message });
-});
-
-// Basic API routes
-app.get("/api/test", (_req, res) => {
-  res.json({ message: "API is working!", timestamp: new Date().toISOString() });
-});
-
-// Simple Supabase API routes
-app.get("/api/biomarkers", async (req, res) => {
-  try {
-    if (!supabase) {
-      return res.status(503).json({ error: 'Database not available' });
-    }
-
-    const { data, error } = await supabase
-      .from('biomarkers')
-      .select('*')
-      .limit(50);
-
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
-
-    res.json(data || []);
-  } catch (error) {
-    console.error('Error fetching biomarkers:', error);
-    res.status(500).json({ error: 'Internal server error' });
+// CORS middleware
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
   }
 });
 
-app.get("/api/biomarkers/category/:category", async (req, res) => {
-  try {
-    if (!supabase) {
-      return res.status(503).json({ error: 'Database not available' });
-    }
-
-    const { data, error } = await supabase
-      .from('biomarkers')
-      .select('*')
-      .eq('category', req.params.category)
-      .limit(50);
-
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
-
-    res.json(data || []);
-  } catch (error) {
-    console.error('Error fetching biomarkers by category:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Auth routes
-app.post("/api/auth/login", async (req, res) => {
-  try {
-    if (!supabase) {
-      return res.status(503).json({ error: 'Database not available' });
-    }
-
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
-
-    // For now, create a simple mock authentication
-    // In production, you would hash the password and verify against database
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .single();
-
-    if (error || !user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    // Mock password verification (in production, use bcrypt)
-    if (user.password_hash !== password) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    // Generate a simple token (in production, use JWT)
-    const token = `mock_token_${user.id}_${Date.now()}`;
-
-    res.json({
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        name: user.name,
-        role: user.role,
-        subscriptionType: user.subscription_type
-      },
-      token
-    });
-  } catch (error) {
-    console.error('Error during login:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
+// API Routes
 app.post("/api/auth/register", async (req, res) => {
   try {
-    if (!supabase) {
-      return res.status(503).json({ error: 'Database not available' });
-    }
+    const { email, password, firstName, lastName } = req.body;
 
-    const { email, username, password, name } = req.body;
-
-    if (!email || !username || !password || !name) {
-      return res.status(400).json({ error: 'All fields are required' });
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
     }
 
     // Check if user already exists
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id')
-      .eq('email', email)
-      .single();
+    const existingUser = await pool.query(
+      'SELECT id FROM users WHERE email = $1',
+      [email]
+    );
 
-    if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ error: "User already exists" });
     }
 
-    // Create new user (in production, hash the password)
-    const { data: user, error } = await supabase
-      .from('users')
-      .insert({
-        email,
-        username,
-        password_hash: password, // In production, hash this
-        name,
-        role: 'user',
-        subscription_type: 'basic'
-      })
-      .select()
-      .single();
+    // Hash password
+    const hashedPassword = await hashPassword(password);
 
-    if (error) {
-      return res.status(500).json({ error: 'Failed to create user' });
-    }
+    // Create user
+    const result = await pool.query(
+      'INSERT INTO users (email, password_hash, first_name, last_name, created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING id, email, first_name, last_name',
+      [email, hashedPassword, firstName || '', lastName || '']
+    );
 
-    // Generate a simple token
-    const token = `mock_token_${user.id}_${Date.now()}`;
+    const user = result.rows[0];
+    const token = generateToken(user.id);
 
     res.status(201).json({
+      message: "User created successfully",
       user: {
         id: user.id,
         email: user.email,
-        username: user.username,
-        name: user.name,
-        role: user.role,
-        subscriptionType: user.subscription_type
+        firstName: user.first_name,
+        lastName: user.last_name
       },
       token
     });
+
   } catch (error) {
-    console.error('Error during registration:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Registration error:", error);
+    res.status(500).json({ error: "Failed to create user" });
   }
 });
 
-app.get("/api/auth/me", async (req, res) => {
+app.post("/api/auth/login", async (req, res) => {
   try {
-    if (!supabase) {
-      return res.status(503).json({ error: 'Database not available' });
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
     }
 
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'No token provided' });
+    // Find user
+    const result = await pool.query(
+      'SELECT id, email, password_hash, first_name, last_name FROM users WHERE email = $1',
+      [email]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    const token = authHeader.substring(7);
-    
-    // Extract user ID from mock token (in production, verify JWT)
-    const userId = token.split('_')[2];
-    
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    const user = result.rows[0];
 
-    if (error || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
+    // Verify password
+    const isValidPassword = await verifyPassword(password, user.password_hash);
+    if (!isValidPassword) {
+      return res.status(401).json({ error: "Invalid credentials" });
     }
+
+    // Generate token
+    const token = generateToken(user.id);
 
     res.json({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      name: user.name,
-      role: user.role,
-      subscriptionType: user.subscription_type
+      message: "Login successful",
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.first_name,
+        lastName: user.last_name
+      },
+      token
     });
+
   } catch (error) {
-    console.error('Error fetching user:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Login error:", error);
+    res.status(500).json({ error: "Login failed" });
   }
 });
 
-app.post("/api/auth/logout", async (req, res) => {
-  // In a real app, you might invalidate the token
-  res.json({ message: 'Logged out successfully' });
+// Health check with database
+app.get("/api/health/database", async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW() as current_time');
+    res.json({
+      status: "ok",
+      database: "connected",
+      current_time: result.rows[0].current_time,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error("Database health check error:", error);
+    res.status(500).json({
+      status: "error",
+      database: "disconnected",
+      error: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
-console.log("✅ API routes registered successfully");
-
-// Serve static files in production
-console.log("🗂️  Starting production static file server");
-console.log("Current working directory:", process.cwd());
-console.log("__dirname equivalent:", import.meta.url);
+// Debug endpoint
+app.get("/api/debug/env", async (req, res) => {
+  res.json({
+    NODE_ENV: process.env.NODE_ENV,
+    HAS_DATABASE_URL: !!process.env.DATABASE_URL,
+    HAS_JWT_SECRET: !!process.env.JWT_SECRET,
+    DATABASE_URL_PREFIX: process.env.DATABASE_URL?.substring(0, 20) + "...",
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Serve static files in production
 console.log("🗂️  Starting production static file server");
