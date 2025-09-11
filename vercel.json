@@ -3,14 +3,14 @@
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "dist/public",
   "functions": {
-    "api/[...].ts": {
+    "api/index.ts": {
       "maxDuration": 30
     }
   },
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/[...].ts"
+      "dest": "/api/index.ts"
     },
     {
       "src": "/(.*)",
