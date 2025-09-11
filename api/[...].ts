@@ -239,6 +239,31 @@ app.get("/api/debug/tables", async (req, res) => {
   }
 });
 
+// Check table structure
+app.get("/api/debug/table-structure", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT column_name, data_type, is_nullable, column_default
+      FROM information_schema.columns 
+      WHERE table_schema = 'public' 
+      AND table_name = 'users'
+      ORDER BY ordinal_position
+    `);
+    
+    res.json({
+      columns: result.rows,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error("Table structure check error:", error);
+    res.status(500).json({
+      error: "Failed to check table structure",
+      message: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Create users table if it doesn't exist
 app.post("/api/debug/create-table", async (req, res) => {
   try {
