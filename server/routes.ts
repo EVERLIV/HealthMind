@@ -661,6 +661,19 @@ ${userContext}
     }
   });
 
+  // Debug environment variables endpoint
+  app.get("/api/debug/env", async (req, res) => {
+    res.json({
+      NODE_ENV: process.env.NODE_ENV,
+      HAS_DATABASE_URL: !!process.env.DATABASE_URL,
+      HAS_JWT_SECRET: !!process.env.JWT_SECRET,
+      HAS_SUPABASE_URL: !!process.env.SUPABASE_URL,
+      HAS_SUPABASE_ANON_KEY: !!process.env.SUPABASE_ANON_KEY,
+      DATABASE_URL_PREFIX: process.env.DATABASE_URL?.substring(0, 20) + "...",
+      timestamp: new Date().toISOString()
+    });
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
