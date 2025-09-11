@@ -1,23 +1,36 @@
 {
   "version": 2,
-  "buildCommand": "npm run vercel-build",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist/public",
   "functions": {
-    "api/hello.ts": {
-      "maxDuration": 30
-    },
-    "api/auth.ts": {
+    "api/[...].ts": {
       "maxDuration": 30
     }
   },
   "routes": [
     {
-      "src": "/api/hello",
-      "dest": "/api/hello.ts"
+      "src": "/api/(.*)",
+      "dest": "/api/[...].ts"
     },
     {
-      "src": "/api/auth/(.*)",
-      "dest": "/api/auth.ts"
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "/manifest.json"
+    },
+    {
+      "src": "/logo-192.png",
+      "dest": "/logo-192.png"
+    },
+    {
+      "src": "/logo-512.png",
+      "dest": "/logo-512.png"
+    },
+    {
+      "src": "/sw.js",
+      "dest": "/sw.js"
     },
     {
       "src": "/(.*)",
