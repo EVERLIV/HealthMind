@@ -1,0 +1,14 @@
+.env.production
+client/index.html
+client/public/sw.js
+client/src/App.tsx
+client/src/components/ObjectUploader.tsx
+client/src/components/layout/mobile-nav.tsx
+deploy-build.js
+deploy-fix.js
+dev.bat
+package-lock.json
+package.json
+server/index.ts
+vercel.json
+vite.config.ts

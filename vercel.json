@@ -33,6 +33,21 @@
       "dest": "/sw.js"
     },
     {
+      "src": "/blood-analysis",
+      "dest": "/app/blood-analysis",
+      "status": 301
+    },
+    {
+      "src": "/health-profile",
+      "dest": "/app/health-profile",
+      "status": 301
+    },
+    {
+      "src": "/article/(.*)",
+      "dest": "/app/article/$1",
+      "status": 301
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }

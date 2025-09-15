@@ -31,6 +31,16 @@ try {
   console.log('⏳ Waiting for filesystem sync...');
   await sleep(3000);
   
+  // Copy correct manifest.json and logo files
+  console.log('📋 Copying correct manifest and assets...');
+  execSync('cp client/public/manifest.json dist/public/', { stdio: 'inherit' });
+  execSync('cp client/public/logo_1756447359961.png dist/public/', { stdio: 'inherit' });
+  
+  // Update HTML and service worker with correct references
+  console.log('🔧 Updating HTML and service worker...');
+  execSync('cp client/index.html dist/public/', { stdio: 'inherit' });
+  execSync('cp client/public/sw.js dist/public/', { stdio: 'inherit' });
+  
   // Force filesystem refresh
   execSync('ls -la dist/public/', { stdio: 'inherit' });
   

@@ -3,9 +3,24 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
+// Plugin to add version info to HTML
+const versionPlugin = () => ({
+  name: 'version-plugin',
+  transformIndexHtml(html: string) {
+    const timestamp = new Date().toISOString();
+    return html.replace(
+      '<meta name="msapplication-navbutton-color" content="#059669" />',
+      `<meta name="msapplication-navbutton-color" content="#059669" />
+    <meta name="version" content="2.0.0" />
+    <meta name="build-timestamp" content="${timestamp}" />`
+    );
+  }
+});
+
 export default defineConfig({
   plugins: [
     react(),
+    versionPlugin(),
     runtimeErrorOverlay(),
     ...(process.env.NODE_ENV !== "production" &&
     process.env.REPL_ID !== undefined
@@ -30,6 +45,10 @@ export default defineConfig({
     rollupOptions: {
       external: ['chart.js', 'react-chartjs-2']
     }
+  },
+  define: {
+    __APP_VERSION__: JSON.stringify("2.0.0"),
+    __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString())
   },
   server: {
     fs: {

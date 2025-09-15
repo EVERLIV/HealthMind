@@ -53,6 +53,9 @@ function Router() {
       <Route path="/article/:id">
         {(params) => <Redirect to={`/app/article/${params.id}`} />}
       </Route>
+      <Route path="/blood-analysis">
+        <Redirect to="/app/blood-analysis" />
+      </Route>
       <Route path="/health-profile">
         <Redirect to="/app/health-profile" />
       </Route>

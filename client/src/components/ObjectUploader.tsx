@@ -184,13 +184,11 @@ export function ObjectUploader({
             uploadFailed: 'Ошибка загрузки',
             paused: 'Приостановлено',
             retry: 'Повторить',
-            cancel: 'Отменить',
             done: 'Готово',
             removeFile: 'Удалить файл',
             editFile: 'Редактировать файл',
             editing: 'Редактирование %{file}',
             finishEditingFile: 'Завершить редактирование',
-            save: 'Сохранить',
             
             // Camera strings
             smile: 'Наведите камеру на анализ',

@@ -117,9 +117,10 @@ app.use((req, res, next) => {
   }
 
   const port = parseInt(process.env.PORT || "5000", 10);
-  server.listen(port, "0.0.0.0", () => {
+  server.listen(port, "localhost", () => {
     console.log(`🚀 EVERLIV HEALTH server running on port ${port}`);
-    console.log(`📊 Health check available at http://0.0.0.0:${port}/health`);
+    console.log(`📊 Health check available at http://localhost:${port}/health`);
+    console.log(`🌐 Main app available at http://localhost:${port}`);
     console.log(`🗄️  Database: ${process.env.DATABASE_URL ? 'Connected' : 'Not configured'}`);
   });
 })();

@@ -7,8 +7,7 @@ const STATIC_FILES = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/logo-192.png',
-  '/logo-512.png',
+  '/logo_1756447359961.png',
   // Add critical CSS and JS files when available
 ];
 
@@ -197,8 +196,8 @@ self.addEventListener('push', event => {
   
   const options = {
     body: 'Время проверить ваше здоровье в EVERLIV HEALTH',
-    icon: '/logo-192.png',
-    badge: '/logo-192.png',
+    icon: '/logo_1756447359961.png',
+    badge: '/logo_1756447359961.png',
     vibrate: [200, 100, 200],
     data: {
       url: '/'
@@ -207,12 +206,12 @@ self.addEventListener('push', event => {
       {
         action: 'open',
         title: 'Открыть приложение',
-        icon: '/logo-192.png'
+        icon: '/logo_1756447359961.png'
       },
       {
         action: 'dismiss',
         title: 'Позже',
-        icon: '/logo-192.png'
+        icon: '/logo_1756447359961.png'
       }
     ]
   };
